@@ -7,7 +7,7 @@ All IAM users with an active password must have MFA enabled.
 
 
 ## Sales Pitch
-- If you would like a free AWS Internal Audit, please email (info@auditops.io).
+- If you would like a free AWS Internal Audit, please email us at info@auditops.io.
 
 ## Other Resources
 - Video: Remediation Guidance (coming soon)
