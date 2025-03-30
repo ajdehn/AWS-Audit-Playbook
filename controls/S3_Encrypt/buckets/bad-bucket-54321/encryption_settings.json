@@ -1,0 +1,25 @@
+{
+    "ResponseMetadata": {
+        "RequestId": "xyz",
+        "HostId": "xyz",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amz-id-2": "xyz",
+            "x-amz-request-id": "xyz",
+            "date": "Mon, 17 Feb 2025 13:52:17 GMT",
+            "transfer-encoding": "chunked",
+            "server": "AmazonS3"
+        },
+        "RetryAttempts": 0
+    },
+    "ServerSideEncryptionConfiguration": {
+        "Rules": [
+            {
+                "ApplyServerSideEncryptionByDefault": {
+                    "SSEAlgorithm": "AES256"
+                },
+                "BucketKeyEnabled": true
+            }
+        ]
+    }
+}
