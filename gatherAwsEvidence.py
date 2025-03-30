@@ -1,6 +1,7 @@
 import boto3
 import json
 import os
+import time
 from botocore.exceptions import ClientError
 
 def main():
@@ -11,10 +12,10 @@ def main():
 
 def gather_IAM_evidence():
     iam_client = boto3.client('iam')
-
-    # Save list of all IAM users (used for IAM_MFA test).
-    allUsers = fetchData(iam_client.list_users)
-    saveJson(allUsers, 'audit_evidence/IAM/all_iam_users.json')
+    # Generate credentials report & save to JSON (used for IAM_MFA test).
+    iam_client.generate_credential_report()
+    time.sleep(10)
+    saveJson(iam_client.get_credential_report(), 'audit_evidence/IAM/credentials_report.json')
 
     # Gather evidence for IAM_PWD
     try:
@@ -26,9 +27,11 @@ def gather_IAM_evidence():
         else:
             raise
     
+    """
     # IAM_MFA: Gather evidence for root account
     accountSummary = iam_client.get_account_summary()
-    saveJson(accountSummary, 'audit_evidence/IAM/account_summary.json')
+    saveJson(accountSummary, 'audit_evidence/IAM/account_summary.json')    
+
 
     # IAM_MFA: Save LoginProfile & MFA evidence status for all IAM users.
     for user in allUsers['Users']:
@@ -43,7 +46,8 @@ def gather_IAM_evidence():
                 # NOTE: IAM user does not have an active console login. 
                 pass
             else:
-                raise e    
+                raise e
+    """    
 
 """
     Saves a json file to a specified path
