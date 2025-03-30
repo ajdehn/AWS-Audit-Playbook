@@ -1,0 +1,32 @@
+{
+    "Users": [
+        {
+            "Path": "/",
+            "UserName": "itauditguy",
+            "UserId": "abc",
+            "Arn": "arn:aws:iam::111111111111:user/itauditguy",
+            "CreateDate": "2022-11-11 23:41:41+00:00",
+            "PasswordLastUsed": "2025-01-09 23:28:10+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "Student1",
+            "UserId": "xyz",
+            "Arn": "arn:aws:iam::111111111111:user/Student1",
+            "CreateDate": "2023-01-29 16:55:20+00:00",
+            "PasswordLastUsed": "2023-02-26 17:12:11+00:00"
+        }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "xyz",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 17 Feb 2025 13:52:11 GMT",
+            "x-amzn-requestid": "xyz",
+            "content-type": "text/xml",
+            "content-length": "1275"
+        },
+        "RetryAttempts": 0
+    }
+}
