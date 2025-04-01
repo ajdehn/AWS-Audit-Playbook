@@ -1,5 +1,7 @@
 # Description
-AuditOps is designed to ELIMINATE screenshots from the AWS audit process. This open source project will help you gather JSON files that can be reviewed by your auditor.
+AuditOps is an open-source project designed to ELIMINATE screenshots from the AWS audit process. To accomplish this mission, we are building the following:
+- Library of controls with detailed evidence collection & testing steps
+- An open source audit workpaper
+- Videos / auditor training to show why JSON files directly from AWS are significantly better than screenshots
 
-# Fun Fact
-A thorough audit of AWS would require ??? screenshots, on average. Assuming each screenshot takes 30 seconds, you would need to spend ??? hours gathering screenshots.
+With your help, we are aiming that 12/31/2026, auditors asking for a screenshot of AWS will be as obsolete as asking clients to fax over their audit evidence.
