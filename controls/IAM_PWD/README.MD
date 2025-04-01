@@ -10,4 +10,4 @@ IAM passwords must meet the following complexity requirements:
 - If you would like a free AWS Internal Audit, please email us at info@auditops.io.
 
 ## Other Resources
-- Video: Remediation Guidance (coming soon)
+- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=290595007)
