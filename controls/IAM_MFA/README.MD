@@ -1,5 +1,5 @@
 ## Control Description
-All IAM users with an active password must have MFA enabled.
+All users with an active password must have MFA enabled.
 
 ## Code Snippet
 ```
