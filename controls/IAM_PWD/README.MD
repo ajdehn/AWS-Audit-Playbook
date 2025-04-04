@@ -1,7 +1,5 @@
 ## Control Description
-IAM passwords must meet the following complexity requirements:
-- At least 14 characters in length
-- Require all character types (lowercase letter, upper case letter, number, special character)
+IAM passwords must comply with the organizations password complexity requirements.
 
 ## Evidence Collection Steps
 1. Call [get_account_password_policy()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/iam/client/get_account_password_policy.html) in Boto3. See [password_policy.json](./password_policy.json) for example evidence.
