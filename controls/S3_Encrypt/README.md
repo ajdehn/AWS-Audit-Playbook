@@ -9,6 +9,4 @@ S3 buckets are encrypted at rest.
 - If you would like a free AWS Internal Audit, please email us at info@auditops.io.
 
 ## Other Resources
-- [Video: How to audit IAM passwords](https://www.loom.com/share/89e2dacf90f14afe8803fa05439caccc?sid=beecc028-26ee-410d-aa61-cd4c2b26efa3)
-- [Video: How to update IAM password settings](https://www.youtube.com/watch?v=Ma5jxRO1nUQ)
-- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=290595007)
+- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=1801900379)
