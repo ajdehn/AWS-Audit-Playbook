@@ -4,8 +4,8 @@ IAM passwords must comply with the organizations password complexity requirement
 ## Evidence Collection Steps
 1. Call [get_account_password_policy()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/iam/client/get_account_password_policy.html) in Boto3. See [password_policy.json](./password_policy.json) for example evidence.
 
-## Sales Pitch
-- If you would like a free AWS Internal Audit, please email us at info@auditops.io.
+## Support
+- Please email us at info@auditops.io if you have any questions.
 
 ## Other Resources
 - [Video: How to audit IAM passwords](https://www.loom.com/share/89e2dacf90f14afe8803fa05439caccc?sid=beecc028-26ee-410d-aa61-cd4c2b26efa3)
