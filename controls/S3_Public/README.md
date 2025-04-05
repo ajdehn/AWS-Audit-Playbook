@@ -9,4 +9,4 @@ S3 buckets are configured to block public access.
 - If you would like a free AWS Internal Audit, please email us at info@auditops.io.
 
 ## Other Resources
-- Example Workpaper COMING SOON
+- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=427799283)
