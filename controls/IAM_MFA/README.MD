@@ -13,9 +13,8 @@ saveJson(iam_client.get_credential_report(), 'audit_evidence/IAM/credentials_rep
 1. Call [list_users()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/iam/client/list_users.html) in Boto3 to get a full list of IAM users.
 2. Call [list_mfa_devices()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/iam/client/list_users.html) in Boto3 to check if the IAM user has MFA enabled.
 
-
-## Sales Pitch
-- If you would like a free AWS Internal Audit, please email us at info@auditops.io.
+## Support
+- Please email us at info@auditops.io if you have any questions.
 
 ## Other Resources
 - Video: Remediation Guidance (coming soon)
