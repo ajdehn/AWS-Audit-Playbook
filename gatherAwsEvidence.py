@@ -9,6 +9,9 @@ def main():
 
     # Gather evidence for IAM
     gather_IAM_evidence()
+    # Gather evidence for S3
+    gather_S3_evidence()
+
 
 def gather_IAM_evidence():
     iam_client = boto3.client('iam')
@@ -25,29 +28,31 @@ def gather_IAM_evidence():
         if e.response["Error"]["Code"] == "NoSuchEntity":
             print("WARNING: IAM Password Policy has not been set.")
         else:
-            raise
-    
-    """
-    # IAM_MFA: Gather evidence for root account
-    accountSummary = iam_client.get_account_summary()
-    saveJson(accountSummary, 'audit_evidence/IAM/account_summary.json')    
+            raise  
 
 
-    # IAM_MFA: Save LoginProfile & MFA evidence status for all IAM users.
-    for user in allUsers['Users']:
-        try:
-            # NOTE: If IAM user does not have a console LoginProfile they also won't have MFA.
-            loginProfile = iam_client.get_login_profile(UserName=user['UserName'])
-            saveJson(loginProfile, f"audit_evidence/IAM/users/{user['UserName']}/login_profile.json")
-            mfaList = iam_client.list_mfa_devices(UserName=user['UserName'])
-            saveJson(mfaList, f"audit_evidence/IAM/users/{user['UserName']}/mfa_devices.json")
-        except ClientError as e:
-            if 'NoSuchEntity' in e.response['Error']['Code']:
-                # NOTE: IAM user does not have an active console login. 
-                pass
-            else:
-                raise e
-    """    
+def gather_S3_evidence():
+    s3_client = boto3.client('s3')
+    # Get all S3 buckets
+    allBuckets = s3_client.list_buckets()
+    saveJson(allBuckets, 'audit_evidence/S3/all_s3_buckets.json')
+    # Save necessary evidence for each bucket.
+    for bucket in allBuckets['Buckets']:
+        bucketName = bucket['Name']
+        # Collect & save encryption evidence
+        # TODO: Add error handling
+        bucketEncryption = s3_client.get_bucket_encryption(Bucket=bucketName)
+        saveJson(bucketEncryption, f"audit_evidence/S3/buckets/{bucketName}/encryption_settings.json")
+        # TODO: Add error handling
+        # TODO: Get global S3 block settings
+        # Collect & save public access settings
+        publicBucketSettings = s3_client.get_public_access_block(Bucket=bucketName)
+        saveJson(publicBucketSettings, f"audit_evidence/S3/buckets/{bucketName}/public_access_settings.json")      
+
+def gather_RDS_evidence():
+    rds_client = boto3.client('rds')
+    # TODO: Save evidence for RDS instances.
+
 
 """
     Saves a json file to a specified path
