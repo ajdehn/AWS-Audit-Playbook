@@ -4,6 +4,13 @@ IAM passwords must comply with the organizations password complexity requirement
 ## Evidence Collection Steps
 1. Call [get_account_password_policy()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/iam/client/get_account_password_policy.html) in Boto3. See [password_policy.json](./password_policy.json) for example evidence.
 
+## Testing Details
+1. Open the [password_policy.json](./password_policy.json) file and confirm the following:
+    * "MinimumPasswordLength" >= Organization's minimum length defined in the password policy.
+    * Settings for "RequireSymbols", "RequireNumbers", "RequireUppercaseCharacters", and "RequireLowercaseCharacters" comply with the password policy.
+    * If in-scope, confirm "ExpirePasswords" is true & "MaxPasswordAge" is <= the number of days defined in the password policy.
+    * If in-scope, confirm "PasswordReusePrevention" is >= the number of passwords remembered in the password policy.
+
 ## Support
 - Please email us at info@auditops.io if you have any questions.
 
