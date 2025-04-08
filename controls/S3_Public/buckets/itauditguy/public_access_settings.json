@@ -1,0 +1,21 @@
+{
+    "ResponseMetadata": {
+        "RequestId": "xyz",
+        "HostId": "xyz",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amz-id-2": "xyz",
+            "x-amz-request-id": "xyz",
+            "date": "Mon, 17 Feb 2025 13:52:16 GMT",
+            "transfer-encoding": "chunked",
+            "server": "AmazonS3"
+        },
+        "RetryAttempts": 0
+    },
+    "PublicAccessBlockConfiguration": {
+        "BlockPublicAcls": false,
+        "IgnorePublicAcls": false,
+        "BlockPublicPolicy": false,
+        "RestrictPublicBuckets": false
+    }
+}
