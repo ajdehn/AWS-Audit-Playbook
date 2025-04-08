@@ -4,4 +4,4 @@ The AWS Audit Playbook is an open-source project designed to ELIMINATE screensho
 - An open source [audit workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?usp=sharing)
 - Example JSON files and detailed instructions for how to test each control
 
-With your help, we hope that screenshots of AWS will be extinct by 12/31/2026.
+With your help, we hope that screenshots of AWS will be extinct by **12/31/2026**.
