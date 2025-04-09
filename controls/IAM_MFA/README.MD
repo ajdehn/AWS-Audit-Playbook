@@ -5,8 +5,12 @@ All users with an active password must have MFA enabled.
 1. Call [generate_credentials_report()](https://boto3.amazonaws.com/v1/documentation/api/1.26.89/reference/services/iam/client/generate_credential_report.html) command in Boto3.
 2. Call [get_credentials_report()](https://boto3.amazonaws.com/v1/documentation/api/1.26.89/reference/services/iam/client/get_credential_report.html) command in Boto3.
 
+## Testing Details
+1. Open the [credentials_report.json](./tbd.json) file and confirm the following:
+    * "MinimumPasswordLength" >= Organization's minimum length defined in the password policy.
+
 ## Support
 - Please email us at info@auditops.io if you have any questions.
 
 ## Other Resources
-- Video: Remediation Guidance (coming soon)
+- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=1190435560)
