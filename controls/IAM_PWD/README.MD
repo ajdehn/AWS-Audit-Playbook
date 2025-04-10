@@ -6,7 +6,7 @@ AWS passwords must comply with the organization's password complexity requiremen
 
 ## Testing Details
 1. Review the [password_policy.json](./password_policy.json) file and confirm the following:
-    * "MinimumPasswordLength" >= Organization's minimum length defined in the password policy.
+    * "MinimumPasswordLength" >= minimum length required in the password policy.
     * Settings for "RequireSymbols", "RequireNumbers", "RequireUppercaseCharacters", and "RequireLowercaseCharacters" comply with the password policy.
     * If required, confirm "MaxPasswordAge" is <= the number of days defined in the password policy & "ExpirePasswords" is set to true.
     * If required, confirm "PasswordReusePrevention" is >= the number of passwords remembered in the password policy.
