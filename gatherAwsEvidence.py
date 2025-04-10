@@ -5,19 +5,14 @@ import time
 from botocore.exceptions import ClientError
 
 def main():
-    # TODO: Check if an 'audit_evidence' folder already exists.
+    # TODO: Check in-scope regions.
 
     # Gather evidence for IAM
-    gather_IAM_evidence()
-    # Gather evidence for S3
-    gather_S3_evidence()
-
-
-def gather_IAM_evidence():
+    print('Gathering IAM evidence')
     iam_client = boto3.client('iam')
     # Generate credentials report & save to JSON (used for IAM_MFA test).
     iam_client.generate_credential_report()
-    time.sleep(10)
+    time.sleep(5)
     saveJson(iam_client.get_credential_report(), 'audit_evidence/IAM/credentials_report.json')
 
     # Gather evidence for IAM_PWD
@@ -28,10 +23,10 @@ def gather_IAM_evidence():
         if e.response["Error"]["Code"] == "NoSuchEntity":
             print("WARNING: IAM Password Policy has not been set.")
         else:
-            raise  
+            raise
 
-
-def gather_S3_evidence():
+    # Gather evidence for S3.
+    print('Gathering S3 evidence')
     s3_client = boto3.client('s3')
     # Get all S3 buckets
     allBuckets = s3_client.list_buckets()
@@ -49,9 +44,19 @@ def gather_S3_evidence():
         publicBucketSettings = s3_client.get_public_access_block(Bucket=bucketName)
         saveJson(publicBucketSettings, f"audit_evidence/S3/buckets/{bucketName}/public_access_settings.json")      
 
-def gather_RDS_evidence():
-    rds_client = boto3.client('rds')
-    # TODO: Save evidence for RDS instances.
+    print('Gathering RDS evidence')
+    for region in boto3.Session().get_available_regions('rds'):
+        try:
+            rds_client = boto3.client('rds', region_name=region)
+            allDatabases = fetchData(rds_client.describe_db_instances)
+            saveJson(allDatabases, f'audit_evidence/RDS/regions/{region}.json')
+        except Exception as e:
+            if 'InvalidClientTokenId' in e.response['Error']['Code']:
+                # NOTE: Error handling for opt-in only regions (ex. af-south-1).
+                # If this error occurs, this region is not utilized doesn't utilize this region.
+                pass
+            else:
+                raise
 
 
 """
