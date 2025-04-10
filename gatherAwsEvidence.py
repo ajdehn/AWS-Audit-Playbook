@@ -13,7 +13,12 @@ def main():
     # Generate credentials report & save to JSON (used for IAM_MFA test).
     iam_client.generate_credential_report()
     time.sleep(5)
-    saveJson(iam_client.get_credential_report(), 'audit_evidence/IAM/credentials_report.json')
+    credentialReport = iam_client.get_credential_report()
+    saveJson(credentialReport, 'audit_evidence/IAM/credentials_report.json')
+    # Save credentials report as a CSV
+    decodedCredentialReport = credentialReport['Content'].decode("utf-8")
+    with open("audit_evidence/IAM/credentials_report.csv", "w") as file:
+        file.write(decodedCredentialReport)
 
     # Gather evidence for IAM_PWD
     try:
