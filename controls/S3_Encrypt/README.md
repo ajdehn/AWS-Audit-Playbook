@@ -3,9 +3,9 @@ S3 buckets are encrypted at rest.
 
 ## Required Evidence
 * [all_s3_buckets.json](./all_s3_buckets.json) provides a list of all S3 buckets.
-  * This evidence is gathered by calling the [list_buckets()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_buckets.html) in Boto3.
+  * This evidence is gathered by calling the [list_buckets()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_buckets.html) command in Boto3.
 * [encryption_settings.json](./buckets/itauditguy/encryption_settings.json) provides the encryption settings for an individual S3 bucket.
-  * This evidence is gathered by calling the [get_bucket_encryption()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/get_bucket_encryption.html) for each S3 bucket.
+  * This evidence is gathered by calling the [get_bucket_encryption()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/get_bucket_encryption.html) command for each S3 bucket.
 
 ## Testing Details
 1. Review the full listing of all S3 buckets in the [all_s3_buckets.json](./all_s3_buckets.json) file.
