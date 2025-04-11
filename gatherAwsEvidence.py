@@ -47,7 +47,17 @@ def main():
         # TODO: Get global S3 block settings
         # Collect & save public access settings
         publicBucketSettings = s3_client.get_public_access_block(Bucket=bucketName)
-        saveJson(publicBucketSettings, f"audit_evidence/S3/buckets/{bucketName}/public_access_settings.json")      
+        saveJson(publicBucketSettings, f"audit_evidence/S3/buckets/{bucketName}/public_access_settings.json")
+        # Collect & save bucket tags
+        try:
+            bucketTags = s3_client.get_bucket_tagging(Bucket=bucketName) 
+            saveJson(bucketTags, f"audit_evidence/S3/buckets/{bucket['Name']}/bucket_tags.json")
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchTagSet':
+                print(f"Warning: {bucket['Name']} does not have tags.")
+                pass
+            else:
+                raise
 
     print('Gathering RDS evidence')
     for region in boto3.Session().get_available_regions('rds'):
