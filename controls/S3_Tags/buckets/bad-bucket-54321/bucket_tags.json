@@ -1,0 +1,33 @@
+{
+    "ResponseMetadata": {
+        "RequestId": "xyz",
+        "HostId": "xyz",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amz-id-2": "xyz",
+            "x-amz-request-id": "xyz",
+            "date": "Mon, 17 Feb 2025 13:52:15 GMT",
+            "transfer-encoding": "chunked",
+            "server": "AmazonS3"
+        },
+        "RetryAttempts": 0
+    },
+    "TagSet": [
+        {
+            "Key": "Environment",
+            "Value": "Production"
+        },
+        {
+            "Key": "Owner",
+            "Value": "IT Audit Guy"
+        },
+        {
+            "Key": "Description",
+            "Value": "Stores pictures of fake drivers licenses for AWS for IT Auditors demo."
+        },
+        {
+            "Key": "Classification",
+            "Value": "Confidential"
+        }
+    ]
+}
