@@ -8,7 +8,7 @@ RDS backups are retained for at least 14 days.
 
 ## Testing Details
 1. Find the "BackupRetentionPeriod" field for each database. This value represents the number of days backups are retained before being automatically deleted.
-2. Confirm the backup retention period is **at least** the number of days required by the organization's backup retention policy. If the database does not meet the requirement, check if there is a valid reason (ex. RDS instance does not host production data).
+2. Confirm the "BackupRetentionPeriod" is **>=** the number of days required by the organization's backup retention policy. If the database does not meet the requirement, check if there is a valid reason (ex. RDS instance does not host production data).
 
 ## Support
 - Please email us at info@auditops.io if you have any questions.
