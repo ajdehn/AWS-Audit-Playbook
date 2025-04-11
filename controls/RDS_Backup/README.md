@@ -4,7 +4,7 @@ RDS backups are retained for at least 14 days.
 
 ## Evidence Required
 * [us_east_1_db_instances.json](./us_east_1_db_instances.json) provides information about all RDS instances in a specific region.
-    * For each in-scope region, call the [describe_db_instances()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/rds/client/describe_db_instances.html) command.
+    * This evidence is gathered by calling the [describe_db_instances()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/rds/client/describe_db_instances.html) command in Boto3 for each in-scope region.
 
 ## Testing Details
 1. Find the "BackupRetentionPeriod" field for each database. This value represents the number of days backups are retained before being automatically deleted.
