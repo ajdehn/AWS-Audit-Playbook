@@ -1,9 +1,11 @@
 ## Control Description
 S3 buckets are configured to block public access.
 
-## Evidence Collection Steps
-1. Call [list_buckets()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_buckets.html) in Boto3. See [all_s3_buckets.json](./all_s3_buckets.json) for example evidence.
-2. For each S3 bucket, run the the [get_public_access_block()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/get_public_access_block.html) in Boto3. See [public_access_settings.json](./buckets/itauditguy/public_access_settings.json) for example evidence.
+## Required Evidence
+* [all_s3_buckets.json](./all_s3_buckets.json) provides a list of all S3 buckets.
+  * This evidence is gathered by calling the [list_buckets()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_buckets.html) command in Boto3.
+* [public_access_settings.json](./buckets/itauditguy/public_access_settings.json) provides the public access settings for an individual S3 bucket.
+  * This evidence is gathered by calling the [get_public_access_block()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/get_public_access_block.html) command for each S3 bucket.
 
 ## Testing Details
 1. Review the full listing of all S3 buckets in the [all_s3_buckets.json](./all_s3_buckets.json) file.
