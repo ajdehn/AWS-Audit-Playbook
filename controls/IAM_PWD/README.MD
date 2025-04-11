@@ -1,9 +1,9 @@
 ## Control Description
 AWS passwords must comply with the organization's password complexity requirements.
 
-## Evidence Required
-* [Password_policy.json](./password_policy.json) describes the password requirements for the AWS account. These settings are applicable to all IAM users in the account.
-   * This evidence is gathered by calling the [get_account_password_policy()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/iam/client/get_account_password_policy.html) command in Boto3.
+## Required Evidence
+* [password_policy.json](./password_policy.json) describes the password requirements for the AWS account. These settings are applicable to all IAM users in the account.
+  * This evidence is gathered by calling the [get_account_password_policy()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/iam/client/get_account_password_policy.html) command in Boto3.
 
 ## Testing Details
 1. Review the [password_policy.json](./password_policy.json) file and confirm the following:
