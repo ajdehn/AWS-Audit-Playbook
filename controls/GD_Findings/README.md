@@ -12,4 +12,4 @@ GuardDuty findings are responded to within organization defined SLA's.
 - Please email us at info@auditops.io if you have any questions.
 
 ## Other Resources
-- [Example Workpaper](google.com)
+- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=1836199300)
