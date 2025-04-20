@@ -5,7 +5,41 @@ import time
 from botocore.exceptions import ClientError
 
 def main():
-    # TODO: Check in-scope regions.
+    # Save a list of all in-scope regions (including opt-in regions)
+    regionList = boto3.client('account').list_regions(RegionOptStatusContains=['ENABLED','ENABLED_BY_DEFAULT'])
+    saveJson(regionList, f'audit_evidence/region_list.json')
+
+    inScopeRegions = []
+    for region in regionList['Regions']:
+        inScopeRegions.append(region['RegionName'])
+
+    print('Gathering GuardDuty evidence')
+    for region in inScopeRegions:
+        print(region)
+        guardduty_client = boto3.client('guardduty', region_name=region)
+        allDetectors = fetchData(guardduty_client.list_detectors)
+        saveJson(allDetectors, f'audit_evidence/GuardDuty/regions/{region}/all_detectors.json')
+        for detector in allDetectors['DetectorIds']:
+            print(detector)
+            detectorDetails = guardduty_client.get_detector(DetectorId=detector)
+            saveJson(detectorDetails, f'audit_evidence/GuardDuty/regions/{region}/{detector}.json')
+            # Filter criteria for only active GuardDuty findings
+            active_findings_filter = {
+                'Criterion': {
+                    'service.archived': {
+                        'Eq': ['false']
+                    }
+                }
+            }
+            # TODO: This is currently limited to the first 50 findings.
+            allFindings = guardduty_client.list_findings(DetectorId=detector, FindingCriteria=active_findings_filter)
+            findingDetails = guardduty_client.get_findings(DetectorId=detector, FindingIds=allFindings['FindingIds'])
+            saveJson(findingDetails, f'audit_evidence/GuardDuty/regions/{region}/findingDetails.json')
+
+            saveJson(allFindings, f'audit_evidence/GuardDuty/regions/{region}/{detector}_findings.json')
+            findingsBySeverity = guardduty_client.get_findings_statistics(DetectorId=detector, 
+            FindingStatisticTypes=['COUNT_BY_SEVERITY'], FindingCriteria=active_findings_filter)
+            saveJson(findingsBySeverity, f'audit_evidence/GuardDuty/regions/{region}/findings_stats.json')
 
     # Gather evidence for IAM
     print('Gathering IAM evidence')
@@ -60,19 +94,19 @@ def main():
                 raise
 
     print('Gathering RDS evidence')
-    for region in boto3.Session().get_available_regions('rds'):
+    for region in inScopeRegions:
         try:
             rds_client = boto3.client('rds', region_name=region)
             allDatabases = fetchData(rds_client.describe_db_instances)
             saveJson(allDatabases, f'audit_evidence/RDS/regions/{region}.json')
         except Exception as e:
+            print("Exception in region: ", region)
             if 'InvalidClientTokenId' in e.response['Error']['Code']:
                 # NOTE: Error handling for opt-in only regions (ex. af-south-1).
                 # If this error occurs, this region is not utilized doesn't utilize this region.
                 pass
             else:
                 raise
-
 
 """
     Saves a json file to a specified path
