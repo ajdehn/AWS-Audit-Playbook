@@ -1,5 +1,5 @@
 ## Control Description
-GuardDuty findings are reviewed and responded to within the companies stated SLA's.
+GuardDuty is enabled for all in-scope regions.
 
 ## Required Evidence
 * [all_detectors.json](./example1.json) provides a list of detectors in an in-scope region.
