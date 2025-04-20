@@ -1,5 +1,5 @@
 ## Control Description
-GuardDuty is enabled for in-scope regions.
+GuardDuty findings are responded to within organization defined SLA's.
 
 ## Required Evidence
 * [example1.json](./example1.json) provides ???.
