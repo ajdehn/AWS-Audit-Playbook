@@ -1,0 +1,129 @@
+{
+    "ResponseMetadata": {
+        "RequestId": "xyz",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Apr 2025 01:12:18 GMT",
+            "content-type": "application/json",
+            "content-length": "3191",
+            "connection": "keep-alive",
+            "x-amzn-requestid": "xyz",
+            "access-control-allow-origin": "*",
+            "access-control-allow-headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-Content-Sha256,X-Amz-User-Agent,*,Date,X-Amz-Target,x-amzn-platform-id,x-amzn-trace-id",
+            "x-amz-apigw-id": "xyz=",
+            "access-control-expose-headers": "x-amzn-ErrorType,x-amzn-requestid,x-amzn-errormessage,x-amzn-trace-id,x-amz-apigw-id,Date",
+            "x-amzn-trace-id": "Root=1-xyz-xyz;Parent=xyz;Sampled=0;Lineage=1:xyz:0",
+            "access-control-max-age": "86400"
+        },
+        "RetryAttempts": 0
+    },
+    "CreatedAt": "2022-11-12T14:20:15.341Z",
+    "FindingPublishingFrequency": "FIFTEEN_MINUTES",
+    "ServiceRole": "arn:aws:iam::111111111111:role/aws-service-role/guardduty.amazonaws.com/AWSServiceRoleForAmazonGuardDuty",
+    "Status": "ENABLED",
+    "UpdatedAt": "2025-03-31T18:28:09.968Z",
+    "DataSources": {
+        "CloudTrail": {
+            "Status": "ENABLED"
+        },
+        "DNSLogs": {
+            "Status": "ENABLED"
+        },
+        "FlowLogs": {
+            "Status": "ENABLED"
+        },
+        "S3Logs": {
+            "Status": "ENABLED"
+        },
+        "Kubernetes": {
+            "AuditLogs": {
+                "Status": "ENABLED"
+            }
+        },
+        "MalwareProtection": {
+            "ScanEc2InstanceWithFindings": {
+                "EbsVolumes": {
+                    "Status": "ENABLED"
+                }
+            },
+            "ServiceRole": "arn:aws:iam::111111111111:role/aws-service-role/malware-protection.guardduty.amazonaws.com/AWSServiceRoleForAmazonGuardDutyMalwareProtection"
+        }
+    },
+    "Tags": {},
+    "Features": [
+        {
+            "Name": "CLOUD_TRAIL",
+            "Status": "ENABLED",
+            "UpdatedAt": "2025-04-16 20:12:17-05:00"
+        },
+        {
+            "Name": "DNS_LOGS",
+            "Status": "ENABLED",
+            "UpdatedAt": "2025-04-16 20:12:17-05:00"
+        },
+        {
+            "Name": "FLOW_LOGS",
+            "Status": "ENABLED",
+            "UpdatedAt": "2025-04-16 20:12:17-05:00"
+        },
+        {
+            "Name": "S3_DATA_EVENTS",
+            "Status": "ENABLED",
+            "UpdatedAt": "2022-11-12 08:20:15-06:00"
+        },
+        {
+            "Name": "EKS_AUDIT_LOGS",
+            "Status": "ENABLED",
+            "UpdatedAt": "2022-11-12 08:20:15-06:00"
+        },
+        {
+            "Name": "EBS_MALWARE_PROTECTION",
+            "Status": "ENABLED",
+            "UpdatedAt": "2022-11-12 08:20:15-06:00"
+        },
+        {
+            "Name": "RDS_LOGIN_EVENTS",
+            "Status": "ENABLED",
+            "UpdatedAt": "2023-11-20 20:09:49-06:00"
+        },
+        {
+            "Name": "EKS_RUNTIME_MONITORING",
+            "Status": "DISABLED",
+            "UpdatedAt": "2025-04-16 20:12:17-05:00",
+            "AdditionalConfiguration": [
+                {
+                    "Name": "EKS_ADDON_MANAGEMENT",
+                    "Status": "DISABLED",
+                    "UpdatedAt": "2025-04-16 20:12:17-05:00"
+                }
+            ]
+        },
+        {
+            "Name": "LAMBDA_NETWORK_LOGS",
+            "Status": "ENABLED",
+            "UpdatedAt": "2023-11-21 12:54:19-06:00"
+        },
+        {
+            "Name": "RUNTIME_MONITORING",
+            "Status": "DISABLED",
+            "UpdatedAt": "2025-04-16 20:12:17-05:00",
+            "AdditionalConfiguration": [
+                {
+                    "Name": "EKS_ADDON_MANAGEMENT",
+                    "Status": "DISABLED",
+                    "UpdatedAt": "2025-04-16 20:12:17-05:00"
+                },
+                {
+                    "Name": "ECS_FARGATE_AGENT_MANAGEMENT",
+                    "Status": "DISABLED",
+                    "UpdatedAt": "2025-04-16 20:12:17-05:00"
+                },
+                {
+                    "Name": "EC2_AGENT_MANAGEMENT",
+                    "Status": "DISABLED",
+                    "UpdatedAt": "2025-04-16 20:12:17-05:00"
+                }
+            ]
+        }
+    ]
+}

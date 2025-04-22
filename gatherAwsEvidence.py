@@ -22,7 +22,7 @@ def main():
         for detector in allDetectors['DetectorIds']:
             print(detector)
             detectorDetails = guardduty_client.get_detector(DetectorId=detector)
-            saveJson(detectorDetails, f'audit_evidence/GuardDuty/regions/{region}/{detector}.json')
+            saveJson(detectorDetails, f'audit_evidence/GuardDuty/regions/{region}/{detector}_config.json')
             # Filter criteria for only active GuardDuty findings
             active_findings_filter = {
                 'Criterion': {
@@ -31,12 +31,6 @@ def main():
                     }
                 }
             }
-            # TODO: This is currently limited to the first 50 findings.
-            allFindings = guardduty_client.list_findings(DetectorId=detector, FindingCriteria=active_findings_filter)
-            findingDetails = guardduty_client.get_findings(DetectorId=detector, FindingIds=allFindings['FindingIds'])
-            saveJson(findingDetails, f'audit_evidence/GuardDuty/regions/{region}/findingDetails.json')
-
-            saveJson(allFindings, f'audit_evidence/GuardDuty/regions/{region}/{detector}_findings.json')
             findingsBySeverity = guardduty_client.get_findings_statistics(DetectorId=detector, 
             FindingStatisticTypes=['COUNT_BY_SEVERITY'], FindingCriteria=active_findings_filter)
             saveJson(findingsBySeverity, f'audit_evidence/GuardDuty/regions/{region}/findings_stats.json')
