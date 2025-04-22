@@ -2,7 +2,7 @@
 GuardDuty is enabled for all in-scope regions.
 
 ## Required Evidence
-* [all_detectors.json](./all_detectors.json) provides a list of detectors in a specific region.
+* [all_detectors.json](./regions/us-east-1/all_detectors.json) provides a list of detectors in a specific region.
   * This evidence is gathered by calling the [list_detectors()](https://boto3.amazonaws.com/v1/documentation/api/1.26.89/reference/services/guardduty/client/list_detectors.html) command in Boto 3.
 * [DETECTOR_ID_config.json](./regions/us-east-1/DETECTOR_ID_config.json) provides information on the configuration of the specific detector.
 
