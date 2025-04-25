@@ -33,7 +33,7 @@ def main():
             }
             findingsBySeverity = guardduty_client.get_findings_statistics(DetectorId=detector, 
             FindingStatisticTypes=['COUNT_BY_SEVERITY'], FindingCriteria=active_findings_filter)
-            saveJson(findingsBySeverity, f'audit_evidence/GuardDuty/regions/{region}/findings_stats.json')
+            saveJson(findingsBySeverity, f'audit_evidence/GuardDuty/regions/{region}/{detector}_findings_stats.json')
 
     # Gather evidence for IAM
     print('Gathering IAM evidence')
