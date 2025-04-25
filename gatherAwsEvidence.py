@@ -19,10 +19,10 @@ def main():
         guardduty_client = boto3.client('guardduty', region_name=region)
         allDetectors = fetchData(guardduty_client.list_detectors)
         saveJson(allDetectors, f'audit_evidence/GuardDuty/regions/{region}/all_detectors.json')
-        for detector in allDetectors['DetectorIds']:
-            print(detector)
-            detectorDetails = guardduty_client.get_detector(DetectorId=detector)
-            saveJson(detectorDetails, f'audit_evidence/GuardDuty/regions/{region}/{detector}_config.json')
+        for detector_id in allDetectors['DetectorIds']:
+            print(detector_id)
+            detectorDetails = guardduty_client.get_detector(DetectorId=detector_id)
+            saveJson(detectorDetails, f'audit_evidence/GuardDuty/regions/{region}/{detector_id}_config.json')
             # Filter criteria for only active GuardDuty findings
             active_findings_filter = {
                 'Criterion': {
@@ -31,9 +31,45 @@ def main():
                     }
                 }
             }
-            findingsBySeverity = guardduty_client.get_findings_statistics(DetectorId=detector, 
+            findingsBySeverity = guardduty_client.get_findings_statistics(DetectorId=detector_id, 
             FindingStatisticTypes=['COUNT_BY_SEVERITY'], FindingCriteria=active_findings_filter)
-            saveJson(findingsBySeverity, f'audit_evidence/GuardDuty/regions/{region}/{detector}_findings_stats.json')
+            saveJson(findingsBySeverity, f'audit_evidence/GuardDuty/regions/{region}/{detector_id}_findings_stats.json')
+            
+            findings = []
+
+            # Step 1: List only ACTIVE finding IDs using filter
+            paginator = guardduty_client.get_paginator('list_findings')
+            page_iterator = paginator.paginate(
+                DetectorId=detector_id,
+                FindingCriteria={
+                    'Criterion': {
+                        'service.archived': {
+                            'Eq': ['false']
+                        }
+                    }
+                }
+            )
+
+            all_finding_ids = []
+            for page in page_iterator:
+                all_finding_ids.extend(page['FindingIds'])
+
+            print(f"Found {len(all_finding_ids)} active findings.")
+
+            # Step 2: Get details in batches
+            print("Fetching finding details...")
+            for i in range(0, len(all_finding_ids), 50):
+                batch_ids = all_finding_ids[i:i + 50]
+                response = guardduty_client.get_findings(
+                    DetectorId=detector_id,
+                    FindingIds=batch_ids
+                )
+                findings.extend(response['Findings'])
+
+            # Step 3: Sort by severity descending
+            findings.sort(key=lambda x: x['Severity'], reverse=True)
+            saveJson(findings, f'audit_evidence/GuardDuty/regions/{region}/{detector_id}_findings.json')
+
 
     # Gather evidence for IAM
     print('Gathering IAM evidence')
