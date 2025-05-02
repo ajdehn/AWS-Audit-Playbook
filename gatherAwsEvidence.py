@@ -20,7 +20,6 @@ def main():
         allDetectors = fetchData(guardduty_client.list_detectors)
         saveJson(allDetectors, f'audit_evidence/GuardDuty/regions/{region}/all_detectors.json')
         for detector_id in allDetectors['DetectorIds']:
-            print(detector_id)
             detectorDetails = guardduty_client.get_detector(DetectorId=detector_id)
             saveJson(detectorDetails, f'audit_evidence/GuardDuty/regions/{region}/{detector_id}_config.json')
             # Filter criteria for only active GuardDuty findings
@@ -54,10 +53,9 @@ def main():
             for page in page_iterator:
                 all_finding_ids.extend(page['FindingIds'])
 
-            print(f"Found {len(all_finding_ids)} active findings.")
+            print(f"Found {len(all_finding_ids)} active findings in {detector_id}.")
 
             # Step 2: Get details in batches
-            print("Fetching finding details...")
             for i in range(0, len(all_finding_ids), 50):
                 batch_ids = all_finding_ids[i:i + 50]
                 response = guardduty_client.get_findings(
@@ -83,6 +81,18 @@ def main():
     decodedCredentialReport = credentialReport['Content'].decode("utf-8")
     with open("audit_evidence/IAM/credentials_report.csv", "w") as file:
         file.write(decodedCredentialReport)
+        
+    # Gather evidence for IAM_Admin
+    administrativeEntities = iam_client.list_entities_for_policy(
+        PolicyArn='arn:aws:iam::aws:policy/AdministratorAccess'
+    )
+    saveJson(administrativeEntities, 'audit_evidence/IAM/administrative_entities.json')
+
+    for group in administrativeEntities['PolicyGroups']:
+        groupMembers = iam_client.get_group(
+            GroupName=group['GroupName']
+        )
+        saveJson(groupMembers, f'audit_evidence/IAM/groups/{group['GroupName']}_members.json')
 
     # Gather evidence for IAM_PWD
     try:

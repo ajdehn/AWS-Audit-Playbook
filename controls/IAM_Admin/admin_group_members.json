@@ -1,0 +1,39 @@
+{
+    "Group": {
+        "Path": "/",
+        "GroupName": "admin_group",
+        "GroupId": "xyz",
+        "Arn": "arn:aws:iam::111111111111:group/Admin_Group",
+        "CreateDate": "2021-07-02 15:31:07+00:00"
+    },
+    "Users": [
+        {
+            "Path": "/",
+            "UserName": "charlotte.blackwood",
+            "UserId": "xyz",
+            "Arn": "arn:aws:iam::111111111111:user/charlotte.blackwood",
+            "CreateDate": "2022-11-11 22:20:15+00:00",
+            "PasswordLastUsed": "2025-05-01 01:38:57+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "nick.bradshaw",
+            "UserId": "xyz",
+            "Arn": "arn:aws:iam::111111111111:user/nick.bradshaw",
+            "CreateDate": "2022-01-23 19:58:56+00:00",
+            "PasswordLastUsed": "2024-04-25 00:14:33+00:00"
+        }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "xyz",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Fri, 02 May 2025 10:58:39 GMT",
+            "x-amzn-requestid": "xyz",
+            "content-type": "text/xml",
+            "content-length": "1202"
+        },
+        "RetryAttempts": 0
+    }
+}
