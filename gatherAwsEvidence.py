@@ -15,7 +15,6 @@ def main():
 
     print('Gathering GuardDuty evidence')
     for region in inScopeRegions:
-        print(region)
         guardduty_client = boto3.client('guardduty', region_name=region)
         allDetectors = fetchData(guardduty_client.list_detectors)
         saveJson(allDetectors, f'audit_evidence/GuardDuty/regions/{region}/all_detectors.json')
@@ -52,8 +51,6 @@ def main():
             all_finding_ids = []
             for page in page_iterator:
                 all_finding_ids.extend(page['FindingIds'])
-
-            print(f"Found {len(all_finding_ids)} active findings in {detector_id}.")
 
             # Step 2: Get details in batches
             for i in range(0, len(all_finding_ids), 50):
@@ -147,6 +144,11 @@ def main():
                 pass
             else:
                 raise
+    
+    print('Gathering CloudTrail evidence')
+    cld_trail_client = boto3.client('cloudtrail')
+    allTrails = cld_trail_client.describe_trails(includeShadowTrails=True)
+    saveJson(allTrails, 'audit_evidence/CloudTrail/all_trails.json')
 
 """
     Saves a json file to a specified path
