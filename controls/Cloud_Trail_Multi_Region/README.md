@@ -13,4 +13,4 @@ At least one multi-region CloudTrail is enabled with log-file validation.
 - Please email us at info@auditops.io if you have any questions.
 
 ## Other Resources
-- [Example Workpaper](google.com)
+- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=1065714791)
