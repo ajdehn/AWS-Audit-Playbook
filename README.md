@@ -1,3 +1,6 @@
+# Author
+AJ Dehn (aj@auditops.io)
+
 # Description
 The AWS Audit Playbook is an open-source project designed to ELIMINATE screenshots from the AWS audit process. To accomplish this mission, we are building the following:
 - A [script](./gatherAwsEvidence.py) to generate JSON files which will provide all necessary audit evidence.
