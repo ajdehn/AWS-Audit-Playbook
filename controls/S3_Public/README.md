@@ -12,8 +12,5 @@ S3 buckets are configured to block public access.
 2. For each S3 bucket, review the [public_access_settings.json](./buckets/itauditguy/public_access_settings.json) file.
 3. Confirm the "BlockPublicAcls", "IgnorePublicAcls", "BlockPublicPolicy", and "RestrictPublicBuckets" are all set to true. If the bucket does not meet the requirements, check if there is a valid reason (ex. S3 Bucket is intended for public consumption and thus does not require block public access to be true).
 
-## Support
-- Please email us at info@auditops.io if you have any questions.
-
 ## Other Resources
 - [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=427799283)
