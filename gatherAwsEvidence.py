@@ -130,6 +130,21 @@ def main():
             else:
                 raise
 
+    print('Gathering EC2 & EBS evidence')
+    for region in inScopeRegions:
+        try:
+            ec2_client = boto3.client('ec2', region_name=region)
+            allVolumes = fetchData(ec2_client.describe_volumes)
+            saveJson(allVolumes, f'audit_evidence/EBS/regions/{region}/allVolumes.json')
+        except Exception as e:
+            print("Exception in region: ", region)
+            if 'InvalidClientTokenId' in e.response['Error']['Code']:
+                # NOTE: Error handling for opt-in only regions (ex. af-south-1).
+                # If this error occurs, this region is not utilized doesn't utilize this region.
+                pass
+            else:
+                raise            
+
     print('Gathering RDS evidence')
     for region in inScopeRegions:
         try:
