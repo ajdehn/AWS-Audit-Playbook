@@ -12,8 +12,5 @@ S3 buckets in the AWS account have appropriate tags applied.
 2. For each S3 bucket, review the [bucket_tags.json](./buckets/itauditguy/bucket_tags.json) file.
 3. Confirm all required tags are applied on each bucket as described in the organization's Data Classification Policy. Usually this policy requires assets to have an "Owner", "Description", and "Classification".
 
-## Support
-- Please email us at info@auditops.io if you have any questions.
-
 ## Other Resources
 - [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=1021258140)
