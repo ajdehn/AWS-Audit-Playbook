@@ -2,7 +2,7 @@
 [AJ Dehn](https://www.linkedin.com/in/ajdehn/)
 
 # Vision
-AWS audits, without screenshots
+AWS audits, without screenshots.
 
 # About
 The AWS Audit Playbook is an open-source project designed to ELIMINATE screenshots from the AWS audit process. To accomplish this vision, we are building the following:
