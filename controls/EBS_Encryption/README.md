@@ -2,7 +2,7 @@
 EBS volumes are encrypted.
 
 ## Required Evidence
-* [ebsVolumes.json](./regions/us-east-1/ebsVolumes.json) provides a list of all EBS volumes.
+* [ebsVolumes.json](./regions/us-east-1/ebsVolumes.json) provides a list of all EBS volumes within each in-scope region.
   * This evidence is gathered by calling the [describe_volumes()](https://boto3.amazonaws.com/v1/documentation/api/1.35.9/reference/services/ec2/client/describe_volumes.html) command in Boto 3. 
 
 ## Testing Details
