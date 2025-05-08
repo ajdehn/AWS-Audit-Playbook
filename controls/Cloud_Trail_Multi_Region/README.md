@@ -9,8 +9,5 @@ At least one multi-region CloudTrail is enabled with log-file validation.
 1. Internal Audit obtained the multi-region settings of each trail by using the boto3 the describe_trails() command.
 2. The multi-region & log file validation settings were reviewed for appropriateness as shown in Column C below.
 
-## Support
-- Please email us at info@auditops.io if you have any questions.
-
 ## Other Resources
 - [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=1065714791)
