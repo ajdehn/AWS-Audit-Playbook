@@ -1,5 +1,5 @@
 # About
-This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) with the goal of helping auditors conduct **AWS audits, without screenshots**.
+This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/). The goal of this project is to help auditors conduct **AWS audits, without screenshots**.
 
 # Summary
 To accomplish this vision, we are building the following:
