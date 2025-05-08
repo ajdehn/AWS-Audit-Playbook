@@ -8,8 +8,5 @@ RDS instances in the AWS account are encrypted.
 ## Testing Details
 1. Confirm the "StorageEncrypted" field is **true** for each database within each region.
 
-## Support
-- Please email us at info@auditops.io if you have any questions.
-
 ## Other Resources
 - [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=164074275)
