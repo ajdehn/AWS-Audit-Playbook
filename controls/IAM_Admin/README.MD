@@ -10,8 +10,5 @@ AWS administrative access is appropriately restricted.
 ## Testing Details
 1. Open the [administrative_entities.json](./administrative_entities.json) and confirm that all entities (groups, roles, and users) require administrative access.
 
-## Support
-- Please email us at info@auditops.io if you have any questions.
-
 ## Other Resources
 - [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=2005756602)
