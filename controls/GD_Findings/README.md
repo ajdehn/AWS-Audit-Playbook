@@ -13,8 +13,5 @@ GuardDuty findings are responded to within organization defined SLA's.
     * Confirm the following "DataSources" were enabled: "CloudTrail", "DNSLogs", "FlowLogs", and "S3Logs".
     * **Note:** It is your responsiblity to determine which regions are in-scope. At a minimum, you should include any region with an AWS resource (S3, RDS, EC2, etc).
 
-## Support
-- Please email us at info@auditops.io if you have any questions.
-
 ## Other Resources
 - [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=1836199300)
