@@ -8,8 +8,5 @@ All users with an active password must have MFA enabled.
 ## Testing Details
 1. Open the [credentials_report.csv](./credentials_report.csv) and confirm that all users with an active password also have MFA enabled.
 
-## Support
-- Please email us at info@auditops.io if you have any questions.
-
 ## Other Resources
 - [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=1190435560)
