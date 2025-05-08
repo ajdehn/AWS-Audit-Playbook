@@ -12,9 +12,6 @@ AWS passwords must comply with the organization's password complexity requiremen
     * If required, confirm "MaxPasswordAge" is <= the number of days defined in the password policy & "ExpirePasswords" is set to true.
     * If required, confirm "PasswordReusePrevention" is >= the number of passwords remembered in the password policy.
 
-## Support
-- Please email us at info@auditops.io if you have any questions.
-
 ## Other Resources
 - [Video: How to audit IAM passwords](https://www.loom.com/share/89e2dacf90f14afe8803fa05439caccc?sid=beecc028-26ee-410d-aa61-cd4c2b26efa3)
 - [Video: How to update IAM password settings](https://www.youtube.com/watch?v=Ma5jxRO1nUQ)
