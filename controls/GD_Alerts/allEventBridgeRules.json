@@ -1,0 +1,29 @@
+{
+    "Rules": [
+        {
+            "Name": "CreateUserRule",
+            "Arn": "arn:aws:events:us-east-1:111111111111:rule/CreateUserRule",
+            "EventPattern": "{\"source\":[\"aws.iam\"],\"detail-type\":[\"AWS API Call via CloudTrail\"],\"detail\":{\"eventSource\":[\"iam.amazonaws.com\"],\"eventName\":[\"createuser\",\"CreateLoginProfile\",\"CreateUser\"]}}",
+            "State": "ENABLED",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "guard_duty_alert_rule",
+            "Arn": "arn:aws:events:us-east-1:111111111111:rule/guard_duty_alert_rule",
+            "EventPattern": "{\"source\":[\"aws.guardduty\"],\"detail-type\":[\"GuardDuty Finding\"],\"detail\":{\"severity\":[4,4.0,4.1,4.2,4.3,4.4,4.5,4.6,4.7,4.8,4.9,5,5.0,5.1,5.2,5.3,5.4,5.5,5.6,5.7,5.8,5.9,6,6.0,6.1,6.2,6.3,6.4,6.5,6.6,6.7,6.8,6.9,7,7.0,7.1,7.2,7.3,7.4,7.5,7.6,7.7,7.8,7.9,8,8.0,8.1,8.2,8.3,8.4,8.5,8.6,8.7,8.8,8.9]}}",
+            "State": "ENABLED",
+            "EventBusName": "default"
+        }
+    ],
+    "ResponseMetadata": {
+        "RequestId": "xyz",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amzn-requestid": "xyz",
+            "content-type": "application/x-amz-json-1.1",
+            "content-length": "3484",
+            "date": "Thu, 22 May 2025 12:33:01 GMT"
+        },
+        "RetryAttempts": 0
+    }
+}
