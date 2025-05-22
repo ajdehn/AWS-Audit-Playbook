@@ -65,6 +65,23 @@ def main():
             findings.sort(key=lambda x: x['Severity'], reverse=True)
             saveJson(findings, f'audit_evidence/GuardDuty/regions/{region}/{detector_id}_findings.json')
 
+    print('Gathering EventBridge evidence') # Used in "GD_Alerts"
+    for region in inScopeRegions:
+        eventbridge_client = boto3.client('events', region_name=region)
+        sns_client = boto3.client('sns', region_name=region)
+        allEventBridgeRules = fetchData(eventbridge_client.list_rules)
+        saveJson(allEventBridgeRules, f"audit_evidence/EventBridge/{region}/allEventBridgeRules.json")
+        for rule in allEventBridgeRules['Rules']:
+            if rule.get('EventPattern'):
+                if 'aws.guardduty' in json.loads(rule['EventPattern'])['source'] and rule.get('State') == 'ENABLED':
+                    ruleName = rule['Name']
+                    targets = eventbridge_client.list_targets_by_rule(Rule=rule['Name'])
+                    saveJson(targets, f"audit_evidence/EventBridge/{region}/{ruleName}_targets.json")
+                    for target in targets['Targets']:
+                        if "sns" in target['Arn']:
+                            topicSubscriptions = sns_client.list_subscriptions_by_topic(TopicArn=target['Arn'])
+                            topicName = target['Arn'].split(':')[5]
+                            saveJson(topicSubscriptions, f"audit_evidence/SNS/{region}/{topicName}.json")
 
     # Gather evidence for IAM
     print('Gathering IAM evidence')
