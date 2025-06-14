@@ -1,5 +1,5 @@
 ## Control Description
-IAM access keys are less than 90 days old.
+IAM access keys are rotated at least every 90 days.
 
 ## Required Evidence
 * [credentials_report.csv](/evidence_library/IAM/credentials_report.csv) lists all users in your account and the status of their various credentials, including access keys.
