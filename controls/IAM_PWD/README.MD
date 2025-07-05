@@ -13,6 +13,5 @@ AWS passwords must comply with the organization's password complexity requiremen
     * If required, confirm "PasswordReusePrevention" is >= the number of passwords remembered in the password policy.
 
 ## Other Resources
-- [Video: How to audit IAM passwords](https://www.loom.com/share/89e2dacf90f14afe8803fa05439caccc?sid=beecc028-26ee-410d-aa61-cd4c2b26efa3)
 - [Video: How to update IAM password settings](https://www.youtube.com/watch?v=Ma5jxRO1nUQ)
 - [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=290595007)
