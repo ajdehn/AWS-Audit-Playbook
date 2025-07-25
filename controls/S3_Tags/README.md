@@ -14,3 +14,4 @@ S3 buckets in the AWS account have appropriate tags applied.
 
 ## Other Resources
 - [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=1021258140)
+- [VIDEO TUTORIAL: How to Audit S3 Bucket Tags](https://youtu.be/7av0BotJaQE)
