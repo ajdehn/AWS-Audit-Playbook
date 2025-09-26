@@ -154,7 +154,9 @@ def main():
             allVolumes = fetchData(ec2_client.describe_volumes)
             saveJson(allVolumes, f'audit_evidence/EC2/regions/{region}/allVolumes.json')
             allInstances = fetchData(ec2_client.describe_volumes)
-            saveJson(allInstances, f'audit_evidence/EC2/regions/{region}/allInstances.json')         
+            saveJson(allInstances, f'audit_evidence/EC2/regions/{region}/allInstances.json')
+            allSecurityGroups = fetchData(ec2_client.describe_security_groups())
+            saveJson(allSecurityGroups, f'audit_evidence/EC2/regions/{region}/allSecurityGroups.json')
         except Exception as e:
             print("Exception in region: ", region)
             if 'InvalidClientTokenId' in e.response['Error']['Code']:
