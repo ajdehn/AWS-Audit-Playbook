@@ -9,7 +9,7 @@ def main():
     regionList = boto3.client('account').list_regions(RegionOptStatusContains=['ENABLED','ENABLED_BY_DEFAULT'])
     saveJson(regionList, f'audit_evidence/region_list.json')
 
-    inScopeRegions = ['us-east-1']
+    inScopeRegions = []
     for region in regionList['Regions']:
         inScopeRegions.append(region['RegionName'])
 
