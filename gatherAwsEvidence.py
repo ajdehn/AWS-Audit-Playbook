@@ -128,14 +128,22 @@ def main():
     for bucket in allBuckets['Buckets']:
         bucketName = bucket['Name']
         # Collect & save encryption evidence
-        # TODO: Add error handling
-        bucketEncryption = s3_client.get_bucket_encryption(Bucket=bucketName)
-        saveJson(bucketEncryption, f"audit_evidence/S3/buckets/{bucketName}/encryption_settings.json")
-        # TODO: Add error handling
+        # TODO: Improve error handling
+        try:
+            bucketEncryption = s3_client.get_bucket_encryption(Bucket=bucketName)
+            saveJson(bucketEncryption, f"audit_evidence/S3/buckets/{bucketName}/encryption_settings.json")
+        except ClientError as e:
+            print(f"Warning: unable to collect S3 encryption settings for {bucket['Name']}.")
+            pass
+        # TODO: Improve error handling
         # TODO: Get global S3 block settings
         # Collect & save public access settings
-        publicBucketSettings = s3_client.get_public_access_block(Bucket=bucketName)
-        saveJson(publicBucketSettings, f"audit_evidence/S3/buckets/{bucketName}/public_access_settings.json")
+        try:
+            publicBucketSettings = s3_client.get_public_access_block(Bucket=bucketName)
+            saveJson(publicBucketSettings, f"audit_evidence/S3/buckets/{bucketName}/public_access_settings.json")
+        except ClientError as e:
+            print(f"Warning: unable to collect S3 public access settings for {bucket['Name']}.")
+            pass        
         # Collect & save bucket tags
         try:
             bucketTags = s3_client.get_bucket_tagging(Bucket=bucketName) 
@@ -145,7 +153,8 @@ def main():
                 print(f"Warning: {bucket['Name']} does not have tags.")
                 pass
             else:
-                raise
+                print(f"Warning: unable to collect S3 tags for {bucket['Name']}.")
+                pass
 
     print('Gathering EC2 & EBS evidence')
     for region in inScopeRegions:
@@ -155,7 +164,7 @@ def main():
             saveJson(allVolumes, f'audit_evidence/EC2/regions/{region}/allVolumes.json')
             allInstances = fetchData(ec2_client.describe_volumes)
             saveJson(allInstances, f'audit_evidence/EC2/regions/{region}/allInstances.json')
-            allSecurityGroups = fetchData(ec2_client.describe_security_groups())
+            allSecurityGroups = fetchData(ec2_client.describe_security_groups)
             saveJson(allSecurityGroups, f'audit_evidence/EC2/regions/{region}/allSecurityGroups.json')
         except Exception as e:
             print("Exception in region: ", region)
