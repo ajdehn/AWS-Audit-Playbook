@@ -1,6 +1,9 @@
 ## Control Description
 Security group rules open to the internet are appropriately restricted.
 
+## Example Risk
+Your engineering team has experienced significant turnover in the last year, and no one knows what security group are used for and why certain ports are open. This spider web of security group rules makes you hesitant to turn off inbound SSH access to your production servers.
+
 ## Required Evidence
 * [securityGroups.json](/evidence_library/EC2/regions/us-east-1/allSecurityGroups.json) provides a list of all EC2 security groups.
   * This evidence is gathered by calling the [describe_security_groups()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/client/describe_security_groups.html) command in Boto 3. 

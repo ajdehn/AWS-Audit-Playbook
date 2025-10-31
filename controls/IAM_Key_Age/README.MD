@@ -1,6 +1,9 @@
 ## Control Description
 IAM access keys are rotated at least every 90 days.
 
+## Example Risk
+Your organization created an IAM access key for a legacy data & analytics tool. This access key is compromised and allows attackers to extract data from your AWS account.
+
 ## Required Evidence
 * [credentials_report.csv](/evidence_library/IAM/credentials_report.csv) lists all users in your account and the status of their various credentials, including access keys.
   * This evidence is gathered by calling the [generate_credentials_report()](https://boto3.amazonaws.com/v1/documentation/api/1.26.89/reference/services/iam/client/generate_credential_report.html) & [get_credentials_report()](https://boto3.amazonaws.com/v1/documentation/api/1.26.89/reference/services/iam/client/get_credential_report.html) commands in Boto3.

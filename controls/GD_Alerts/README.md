@@ -1,6 +1,9 @@
 ## Control Description
 GuardDuty is configured to send alerts to relevant personnel, for each in-scope region.
 
+## Example Risk
+A malicious actor compromised your AWS account and launches bitcoin miners at your company's expense. The new EC2 instances aren't discovered for 3 days and costs your organization $10,000.
+
 ## Required Evidence
 * [allEventBridgeRules.json](/evidence_library/EventBridge/us-east-1/allEventBridgeRules.json) provides a list of all event bridge rules.
   * This evidence is gathered by calling the [list_rules()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/events/client/list_rules.html) command in Boto 3.

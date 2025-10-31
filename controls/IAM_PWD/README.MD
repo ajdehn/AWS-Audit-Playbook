@@ -1,6 +1,9 @@
 ## Control Description
 AWS passwords must comply with the organization's password complexity requirements.
 
+## Example Risk
+An engineer sets their IAM user's password as "Fall2025!". Their account is compromised and the attacker is threatening to release your company's sensitive data unless you pay a $500,000 ransom.
+
 ## Required Evidence
 * [password_policy.json](/evidence_library/IAM/password_policy.json) describes the password requirements for the AWS account. These settings are applicable to all IAM users in the account.
   * This evidence is gathered by calling the [get_account_password_policy()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/iam/client/get_account_password_policy.html) command in Boto3.

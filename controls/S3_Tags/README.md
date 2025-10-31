@@ -1,6 +1,9 @@
 ## Control Description
 S3 buckets in the AWS account have appropriate tags applied.
 
+## Example Risk
+Your lead DevOps engineer wins the lottery and walks away with $100 million dollars. You never hear from them again, and your team is unable to maintain your AWS account as a result of their absence.
+
 ## Required Evidence
 * [all_s3_buckets.json](/evidence_library/S3/all_s3_buckets.json) provides a list of all S3 buckets.
   * This evidence is gathered by calling the [list_buckets()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_buckets.html) command in Boto3.
