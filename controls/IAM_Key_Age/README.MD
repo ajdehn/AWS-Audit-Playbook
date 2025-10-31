@@ -2,7 +2,7 @@
 IAM access keys are rotated at least every 90 days.
 
 ## Example Risk
-Your organization created an IAM access key for a legacy data & analytics tool. This access key is compromised and allows attackers to extract data from your AWS account.
+Your organization shares an IAM access key for a legacy data & analytics tool. This access key is compromised and allows attackers to extract data from your AWS account.
 
 ## Required Evidence
 * [credentials_report.csv](/evidence_library/IAM/credentials_report.csv) lists all users in your account and the status of their various credentials, including access keys.
