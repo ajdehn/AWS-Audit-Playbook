@@ -1,6 +1,9 @@
 ## Control Description
 All users with an active password must have MFA enabled.
 
+## Example Risk
+An engineer reuses their password across multiple applications. Their Facebook password is compromised and a malicious actor logs into their AWS IAM user account using the compromised password.
+
 ## Required Evidence
 * [credentials_report.csv](/evidence_library/IAM/credentials_report.csv) lists all users in your account and the status of their various credentials, including passwords and MFA devices.
   * This evidence is gathered by calling the [generate_credentials_report()](https://boto3.amazonaws.com/v1/documentation/api/1.26.89/reference/services/iam/client/generate_credential_report.html) & [get_credentials_report()](https://boto3.amazonaws.com/v1/documentation/api/1.26.89/reference/services/iam/client/get_credential_report.html) commands in Boto3.
