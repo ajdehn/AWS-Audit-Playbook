@@ -4,8 +4,8 @@ This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/). The
 # Summary
 To accomplish this vision, we are building the following:
 - A read-only [script](./gatherAwsEvidence.py) to generate JSON files directly from AWS (no screenshots required) without affecting your environment.
+- A [library](./evidence_library/) of audit evidence created from the script with example JSON files.
 - List of [controls](./controls/) with detailed guidance of how to test each control.
-- A [library](./evidence_library/) of audit evidence with example JSON files.
 - An example [audit workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?usp=sharing) to document audit results.
 
 # Setup Instructions
