@@ -1,19 +1,19 @@
 {
     "PolicyGroups": [
         {
-            "GroupName": "admin_group",
+            "GroupName": "Admin-Group",
             "GroupId": "xyz"
         }
     ],
     "PolicyUsers": [
         {
-            "UserName": "pete.mitchell",
+            "UserName": "maverick",
             "UserId": "xyz"
         }
     ],
     "PolicyRoles": [
         {
-            "RoleName": "random_vendor_role",
+            "RoleName": "Goose_break_glass",
             "RoleId": "xyz"
         }
     ],
@@ -22,7 +22,7 @@
         "RequestId": "xyz",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "date": "Fri, 02 May 2025 10:47:32 GMT",
+            "date": "Mon, 03 Nov 2025 20:06:49 GMT",
             "x-amzn-requestid": "xyz",
             "content-type": "text/xml",
             "content-length": "796"
