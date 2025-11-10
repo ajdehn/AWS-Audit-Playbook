@@ -1,0 +1,21 @@
+{
+    "inScopeRegions": [],
+    "Cloud_Trail_Multi_Region": true,
+    "EBS_Encryption": true,
+    "EC2_Public_Security_Groups": true,
+    "EC2_Tags": true,
+    "GD_Alerts": true,
+    "GD_Enabled": true,
+    "GD_Findings": true,
+    "IAM_Admin": true,
+    "IAM_Key_Age": true,
+    "IAM_MFA": true,
+    "IAM_PWD": true,
+    "RDS_Backup": true,
+    "RDS_Encrypt": true,
+    "RDS_Public": true,
+    "RDS_Tags": true,
+    "S3_Encrypt": true,
+    "S3_Public": true,
+    "S3_Tags": true
+}

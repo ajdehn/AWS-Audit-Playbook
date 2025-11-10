@@ -18,4 +18,5 @@ To accomplish this vision, we are building the following:
     * NOTE: Access keys can only be viewed once, at the time of creation.  They must be stored securely elsewhere for future use.
 4. Install the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 5. Configure the access key created in Step 3 on your local machine using the 'aws configure' command [Video Tutorial](https://youtu.be/RLx5qVZSTyE?si=7fqyxFzThDaB-mGQ).
-6. Run the command 'python gatherAwsEvidence.py'
+6. Configure the auditScope variable in gatherAwsEvidence.py. Specify which regions are in-scope, and set controls that are out of scope as "False" to avoid collecting unnecesary evidence.
+7. Run the command 'python gatherAwsEvidence.py'
