@@ -6,7 +6,7 @@
         "HTTPHeaders": {
             "x-amz-id-2": "xyz",
             "x-amz-request-id": "xyz",
-            "date": "Mon, 03 Nov 2025 20:06:50 GMT",
+            "date": "Mon, 03 Nov 2025 20:06:52 GMT",
             "transfer-encoding": "chunked",
             "server": "AmazonS3"
         },
@@ -14,20 +14,16 @@
     },
     "TagSet": [
         {
-            "Key": "Environment",
-            "Value": "Production"
-        },
-        {
             "Key": "Owner",
-            "Value": "IT Audit Guy"
+            "Value": "Taylor Swift"
         },
         {
             "Key": "Description",
-            "Value": "Stores pictures of fake drivers licenses for AWS for IT Auditors demo."
+            "Value": "Song lyrics for 13th album."
         },
         {
             "Key": "Classification",
-            "Value": "Confidential"
+            "Value": "Top Secret"
         }
     ]
 }
