@@ -3,7 +3,7 @@ At least one multi-region CloudTrail is enabled with log-file validation.
 
 ## Required Evidence
 * [all_trails.json](/evidence_library/CloudTrail/all_trails.json) provides a list of all trails in the AWS account.
-  * This evidence is gathered by calling the [describe_trails()](https://boto3.amazonaws.com/v1/documentation/api/1.26.93/reference/services/cloudtrail/client/describe_trails.html) command in Boto 3. 
+  * This evidence is gathered by calling the [describe_trails()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/cloudtrail/client/describe_trails.html) command in Boto 3. 
 
 ## Testing Details
 1. Internal Audit obtained the multi-region settings of each trail by using the boto3 the describe_trails() command.
