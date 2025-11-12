@@ -13,7 +13,7 @@
     ],
     "PolicyRoles": [
         {
-            "RoleName": "Goose_break_glass",
+            "RoleName": "Goose_temp_admin_access",
             "RoleId": "xyz"
         }
     ],

@@ -6,7 +6,7 @@
         "HTTPHeaders": {
             "x-amz-id-2": "xyz",
             "x-amz-request-id": "xyz",
-            "date": "Mon, 17 Feb 2025 13:52:15 GMT",
+            "date": "Mon, 03 Nov 2025 20:06:47 GMT",
             "content-type": "application/xml",
             "transfer-encoding": "chunked",
             "server": "AmazonS3"
@@ -25,7 +25,12 @@
         {
             "Name": "itauditguy",
             "CreationDate": "2022-11-27 20:54:44+00:00"
+        },
+        {
+            "Name": "taylor-swift-secret-vault",
+            "CreationDate": "2025-11-02 16:58:48+00:00"
         }
+
     ],
     "Owner": {
         "DisplayName": "aws",

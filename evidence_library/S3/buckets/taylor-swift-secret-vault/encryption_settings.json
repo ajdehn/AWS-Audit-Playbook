@@ -6,7 +6,7 @@
         "HTTPHeaders": {
             "x-amz-id-2": "xyz",
             "x-amz-request-id": "xyz",
-            "date": "Mon, 03 Nov 2025 20:06:49 GMT",
+            "date": "Mon, 03 Nov 2025 20:06:52 GMT",
             "transfer-encoding": "chunked",
             "server": "AmazonS3"
         },
@@ -18,7 +18,7 @@
                 "ApplyServerSideEncryptionByDefault": {
                     "SSEAlgorithm": "AES256"
                 },
-                "BucketKeyEnabled": false
+                "BucketKeyEnabled": true
             }
         ]
     }
