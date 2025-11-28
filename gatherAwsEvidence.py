@@ -62,17 +62,16 @@ def checkConfigFile(config):
                    'GD_Alerts', 'GD_Enabled', 'GD_Findings', 'IAM_Admin', 'IAM_Key_Age', 'IAM_MFA', 'IAM_PWD',
                    'RDS_Backup', 'RDS_Encrypt', 'RDS_Public', 'RDS_Tags', 'S3_Encrypt', 'S3_Public', 'S3_Tags']
     for controlName in allControls:
-        inScopeControl = config.get(controlName)
-        if inScopeControl is None:
+        if config.get(controlName) is None:
             raise KeyError(f"Invalid configuration. {controlName} is not in the config file")
-        if not isinstance(config[controlName], bool):
+        elif not isinstance(config[controlName], bool):
             raise ValueError(f"Invalid configuration. {controlName} should be True or False")
-
-    saveJson(config, f'audit_evidence/audit_scope.json')
 
     # If regions list is empty, make all regions in scope.
     if len(config['inScopeRegions']) == 0:
         config['inScopeRegions'] = awsRegionList
+
+    saveJson(config, f'audit_evidence/audit_scope.json')
 
     return config
 
@@ -81,6 +80,10 @@ def checkConfigFile(config):
     Save all IAM related evidence
 """
 def saveIAMEvidence(config):
+    if not any ([config['IAM_MFA'], config['IAM_Key_Age'], config['IAM_Admin'], config['IAM_PWD']]):
+        # No EC2/EBS tests are in-scope.
+        print('All EC2 & EBS options set to false.  Skipping.')
+        return
     print('Gathering IAM evidence')
     iam_client = boto3.client('iam')
 
@@ -101,10 +104,9 @@ def saveIAMEvidence(config):
         )
         saveJson(administrativeEntities, 'audit_evidence/IAM/administrative_entities.json')
 
+        #if sepearate JSONs was not intentional, may be desireable to explore a dictionary or multi-dimension list 
         for group in administrativeEntities['PolicyGroups']:
-            groupMembers = iam_client.get_group(
-                GroupName=group['GroupName']
-            )
+            groupMembers = iam_client.get_group(GroupName=group['GroupName'])
             saveJson(groupMembers, f'audit_evidence/IAM/groups/{group['GroupName']}_members.json')
 
     if config['IAM_PWD']:
@@ -120,7 +122,8 @@ def saveIAMEvidence(config):
 
 def saveEC2Evidence(config):
     if not any ([config['EBS_Encryption'], config['EC2_Tags'], config['EC2_Public_Security_Groups']]):
-        # No S3 tests are in-scope.
+        # No EC2/EBS tests are in-scope.
+        print('All EC2 & EBS options set to false.  Skipping.')
         return
     print('Gathering EC2 & EBS evidence')
     for region in config['inScopeRegions']:
@@ -148,6 +151,7 @@ def saveEC2Evidence(config):
 def saveS3Evidence(config):
     if not any ([config['S3_Encrypt'], config['S3_Public'], config['S3_Tags']]):
         # No S3 tests are in-scope.
+        print('All S3 options set to false.  Skipping.')
         return
     print('Gathering S3 evidence')
     s3_client = boto3.client('s3')
@@ -181,15 +185,16 @@ def saveS3Evidence(config):
                 saveJson(bucketTags, f"audit_evidence/S3/buckets/{bucket['Name']}/bucket_tags.json")
             except ClientError as e:
                 if e.response['Error']['Code'] == 'NoSuchTagSet':
-                    print(f"Warning: {bucket['Name']} does not have tags.")
+                    print(f"Info: {bucket['Name']} does not have any tags set.")
                     pass
                 else:
-                    print(f"Warning: unable to collect S3 tags for {bucket['Name']}.")
+                    print(f"Warning: script was unable to check for or collect S3 tags for {bucket['Name']}.")
                     pass
 
 def saveRDSEvidence(config):
     if not any ([config['RDS_Encrypt'], config['RDS_Public'], config['RDS_Tags']]):
         # No RDS tests are in-scope.
+        print('All RDS options set to false.  Skipping.')
         return    
     print('Gathering RDS evidence')
     for region in config['inScopeRegions']:
@@ -209,6 +214,7 @@ def saveRDSEvidence(config):
 def saveGuardDutyEvidence(config):
     if not any ([config['GD_Alerts'], config['GD_Enabled'], config['GD_Findings']]):
         # No GuardDuty tests are in-scope.
+        print('All GuardDuty options set to false.  Skipping.')
         return
     print('Gathering GuardDuty evidence')
     for region in config['inScopeRegions']:
@@ -277,7 +283,9 @@ def saveEventBridgeEvidence(config):
                             if "sns" in target['Arn']:
                                 topicSubscriptions = sns_client.list_subscriptions_by_topic(TopicArn=target['Arn'])
                                 topicName = target['Arn'].split(':')[5]
-                                saveJson(topicSubscriptions, f"audit_evidence/SNS/{region}/{topicName}.json")    
+                                saveJson(topicSubscriptions, f"audit_evidence/SNS/{region}/{topicName}.json")
+    else:
+        print('Skipping EventBridge becuase GuardDuty Alerts were not selected for evidence gathering.')    
 
 def saveCloudTrailEvidence(config):
     if config['Cloud_Trail_Multi_Region']:
@@ -285,6 +293,8 @@ def saveCloudTrailEvidence(config):
         cld_trail_client = boto3.client('cloudtrail')
         allTrails = cld_trail_client.describe_trails(includeShadowTrails=True)
         saveJson(allTrails, 'audit_evidence/CloudTrail/all_trails.json')
+    else:
+        print('Skipping CloudTrail because Multi Region was not selected for evidence gathering.')
 
 """
     Saves a json file to a specified path
