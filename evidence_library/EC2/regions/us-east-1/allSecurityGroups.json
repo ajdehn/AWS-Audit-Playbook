@@ -25,6 +25,10 @@
                     "Value": "To connect to this instance, you will need to enable temporary IP access."
                 },
                 {
+                    "Key": "Reviewed_By",
+                    "Value": "AJ Dehn"
+                },
+                {
                     "Key": "Last Reviewed",
                     "Value": "2025-05-31"
                 },
@@ -34,7 +38,7 @@
                 },
                 {
                     "Key": "Owner",
-                    "Value": "AJ Dehn"
+                    "Value": "Engineering"
                 }
             ],
             "VpcId": "vpc-xyz",
@@ -61,12 +65,16 @@
             ],
             "Tags": [
                 {
+                    "Key": "Reviewed_By",
+                    "Value": "AJ Dehn"
+                },                
+                {
                     "Key": "Last Reviewed",
                     "Value": "2025-03-29"
                 },
                 {
                     "Key": "Owner",
-                    "Value": "AJ Dehn"
+                    "Value": "Engineering"
                 },
                 {
                     "Key": "Name",
@@ -116,13 +124,16 @@
             "Tags": [
                 {
                     "Key": "Owner",
-                    "Value": "AJ Dehn"
+                    "Value": "Engineering"
                 },
                 {
                     "Key": "Description",
                     "Value": "Controls traffic to Lambda functions."
                 },
                 {
+                    "Key": "Reviewed_By",
+                    "Value": "AJ Dehn"
+                },                {
                     "Key": "Last Reviewed",
                     "Value": "2025-03-29"
                 },
@@ -190,12 +201,16 @@
             ],
             "Tags": [
                 {
+                    "Key": "Reviewed_By",
+                    "Value": "AJ Dehn"
+                },                
+                {
                     "Key": "Last Reviewed",
                     "Value": "2025-03-28"
                 },
                 {
                     "Key": "Owner",
-                    "Value": "AJ Dehn"
+                    "Value": "Engineering"
                 },
                 {
                     "Key": "Name",
