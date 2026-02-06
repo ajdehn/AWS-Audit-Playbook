@@ -1,28 +1,75 @@
 {
     "Rules": [
         {
-            "Name": "CreateUserRule",
-            "Arn": "arn:aws:events:us-east-1:111111111111:rule/CreateUserRule",
-            "EventPattern": "{\"source\":[\"aws.iam\"],\"detail-type\":[\"AWS API Call via CloudTrail\"],\"detail\":{\"eventSource\":[\"iam.amazonaws.com\"],\"eventName\":[\"createuser\",\"CreateLoginProfile\",\"CreateUser\"]}}",
+            "Name": "AuditManagerSecurityHubFindingsReceiver",
+            "Arn": "arn:aws:events:us-east-1:111111111111:rule/AuditManagerSecurityHubFindingsReceiver",
+            "EventPattern": "{\"source\": [ \"aws.securityhub\" ], \"detail-type\": [ \"Security Hub Findings - Imported\" ]}",
             "State": "ENABLED",
+            "Description": "This rule is used to route Security Hub findings to Audit Manager.",
+            "ManagedBy": "auditmanager.amazonaws.com",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "DO-NOT-DELETE-AmazonInspectorEc2ManagedRule",
+            "Arn": "arn:aws:events:us-east-1:111111111111:rule/DO-NOT-DELETE-AmazonInspectorEc2ManagedRule",
+            "EventPattern": "{\"source\": [\"aws.ec2\"], \"detail-type\": [\"EC2 Instance State-change Notification\"], \"detail\": {\"state\":[\"running\", \"stopped\", \"terminated\"]}}",
+            "State": "ENABLED",
+            "Description": "Managed rule used to route EC2 Events to Inspector",
+            "ManagedBy": "inspector2.amazonaws.com",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "DO-NOT-DELETE-AmazonInspectorEc2TagManagedRule",
+            "Arn": "arn:aws:events:us-east-1:111111111111:rule/DO-NOT-DELETE-AmazonInspectorEc2TagManagedRule",
+            "EventPattern": "{\"source\": [\"aws.tag\"], \"detail-type\": [\"Tag Change on Resource\"], \"detail\": {\"service\":[\"ec2\"], \"resource-type\":[\"instance\"]}}",
+            "State": "ENABLED",
+            "Description": "Managed rule used to route EC2 Tag Change Events to Inspector",
+            "ManagedBy": "inspector2.amazonaws.com",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "DO-NOT-DELETE-AmazonInspectorEcrManagedRule",
+            "Arn": "arn:aws:events:us-east-1:111111111111:rule/DO-NOT-DELETE-AmazonInspectorEcrManagedRule",
+            "EventPattern": "{\"source\": [\"aws.ecr\", \"aws.ecs\"], \"account\": [\"111111111111\"],\"detail-type\": [\"ECR Image Action\", \"ECR Scan Resource Change\", \"ECS Task State Change\"]}",
+            "State": "ENABLED",
+            "Description": "Managed rule used to route ECR and ECS Events to Inspector",
+            "ManagedBy": "inspector2.amazonaws.com",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "DO-NOT-DELETE-AmazonInspectorLambdaManagedRule",
+            "Arn": "arn:aws:events:us-east-1:111111111111:rule/DO-NOT-DELETE-AmazonInspectorLambdaManagedRule",
+            "EventPattern": "{\"source\": [\"aws.lambda\"], \"detail-type\": [\"AWS API Call via CloudTrail\"], \"detail\": {\"eventSource\":[\"lambda.amazonaws.com\"], \"managementEvent\": [true]}}",
+            "State": "ENABLED",
+            "Description": "Managed rule used to route lambda Events to Inspector",
+            "ManagedBy": "inspector2.amazonaws.com",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "DO-NOT-DELETE-AmazonInspectorLambdaTagManagedRule",
+            "Arn": "arn:aws:events:us-east-1:111111111111:rule/DO-NOT-DELETE-AmazonInspectorLambdaTagManagedRule",
+            "EventPattern": "{\"source\": [\"aws.tag\"], \"detail-type\": [\"Tag Change on Resource\"], \"detail\": {\"service\":[\"lambda\"]}}",
+            "State": "ENABLED",
+            "Description": "Managed rule used to route Lambda Tag Change Events to Inspector",
+            "ManagedBy": "inspector2.amazonaws.com",
             "EventBusName": "default"
         },
         {
             "Name": "guard_duty_alert_rule",
             "Arn": "arn:aws:events:us-east-1:111111111111:rule/guard_duty_alert_rule",
-            "EventPattern": "{\"source\":[\"aws.guardduty\"],\"detail-type\":[\"GuardDuty Finding\"],\"detail\":{\"severity\":[4,4.0,4.1,4.2,4.3,4.4,4.5,4.6,4.7,4.8,4.9,5,5.0,5.1,5.2,5.3,5.4,5.5,5.6,5.7,5.8,5.9,6,6.0,6.1,6.2,6.3,6.4,6.5,6.6,6.7,6.8,6.9,7,7.0,7.1,7.2,7.3,7.4,7.5,7.6,7.7,7.8,7.9,8,8.0,8.1,8.2,8.3,8.4,8.5,8.6,8.7,8.8,8.9]}}",
+            "EventPattern": "{\"source\":[\"aws.guardduty\"],\"detail-type\":[\"GuardDuty Finding\"],\"detail\":{\"severity\":[5,5.0,5.1,5.2,5.3,5.4,5.5,5.6,5.7,5.8,5.9,6,6.0,6.1,6.2,6.3,6.4,6.5,6.6,6.7,6.8,6.9,7,7.0,7.1,7.2,7.3,7.4,7.5,7.6,7.7,7.8,7.9,8,8.0,8.1,8.2,8.3,8.4,8.5,8.6,8.7,8.8,8.9]}}",
             "State": "ENABLED",
             "EventBusName": "default"
         }
     ],
     "ResponseMetadata": {
-        "RequestId": "xyz",
+        "RequestId": "3110c863-da03-406a-a96e-ec96130d1b9b",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "x-amzn-requestid": "xyz",
+            "x-amzn-requestid": "3110c863-da03-406a-a96e-ec96130d1b9b",
             "content-type": "application/x-amz-json-1.1",
-            "content-length": "3484",
-            "date": "Thu, 22 May 2025 12:33:01 GMT"
+            "content-length": "3270",
+            "date": "Fri, 06 Feb 2026 16:26:11 GMT"
         },
         "RetryAttempts": 0
     }

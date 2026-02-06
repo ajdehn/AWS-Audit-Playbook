@@ -1,0 +1,17 @@
+{
+    "Volumes": [],
+    "ResponseMetadata": {
+        "RequestId": "63792eda-4a08-41a4-a3aa-5f49d529a08e",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amzn-requestid": "63792eda-4a08-41a4-a3aa-5f49d529a08e",
+            "cache-control": "no-cache, no-store",
+            "strict-transport-security": "max-age=31536000; includeSubDomains",
+            "content-type": "text/xml;charset=UTF-8",
+            "content-length": "210",
+            "date": "Fri, 06 Feb 2026 16:25:17 GMT",
+            "server": "AmazonEC2"
+        },
+        "RetryAttempts": 0
+    }
+}

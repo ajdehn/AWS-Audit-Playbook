@@ -1,0 +1,53 @@
+{
+    "SecurityGroups": [
+        {
+            "GroupId": "sg-0e17e1cdc910dfecf",
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "-1",
+                    "UserIdGroupPairs": [],
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ],
+            "VpcId": "vpc-0fedb427522c8959e",
+            "SecurityGroupArn": "arn:aws:ec2:ap-southeast-2:111111111111:security-group/sg-0e17e1cdc910dfecf",
+            "OwnerId": "111111111111",
+            "GroupName": "default",
+            "Description": "default VPC security group",
+            "IpPermissions": [
+                {
+                    "IpProtocol": "-1",
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "111111111111",
+                            "GroupId": "sg-0e17e1cdc910dfecf"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ]
+        }
+    ],
+    "ResponseMetadata": {
+        "RequestId": "0224ceaf-6fb6-42fb-8edc-98b965a44276",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amzn-requestid": "0224ceaf-6fb6-42fb-8edc-98b965a44276",
+            "cache-control": "no-cache, no-store",
+            "strict-transport-security": "max-age=31536000; includeSubDomains",
+            "content-type": "text/xml;charset=UTF-8",
+            "content-length": "965",
+            "date": "Fri, 06 Feb 2026 16:25:19 GMT",
+            "server": "AmazonEC2"
+        },
+        "RetryAttempts": 0
+    }
+}

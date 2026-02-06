@@ -1,0 +1,37 @@
+{
+    "Groups": [
+        {
+            "Path": "/",
+            "GroupName": "Admin-Group",
+            "GroupId": "AGPA3TURCXF5BRURZGNO6",
+            "Arn": "arn:aws:iam::111111111111:group/Admin-Group",
+            "CreateDate": "2022-08-12 22:26:44+00:00"
+        },
+        {
+            "Path": "/",
+            "GroupName": "Read-Only-Group",
+            "GroupId": "AGPA3TURCXF5HTMVQJYWW",
+            "Arn": "arn:aws:iam::111111111111:group/Read-Only-Group",
+            "CreateDate": "2023-01-29 17:53:49+00:00"
+        },
+        {
+            "Path": "/",
+            "GroupName": "Student-Group",
+            "GroupId": "AGPA3TURCXF5EXZAMCECQ",
+            "Arn": "arn:aws:iam::111111111111:group/Student-Group",
+            "CreateDate": "2023-01-29 16:53:21+00:00"
+        }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "1766d205-cf13-4246-8513-5c86551b51b1",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Fri, 06 Feb 2026 16:24:42 GMT",
+            "x-amzn-requestid": "1766d205-cf13-4246-8513-5c86551b51b1",
+            "content-type": "text/xml",
+            "content-length": "1108"
+        },
+        "RetryAttempts": 0
+    }
+}

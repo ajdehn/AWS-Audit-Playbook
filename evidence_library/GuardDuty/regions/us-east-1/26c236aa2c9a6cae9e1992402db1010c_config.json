@@ -1,27 +1,27 @@
 {
     "ResponseMetadata": {
-        "RequestId": "xyz",
+        "RequestId": "163291fa-777d-4251-a90d-e48184dc4be5",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "date": "Thu, 17 Apr 2025 01:12:18 GMT",
+            "date": "Fri, 06 Feb 2026 16:25:03 GMT",
             "content-type": "application/json",
-            "content-length": "3191",
+            "content-length": "3194",
             "connection": "keep-alive",
-            "x-amzn-requestid": "xyz",
+            "x-amzn-requestid": "163291fa-777d-4251-a90d-e48184dc4be5",
             "access-control-allow-origin": "*",
             "access-control-allow-headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-Content-Sha256,X-Amz-User-Agent,*,Date,X-Amz-Target,x-amzn-platform-id,x-amzn-trace-id",
-            "x-amz-apigw-id": "xyz=",
+            "x-amz-apigw-id": "YXha5FF7oAMELkg=",
             "access-control-expose-headers": "x-amzn-ErrorType,x-amzn-requestid,x-amzn-errormessage,x-amzn-trace-id,x-amz-apigw-id,Date",
-            "x-amzn-trace-id": "Root=1-xyz-xyz;Parent=xyz;Sampled=0;Lineage=1:xyz:0",
+            "x-amzn-trace-id": "Root=1-698615de-0b5495a15103f2b12d913c24;Parent=3bd7a408d101b45e;Sampled=0;Lineage=1:b41c633d:0",
             "access-control-max-age": "86400"
         },
         "RetryAttempts": 0
     },
-    "CreatedAt": "2022-11-12T14:20:15.341Z",
+    "CreatedAt": "2022-11-12T19:32:35.430Z",
     "FindingPublishingFrequency": "FIFTEEN_MINUTES",
     "ServiceRole": "arn:aws:iam::111111111111:role/aws-service-role/guardduty.amazonaws.com/AWSServiceRoleForAmazonGuardDuty",
     "Status": "ENABLED",
-    "UpdatedAt": "2025-03-31T18:28:09.968Z",
+    "UpdatedAt": "2022-11-12T19:32:52.182Z",
     "DataSources": {
         "CloudTrail": {
             "Status": "ENABLED"
@@ -54,74 +54,74 @@
         {
             "Name": "CLOUD_TRAIL",
             "Status": "ENABLED",
-            "UpdatedAt": "2025-04-16 20:12:17-05:00"
+            "UpdatedAt": "2026-02-06 10:25:03-06:00"
         },
         {
             "Name": "DNS_LOGS",
             "Status": "ENABLED",
-            "UpdatedAt": "2025-04-16 20:12:17-05:00"
+            "UpdatedAt": "2026-02-06 10:25:03-06:00"
         },
         {
             "Name": "FLOW_LOGS",
             "Status": "ENABLED",
-            "UpdatedAt": "2025-04-16 20:12:17-05:00"
+            "UpdatedAt": "2026-02-06 10:25:03-06:00"
         },
         {
             "Name": "S3_DATA_EVENTS",
             "Status": "ENABLED",
-            "UpdatedAt": "2022-11-12 08:20:15-06:00"
+            "UpdatedAt": "2022-11-12 13:32:35-06:00"
         },
         {
             "Name": "EKS_AUDIT_LOGS",
             "Status": "ENABLED",
-            "UpdatedAt": "2022-11-12 08:20:15-06:00"
+            "UpdatedAt": "2022-11-12 13:32:35-06:00"
         },
         {
             "Name": "EBS_MALWARE_PROTECTION",
             "Status": "ENABLED",
-            "UpdatedAt": "2022-11-12 08:20:15-06:00"
+            "UpdatedAt": "2022-11-12 13:32:35-06:00"
         },
         {
             "Name": "RDS_LOGIN_EVENTS",
-            "Status": "ENABLED",
-            "UpdatedAt": "2023-11-20 20:09:49-06:00"
+            "Status": "DISABLED",
+            "UpdatedAt": "2022-11-12 13:32:35-06:00"
         },
         {
             "Name": "EKS_RUNTIME_MONITORING",
             "Status": "DISABLED",
-            "UpdatedAt": "2025-04-16 20:12:17-05:00",
+            "UpdatedAt": "2026-02-06 10:25:03-06:00",
             "AdditionalConfiguration": [
                 {
                     "Name": "EKS_ADDON_MANAGEMENT",
                     "Status": "DISABLED",
-                    "UpdatedAt": "2025-04-16 20:12:17-05:00"
+                    "UpdatedAt": "2026-02-06 10:25:03-06:00"
                 }
             ]
         },
         {
             "Name": "LAMBDA_NETWORK_LOGS",
-            "Status": "ENABLED",
-            "UpdatedAt": "2023-11-21 12:54:19-06:00"
+            "Status": "DISABLED",
+            "UpdatedAt": "2026-02-06 10:25:03-06:00"
         },
         {
             "Name": "RUNTIME_MONITORING",
             "Status": "DISABLED",
-            "UpdatedAt": "2025-04-16 20:12:17-05:00",
+            "UpdatedAt": "2026-02-06 10:25:03-06:00",
             "AdditionalConfiguration": [
                 {
                     "Name": "EKS_ADDON_MANAGEMENT",
                     "Status": "DISABLED",
-                    "UpdatedAt": "2025-04-16 20:12:17-05:00"
+                    "UpdatedAt": "2026-02-06 10:25:03-06:00"
                 },
                 {
                     "Name": "ECS_FARGATE_AGENT_MANAGEMENT",
                     "Status": "DISABLED",
-                    "UpdatedAt": "2025-04-16 20:12:17-05:00"
+                    "UpdatedAt": "2026-02-06 10:25:03-06:00"
                 },
                 {
                     "Name": "EC2_AGENT_MANAGEMENT",
                     "Status": "DISABLED",
-                    "UpdatedAt": "2025-04-16 20:12:17-05:00"
+                    "UpdatedAt": "2026-02-06 10:25:03-06:00"
                 }
             ]
         }

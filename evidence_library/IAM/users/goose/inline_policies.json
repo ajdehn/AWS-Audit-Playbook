@@ -1,0 +1,15 @@
+{
+    "PolicyNames": [],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "e752af1a-ba09-487a-8ae0-77425fc66ff0",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Fri, 06 Feb 2026 16:24:43 GMT",
+            "x-amzn-requestid": "e752af1a-ba09-487a-8ae0-77425fc66ff0",
+            "content-type": "text/xml",
+            "content-length": "323"
+        },
+        "RetryAttempts": 0
+    }
+}

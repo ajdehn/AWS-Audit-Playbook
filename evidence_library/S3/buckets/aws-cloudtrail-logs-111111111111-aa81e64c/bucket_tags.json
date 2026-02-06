@@ -1,12 +1,12 @@
 {
     "ResponseMetadata": {
-        "RequestId": "xyz",
-        "HostId": "xyz",
+        "RequestId": "7379WBSWDATZ9NHF",
+        "HostId": "n4mYAxV4u9jWFP+3g9FKR0PY0Wl/bsrlpTqJ6VUiO4UJ2dGUHm7c4ZZHYpqzql8DV3+TxSEzEac=",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "x-amz-id-2": "xyz",
-            "x-amz-request-id": "xyz",
-            "date": "Mon, 03 Nov 2025 20:06:49 GMT",
+            "x-amz-id-2": "n4mYAxV4u9jWFP+3g9FKR0PY0Wl/bsrlpTqJ6VUiO4UJ2dGUHm7c4ZZHYpqzql8DV3+TxSEzEac=",
+            "x-amz-request-id": "7379WBSWDATZ9NHF",
+            "date": "Fri, 06 Feb 2026 16:24:47 GMT",
             "transfer-encoding": "chunked",
             "server": "AmazonS3"
         },
@@ -20,6 +20,10 @@
         {
             "Key": "Description",
             "Value": "Stores CloudTrail logs for the AWS Account."
+        },
+        {
+            "Key": "Data-classification",
+            "Value": "Internal"
         }
     ]
 }

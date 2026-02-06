@@ -2,6 +2,7 @@ import boto3
 import json
 import os
 import time
+from datetime import datetime, timedelta, timezone
 from botocore.exceptions import ClientError
 
 def main():
@@ -21,6 +22,7 @@ def main():
         "IAM_Key_Age": True,
         "IAM_MFA": True,
         "IAM_PWD": True,
+        "IAM_UAR": True,
         "RDS_Backup": True,
         "RDS_Encrypt": True,
         "RDS_Public": True,
@@ -60,7 +62,7 @@ def checkConfigFile(config):
         # Check if each control is in the config file, and confirm that the value is boolean.
     allControls = ['Cloud_Trail_Multi_Region', 'EBS_Encryption', 'EC2_Public_Security_Groups', 'EC2_Tags',
                    'GD_Alerts', 'GD_Enabled', 'GD_Findings', 'IAM_Admin', 'IAM_Key_Age', 'IAM_MFA', 'IAM_PWD',
-                   'RDS_Backup', 'RDS_Encrypt', 'RDS_Public', 'RDS_Tags', 'S3_Encrypt', 'S3_Public', 'S3_Tags']
+                   'IAM_UAR', 'RDS_Backup', 'RDS_Encrypt', 'RDS_Public', 'RDS_Tags', 'S3_Encrypt', 'S3_Public', 'S3_Tags']
     for controlName in allControls:
         if config.get(controlName) is None:
             raise KeyError(f"Invalid configuration. {controlName} is not in the config file")
@@ -86,6 +88,22 @@ def saveIAMEvidence(config):
         return
     print('Gathering IAM evidence')
     iam_client = boto3.client('iam')
+    cloudtrail_client = boto3.client('cloudtrail')
+
+    # Calculate start time
+    start_time = datetime.now(timezone.utc) - timedelta(days=180)
+    
+    # Lookup events for CreateUser
+    response = cloudtrail_client.lookup_events(
+        LookupAttributes=[
+            {
+                'AttributeKey': 'EventName',
+                'AttributeValue': 'CreateUser'
+            },
+        ],
+        StartTime=start_time
+    )
+    saveJson(response, 'audit_evidence/IAM/new_iam_users.json')
 
     if config['IAM_MFA'] or config['IAM_Key_Age']:
         # Generate credentials report & save to JSON.
@@ -108,6 +126,44 @@ def saveIAMEvidence(config):
         for group in administrativeEntities['PolicyGroups']:
             groupMembers = iam_client.get_group(GroupName=group['GroupName'])
             saveJson(groupMembers, f'audit_evidence/IAM/groups/{group['GroupName']}_members.json')
+    
+    if (config['IAM_UAR']):
+        # Gather IAM group related evidence
+        allGroups = fetchData(iam_client.list_groups)
+        saveJson(allGroups, f'audit_evidence/IAM/all_iam_groups.json')
+        for group in allGroups['Groups']:
+            # Get and save group members
+            groupMembers = fetchData(iam_client.get_group, GroupName=group['GroupName'])
+            saveJson(groupMembers, f"audit_evidence/IAM/groups/{group['GroupName']}/group_members.json")
+            # Get and save group's attached policies
+            managedPolicies = fetchData(iam_client.list_attached_group_policies,GroupName=group['GroupName'])
+            saveJson(managedPolicies, f"audit_evidence/IAM/groups/{group['GroupName']}/attached_managed_policies.json")
+            # Get and save group's inline policies
+            groupInlinePolicies = fetchData(iam_client.list_group_policies, GroupName=group['GroupName'])
+            saveJson(groupInlinePolicies, f"audit_evidence/IAM/groups/{group['GroupName']}/inline_policies.json")
+            # Save policy documents for each inline policies attached to the group.         
+            for policy in groupInlinePolicies['PolicyNames']:
+                groupInlinePolicyDoc = iam_client.get_group_policy(GroupName=group['GroupName'], PolicyName=policy)
+                saveJson(groupInlinePolicyDoc, f"audit_evidence/IAM/groups/{group['GroupName']}/inline_policies/{policy}.json")
+
+        # Gather IAM user related evidence
+        allUsers = fetchData(iam_client.list_users)
+        saveJson(allUsers, f'audit_evidence/IAM/all_iam_users.json')
+
+        for user in allUsers['Users']:
+            # Save managed policies attached directly to a user.
+            managedPolicies = fetchData(iam_client.list_attached_user_policies,UserName=user['UserName'])
+            saveJson(managedPolicies, f"audit_evidence/IAM/users/{user['UserName']}/attached_managed_policies.json")
+            # Save inline policies attached directly to a user.
+            userInlinePolicies = fetchData(iam_client.list_user_policies, UserName=user['UserName'])
+            saveJson(userInlinePolicies, f"audit_evidence/IAM/users/{user['UserName']}/inline_policies.json")
+            # Save policy documents for each inline policies attached to the user.
+            for policy in userInlinePolicies['PolicyNames']:
+                userInlinePolicyDoc = iam_client.get_user_policy(UserName=user['UserName'], PolicyName=policy)
+                saveJson(userInlinePolicyDoc, f"audit_evidence/IAM/users/{user['UserName']}/inline_policies/{policy}.json")   
+            # Save groups user is a member of.
+            groupMembership = fetchData(iam_client.list_groups_for_user, UserName=user['UserName'])
+            saveJson(groupMembership, f"audit_evidence/IAM/users/{user['UserName']}/group_membership.json")
 
     if config['IAM_PWD']:
         try:

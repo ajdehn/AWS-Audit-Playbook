@@ -1,0 +1,20 @@
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "ReadOnly",
+            "PolicyArn": "arn:aws:iam::111111111111:policy/ReadOnly"
+        }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "a1edba12-aba1-466c-bc24-5dc64d2eb6ca",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Fri, 06 Feb 2026 16:24:42 GMT",
+            "x-amzn-requestid": "a1edba12-aba1-466c-bc24-5dc64d2eb6ca",
+            "content-type": "text/xml",
+            "content-length": "533"
+        },
+        "RetryAttempts": 0
+    }
+}

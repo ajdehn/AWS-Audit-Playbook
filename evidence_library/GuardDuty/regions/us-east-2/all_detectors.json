@@ -1,25 +1,21 @@
 {
     "ResponseMetadata": {
-        "RequestId": "xyz",
+        "RequestId": "c38ce876-3d80-4cbd-9988-f49805649351",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "date": "Tue, 22 Apr 2025 01:32:57 GMT",
+            "date": "Fri, 06 Feb 2026 16:25:04 GMT",
             "content-type": "application/json",
-            "content-length": "174",
+            "content-length": "18",
             "connection": "keep-alive",
-            "x-amzn-requestid": "xyz",
+            "x-amzn-requestid": "c38ce876-3d80-4cbd-9988-f49805649351",
             "access-control-allow-origin": "*",
             "access-control-allow-headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-Content-Sha256,X-Amz-User-Agent,*,Date,X-Amz-Target,x-amzn-platform-id,x-amzn-trace-id",
-            "x-amz-apigw-id": "xyz=",
+            "x-amz-apigw-id": "YXhbHEBbCYcEgKg=",
             "access-control-expose-headers": "x-amzn-ErrorType,x-amzn-requestid,x-amzn-errormessage,x-amzn-trace-id,x-amz-apigw-id,Date",
-            "x-amzn-trace-id": "Root=1-xyz;Parent=xyz;Sampled=0;Lineage=1:xyz:0",
+            "x-amzn-trace-id": "Root=1-698615e0-3784743107e22c2c6a383c1b;Parent=4b20619d16ba0b1c;Sampled=0;Lineage=1:61e62321:0",
             "access-control-max-age": "86400"
         },
         "RetryAttempts": 0
     },
-    "FindingStatistics": {
-        "CountBySeverity": {
-            "5.0": 1
-        }
-    }
+    "DetectorIds": []
 }

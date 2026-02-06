@@ -1,0 +1,21 @@
+{
+    "ResponseMetadata": {
+        "RequestId": "a43197a0-5d5c-44aa-9fb9-19e5290879e0",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Fri, 06 Feb 2026 16:24:53 GMT",
+            "content-type": "application/json",
+            "content-length": "18",
+            "connection": "keep-alive",
+            "x-amzn-requestid": "a43197a0-5d5c-44aa-9fb9-19e5290879e0",
+            "access-control-allow-origin": "*",
+            "access-control-allow-headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-Content-Sha256,X-Amz-User-Agent,*,Date,X-Amz-Target,x-amzn-platform-id,x-amzn-trace-id",
+            "x-amz-apigw-id": "YXhZbHWGBcwEWsQ=",
+            "access-control-expose-headers": "x-amzn-ErrorType,x-amzn-requestid,x-amzn-errormessage,x-amzn-trace-id,x-amz-apigw-id,Date",
+            "x-amzn-trace-id": "Root=1-698615d5-64b39ca3155fb7a83eaa74ec;Parent=6f94a423181620c4;Sampled=0;Lineage=1:94bc262a:0",
+            "access-control-max-age": "86400"
+        },
+        "RetryAttempts": 0
+    },
+    "DetectorIds": []
+}

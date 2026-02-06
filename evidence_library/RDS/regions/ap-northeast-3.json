@@ -1,0 +1,15 @@
+{
+    "DBInstances": [],
+    "ResponseMetadata": {
+        "RequestId": "086f58b0-c42c-4664-a392-bf268804b221",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amzn-requestid": "086f58b0-c42c-4664-a392-bf268804b221",
+            "strict-transport-security": "max-age=31536000",
+            "content-type": "text/xml",
+            "content-length": "297",
+            "date": "Fri, 06 Feb 2026 16:25:38 GMT"
+        },
+        "RetryAttempts": 0
+    }
+}
