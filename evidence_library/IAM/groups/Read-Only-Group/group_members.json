@@ -1,0 +1,30 @@
+{
+    "Group": {
+        "Path": "/",
+        "GroupName": "Read-Only-Group",
+        "GroupId": "AGPA3TURCXF5HTMVQJYWW",
+        "Arn": "arn:aws:iam::111111111111:group/Read-Only-Group",
+        "CreateDate": "2023-01-29 17:53:49+00:00"
+    },
+    "Users": [
+        {
+            "Path": "/",
+            "UserName": "goose",
+            "UserId": "AIDA3TURCXF5KWFDYXPDC",
+            "Arn": "arn:aws:iam::111111111111:user/goose",
+            "CreateDate": "2025-11-03 00:38:00+00:00"
+        }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "af842bea-4e59-4197-add7-903e0e4fbfd5",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Fri, 06 Feb 2026 16:24:42 GMT",
+            "x-amzn-requestid": "af842bea-4e59-4197-add7-903e0e4fbfd5",
+            "content-type": "text/xml",
+            "content-length": "798"
+        },
+        "RetryAttempts": 0
+    }
+}

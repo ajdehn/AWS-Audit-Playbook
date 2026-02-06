@@ -1,0 +1,15 @@
+{
+    "AttachedPolicies": [],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "c04fe8aa-04ef-4e76-b0ba-aa20e0964e59",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Fri, 06 Feb 2026 16:24:44 GMT",
+            "x-amzn-requestid": "c04fe8aa-04ef-4e76-b0ba-aa20e0964e59",
+            "content-type": "text/xml",
+            "content-length": "360"
+        },
+        "RetryAttempts": 0
+    }
+}

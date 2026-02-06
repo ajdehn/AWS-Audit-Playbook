@@ -1,0 +1,14 @@
+{
+    "Rules": [],
+    "ResponseMetadata": {
+        "RequestId": "524293f1-621d-4746-b74d-be55eebaa24a",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amzn-requestid": "524293f1-621d-4746-b74d-be55eebaa24a",
+            "content-type": "application/x-amz-json-1.1",
+            "content-length": "12",
+            "date": "Fri, 06 Feb 2026 16:26:00 GMT"
+        },
+        "RetryAttempts": 0
+    }
+}

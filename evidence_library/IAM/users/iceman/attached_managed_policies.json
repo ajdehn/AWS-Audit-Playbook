@@ -1,0 +1,20 @@
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "IAMUserChangePassword",
+            "PolicyArn": "arn:aws:iam::aws:policy/IAMUserChangePassword"
+        }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "4022e459-40dc-47f9-b569-40c06fe92410",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Fri, 06 Feb 2026 16:24:43 GMT",
+            "x-amzn-requestid": "4022e459-40dc-47f9-b569-40c06fe92410",
+            "content-type": "text/xml",
+            "content-length": "546"
+        },
+        "RetryAttempts": 0
+    }
+}

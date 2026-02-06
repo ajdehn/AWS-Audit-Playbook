@@ -1,19 +1,19 @@
 {
     "Subscriptions": [
         {
-            "SubscriptionArn": "arn:aws:sns:us-east-1:111111111111:GuardDuty_to_Email:xyz",
+            "SubscriptionArn": "arn:aws:sns:us-east-1:111111111111:GuardDuty_to_Email:9a39b000-c2f8-4f59-89b2-52a57c0e537e",
             "Owner": "111111111111",
             "Protocol": "email",
-            "Endpoint": "aws-alerts@acme.com",
+            "Endpoint": "aws-alerts@auditops.io",
             "TopicArn": "arn:aws:sns:us-east-1:111111111111:GuardDuty_to_Email"
         }
     ],
     "ResponseMetadata": {
-        "RequestId": "xyz",
+        "RequestId": "a22875e6-23a8-5f36-bea2-17e63bcc2b91",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "x-amzn-requestid": "xyz",
-            "date": "Thu, 22 May 2025 12:33:02 GMT",
+            "x-amzn-requestid": "a22875e6-23a8-5f36-bea2-17e63bcc2b91",
+            "date": "Fri, 06 Feb 2026 16:26:12 GMT",
             "content-type": "text/xml",
             "content-length": "710",
             "connection": "keep-alive"

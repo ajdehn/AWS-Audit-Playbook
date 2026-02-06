@@ -1,6 +1,7 @@
 {
     "Volumes": [
         {
+            "AvailabilityZoneId": "use1-az5",
             "Iops": 3000,
             "VolumeType": "gp3",
             "MultiAttachEnabled": false,
@@ -8,36 +9,35 @@
             "Operator": {
                 "Managed": false
             },
-            "VolumeId": "vol-xyz",
+            "VolumeId": "vol-0fad5b6c1c9198060",
             "Size": 8,
-            "SnapshotId": "snap-xyz",
-            "AvailabilityZone": "us-east-1a",
+            "SnapshotId": "snap-09c6080e76e2ee4fc",
+            "AvailabilityZone": "us-east-1f",
             "State": "in-use",
-            "CreateTime": "2025-05-04 14:52:42.828000+00:00",
+            "CreateTime": "2026-02-06 16:22:35.188000+00:00",
             "Attachments": [
                 {
                     "DeleteOnTermination": true,
-                    "VolumeId": "vol-xyz",
-                    "InstanceId": "i-xyz",
+                    "VolumeId": "vol-0fad5b6c1c9198060",
+                    "InstanceId": "i-00ad64923065104d8",
                     "Device": "/dev/xvda",
                     "State": "attached",
-                    "AttachTime": "2025-05-04 14:52:42+00:00"
+                    "AttachTime": "2026-02-06 16:22:35+00:00"
                 }
             ],
-            "Encrypted": true,
-            "KmsKeyId": "arn:aws:kms:us-east-1:111111111111:key/xyz"
+            "Encrypted": false
         }
     ],
     "ResponseMetadata": {
-        "RequestId": "xyz",
+        "RequestId": "a2b2eada-7f57-430d-835a-7f61bb462633",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "x-amzn-requestid": "xyz",
+            "x-amzn-requestid": "a2b2eada-7f57-430d-835a-7f61bb462633",
             "cache-control": "no-cache, no-store",
             "strict-transport-security": "max-age=31536000; includeSubDomains",
             "content-type": "text/xml;charset=UTF-8",
-            "content-length": "1020",
-            "date": "Thu, 08 May 2025 11:05:51 GMT",
+            "content-length": "1121",
+            "date": "Fri, 06 Feb 2026 16:25:31 GMT",
             "server": "AmazonEC2"
         },
         "RetryAttempts": 0

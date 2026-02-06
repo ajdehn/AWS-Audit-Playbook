@@ -1,0 +1,45 @@
+{
+    "Group": {
+        "Path": "/",
+        "GroupName": "Admin-Group",
+        "GroupId": "AGPA3TURCXF5BRURZGNO6",
+        "Arn": "arn:aws:iam::111111111111:group/Admin-Group",
+        "CreateDate": "2022-08-12 22:26:44+00:00"
+    },
+    "Users": [
+        {
+            "Path": "/",
+            "UserName": "slider",
+            "UserId": "AIDA3TURCXF5LJGCKJSJ2",
+            "Arn": "arn:aws:iam::111111111111:user/slider",
+            "CreateDate": "2025-11-03 00:54:42+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "itauditguy",
+            "UserId": "AIDA3TURCXF5MUI5NKMTI",
+            "Arn": "arn:aws:iam::111111111111:user/itauditguy",
+            "CreateDate": "2022-11-11 23:41:41+00:00",
+            "PasswordLastUsed": "2026-02-06 16:21:38+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "iceman",
+            "UserId": "AIDA3TURCXF5NGTHI54WF",
+            "Arn": "arn:aws:iam::111111111111:user/iceman",
+            "CreateDate": "2025-11-03 00:38:24+00:00"
+        }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "ee375e74-6175-4d44-a828-a0117bd7b110",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Fri, 06 Feb 2026 16:24:42 GMT",
+            "x-amzn-requestid": "ee375e74-6175-4d44-a828-a0117bd7b110",
+            "content-type": "text/xml",
+            "content-length": "1362"
+        },
+        "RetryAttempts": 0
+    }
+}

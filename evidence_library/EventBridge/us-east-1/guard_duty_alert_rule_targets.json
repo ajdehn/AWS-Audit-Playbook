@@ -1,7 +1,7 @@
 {
     "Targets": [
         {
-            "Id": "xyz",
+            "Id": "Id954affd7-72e6-4c09-bdbc-d485b40ddf45",
             "Arn": "arn:aws:sns:us-east-1:111111111111:GuardDuty_to_Email",
             "InputTransformer": {
                 "InputPathsMap": {
@@ -12,18 +12,18 @@
                     "region": "$.region",
                     "severity": "$.detail.severity"
                 },
-                "InputTemplate": "\"AWS <Account_ID> has a severity <severity> GuardDuty finding type <Finding_Type> in the <region> region.\"\n\"Finding Description:\"\n\"<Finding_description>. \"\n\"For more details open the GuardDuty console at https://console.aws.amazon.com/guardduty/home?region=<region>#/findings?search=id%3D<Finding_ID>\""
+                "InputTemplate": "\n\"AWS <Account_ID> has a severity <severity> GuardDuty finding type <Finding_Type> in the <region> region.\"\n\"Finding Description:\"\n\"<Finding_description>. \"\n\"For more details open the GuardDuty console at https://console.aws.amazon.com/guardduty/home?region=<region>#/findings?search=id%3D<Finding_ID>\"\n                            "
             }
         }
     ],
     "ResponseMetadata": {
-        "RequestId": "xyz",
+        "RequestId": "a180ed68-23ea-4560-8b12-2a9bc3f5e92d",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "x-amzn-requestid": "xyz",
+            "x-amzn-requestid": "a180ed68-23ea-4560-8b12-2a9bc3f5e92d",
             "content-type": "application/x-amz-json-1.1",
-            "content-length": "681",
-            "date": "Thu, 22 May 2025 12:33:01 GMT"
+            "content-length": "713",
+            "date": "Fri, 06 Feb 2026 16:26:11 GMT"
         },
         "RetryAttempts": 0
     }

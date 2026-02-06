@@ -1,7 +1,7 @@
 {
     "SecurityGroups": [
         {
-            "GroupId": "sg-2345",
+            "GroupId": "sg-0d3a9f0b108d87954",
             "IpPermissionsEgress": [
                 {
                     "IpProtocol": "-1",
@@ -17,39 +17,31 @@
             ],
             "Tags": [
                 {
-                    "Key": "Name",
-                    "Value": "bastion-host-sg"
-                },
-                {
-                    "Key": "Note",
-                    "Value": "To connect to this instance, you will need to enable temporary IP access."
-                },
-                {
-                    "Key": "Reviewed_By",
-                    "Value": "AJ Dehn"
-                },
-                {
-                    "Key": "Last Reviewed",
-                    "Value": "2025-05-31"
+                    "Key": "Last_Review_Date",
+                    "Value": "2026-01-08"
                 },
                 {
                     "Key": "Description",
-                    "Value": "Security group for Bastion Host. This is used by Twingate."
+                    "Value": "Security group used to control traffic to TwinGate host."
                 },
                 {
                     "Key": "Owner",
                     "Value": "Engineering"
+                },
+                {
+                    "Key": "Reviewed_By",
+                    "Value": "AJ Dehn"
                 }
             ],
-            "VpcId": "vpc-xyz",
-            "SecurityGroupArn": "arn:aws:ec2:us-east-1:111111111111:security-group/sg-2345",
+            "VpcId": "vpc-0e6463c734ce09ced",
+            "SecurityGroupArn": "arn:aws:ec2:us-east-1:111111111111:security-group/sg-0d3a9f0b108d87954",
             "OwnerId": "111111111111",
             "GroupName": "bastion-host-sg",
             "Description": "Bastion Host Security Group",
             "IpPermissions": []
         },
         {
-            "GroupId": "sg-4567",
+            "GroupId": "sg-0c8fdfe934b59f4fa",
             "IpPermissionsEgress": [
                 {
                     "IpProtocol": "-1",
@@ -63,181 +55,56 @@
                     "PrefixListIds": []
                 }
             ],
-            "Tags": [
-                {
-                    "Key": "Reviewed_By",
-                    "Value": "AJ Dehn"
-                },                
-                {
-                    "Key": "Last Reviewed",
-                    "Value": "2025-03-29"
-                },
-                {
-                    "Key": "Owner",
-                    "Value": "Engineering"
-                },
-                {
-                    "Key": "Name",
-                    "Value": "default-unable-to-delete"
-                },
-                {
-                    "Key": "Description",
-                    "Value": "This is the default security group and cannot be deleted."
-                }
-            ],
-            "VpcId": "vpc-xyz",
-            "SecurityGroupArn": "arn:aws:ec2:us-east-1:111111111111:security-group/sg-4567",
+            "VpcId": "vpc-0e6463c734ce09ced",
+            "SecurityGroupArn": "arn:aws:ec2:us-east-1:111111111111:security-group/sg-0c8fdfe934b59f4fa",
             "OwnerId": "111111111111",
             "GroupName": "default",
             "Description": "default VPC security group",
-            "IpPermissions": []
-        },
-        {
-            "GroupId": "sg-3456",
-            "IpPermissionsEgress": [
+            "IpPermissions": [
                 {
                     "IpProtocol": "-1",
-                    "UserIdGroupPairs": [],
-                    "IpRanges": [
-                        {
-                            "CidrIp": "0.0.0.0/0"
-                        }
-                    ],
-                    "Ipv6Ranges": [],
-                    "PrefixListIds": []
-                },
-                {
-                    "IpProtocol": "tcp",
-                    "FromPort": 3306,
-                    "ToPort": 3306,
                     "UserIdGroupPairs": [
                         {
                             "UserId": "111111111111",
-                            "GroupId": "sg-5678"
+                            "GroupId": "sg-0c8fdfe934b59f4fa"
                         }
                     ],
                     "IpRanges": [],
-                    "Ipv6Ranges": [],
-                    "PrefixListIds": []
-                }
-            ],
-            "Tags": [
-                {
-                    "Key": "Owner",
-                    "Value": "Engineering"
-                },
-                {
-                    "Key": "Description",
-                    "Value": "Controls traffic to Lambda functions."
-                },
-                {
-                    "Key": "Reviewed_By",
-                    "Value": "AJ Dehn"
-                },                {
-                    "Key": "Last Reviewed",
-                    "Value": "2025-03-29"
-                },
-                {
-                    "Key": "Name",
-                    "Value": "Lambda SG"
-                }
-            ],
-            "VpcId": "vpc-xyz",
-            "SecurityGroupArn": "arn:aws:ec2:us-east-1:111111111111:security-group/sg-3456",
-            "OwnerId": "111111111111",
-            "GroupName": "lambda-prod-security-group",
-            "Description": "Controls traffic to Lambda.",
-            "IpPermissions": [
-                {
-                    "IpProtocol": "tcp",
-                    "FromPort": 0,
-                    "ToPort": 65535,
-                    "UserIdGroupPairs": [],
-                    "IpRanges": [
-                        {
-                            "CidrIp": "0.0.0.0/0"
-                        }
-                    ],
                     "Ipv6Ranges": [],
                     "PrefixListIds": []
                 }
             ]
         },
         {
-            "GroupId": "sg-1234",
+            "GroupId": "sg-0f1c8a3d07e49bb15",
             "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "-1",
+                    "UserIdGroupPairs": [],
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ],
+            "VpcId": "vpc-07f04ca6f41cbb18f",
+            "SecurityGroupArn": "arn:aws:ec2:us-east-1:111111111111:security-group/sg-0f1c8a3d07e49bb15",
+            "OwnerId": "111111111111",
+            "GroupName": "default",
+            "Description": "default VPC security group",
+            "IpPermissions": [
                 {
                     "IpProtocol": "-1",
                     "UserIdGroupPairs": [
                         {
-                            "Description": "Traffic to ECS",
                             "UserId": "111111111111",
-                            "GroupId": "sg-6789"
-                        },
-                        {
-                            "Description": "Allow traffic to Bastion host.",
-                            "UserId": "111111111111",
-                            "GroupId": "sg-2345"
+                            "GroupId": "sg-0f1c8a3d07e49bb15"
                         }
                     ],
                     "IpRanges": [],
-                    "Ipv6Ranges": [],
-                    "PrefixListIds": []
-                },
-                {
-                    "IpProtocol": "tcp",
-                    "FromPort": 443,
-                    "ToPort": 443,
-                    "UserIdGroupPairs": [],
-                    "IpRanges": [
-                        {
-                            "Description": "HTTPs to internet.",
-                            "CidrIp": "0.0.0.0/0"
-                        }
-                    ],
-                    "Ipv6Ranges": [],
-                    "PrefixListIds": []
-                }
-            ],
-            "Tags": [
-                {
-                    "Key": "Reviewed_By",
-                    "Value": "AJ Dehn"
-                },                
-                {
-                    "Key": "Last Reviewed",
-                    "Value": "2025-03-28"
-                },
-                {
-                    "Key": "Owner",
-                    "Value": "Engineering"
-                },
-                {
-                    "Key": "Name",
-                    "Value": "app LB SG"
-                },
-                {
-                    "Key": "Description",
-                    "Value": "Controls traffic to app.acme.com"
-                }
-            ],
-            "VpcId": "vpc-xyz",
-            "SecurityGroupArn": "arn:aws:ec2:us-east-1:111111111111:security-group/sg-1234",
-            "OwnerId": "111111111111",
-            "GroupName": "acme-web-lb-sg",
-            "Description": "load balancer for web SG",
-            "IpPermissions": [
-                {
-                    "IpProtocol": "tcp",
-                    "FromPort": 443,
-                    "ToPort": 443,
-                    "UserIdGroupPairs": [],
-                    "IpRanges": [
-                        {
-                            "Description": "Allow HTTPS to Load Balancer.",
-                            "CidrIp": "0.0.0.0/0"
-                        }
-                    ],
                     "Ipv6Ranges": [],
                     "PrefixListIds": []
                 }
@@ -245,16 +112,16 @@
         }
     ],
     "ResponseMetadata": {
-        "RequestId": "xyz",
+        "RequestId": "02f2d2b3-dbf4-4114-8c0a-cc28e3b9fad3",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "x-amzn-requestid": "xyz",
+            "x-amzn-requestid": "02f2d2b3-dbf4-4114-8c0a-cc28e3b9fad3",
             "cache-control": "no-cache, no-store",
             "strict-transport-security": "max-age=31536000; includeSubDomains",
             "vary": "accept-encoding",
             "content-type": "text/xml;charset=UTF-8",
-            "transfer-encoding": "chunked",
-            "date": "Wed, 25 Jun 2025 12:38:54 GMT",
+            "content-length": "2494",
+            "date": "Fri, 06 Feb 2026 16:25:32 GMT",
             "server": "AmazonEC2"
         },
         "RetryAttempts": 0

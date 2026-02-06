@@ -1,0 +1,30 @@
+{
+    "Group": {
+        "Path": "/",
+        "GroupName": "Student-Group",
+        "GroupId": "AGPA3TURCXF5EXZAMCECQ",
+        "Arn": "arn:aws:iam::111111111111:group/Student-Group",
+        "CreateDate": "2023-01-29 16:53:21+00:00"
+    },
+    "Users": [
+        {
+            "Path": "/",
+            "UserName": "goose",
+            "UserId": "AIDA3TURCXF5KWFDYXPDC",
+            "Arn": "arn:aws:iam::111111111111:user/goose",
+            "CreateDate": "2025-11-03 00:38:00+00:00"
+        }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "05ff2e0f-4319-4564-9fa2-1d3667ad8991",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Fri, 06 Feb 2026 16:24:43 GMT",
+            "x-amzn-requestid": "05ff2e0f-4319-4564-9fa2-1d3667ad8991",
+            "content-type": "text/xml",
+            "content-length": "794"
+        },
+        "RetryAttempts": 0
+    }
+}

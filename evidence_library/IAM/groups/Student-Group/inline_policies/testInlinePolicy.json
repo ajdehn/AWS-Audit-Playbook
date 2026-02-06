@@ -1,0 +1,26 @@
+{
+    "GroupName": "Student-Group",
+    "PolicyName": "testInlinePolicy",
+    "PolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "VisualEditor0",
+                "Effect": "Allow",
+                "Action": "ec2:DescribeAccountAttributes",
+                "Resource": "*"
+            }
+        ]
+    },
+    "ResponseMetadata": {
+        "RequestId": "8158b5b1-92ca-4741-8cef-ca3e89c1956c",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Fri, 06 Feb 2026 16:24:43 GMT",
+            "x-amzn-requestid": "8158b5b1-92ca-4741-8cef-ca3e89c1956c",
+            "content-type": "text/xml",
+            "content-length": "704"
+        },
+        "RetryAttempts": 0
+    }
+}

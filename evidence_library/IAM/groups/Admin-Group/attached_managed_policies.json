@@ -1,0 +1,20 @@
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "AdministratorAccess",
+            "PolicyArn": "arn:aws:iam::aws:policy/AdministratorAccess"
+        }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "dc9953c7-b6f9-40f1-88fd-389f30aafef1",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Fri, 06 Feb 2026 16:24:42 GMT",
+            "x-amzn-requestid": "dc9953c7-b6f9-40f1-88fd-389f30aafef1",
+            "content-type": "text/xml",
+            "content-length": "546"
+        },
+        "RetryAttempts": 0
+    }
+}

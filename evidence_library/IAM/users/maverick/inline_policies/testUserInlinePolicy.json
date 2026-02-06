@@ -1,0 +1,26 @@
+{
+    "UserName": "maverick",
+    "PolicyName": "testUserInlinePolicy",
+    "PolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "VisualEditor0",
+                "Effect": "Allow",
+                "Action": "lambda:ListAliases",
+                "Resource": "*"
+            }
+        ]
+    },
+    "ResponseMetadata": {
+        "RequestId": "6201d1f4-6d20-443c-b138-ac809e9573a5",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Fri, 06 Feb 2026 16:24:44 GMT",
+            "x-amzn-requestid": "6201d1f4-6d20-443c-b138-ac809e9573a5",
+            "content-type": "text/xml",
+            "content-length": "686"
+        },
+        "RetryAttempts": 0
+    }
+}
