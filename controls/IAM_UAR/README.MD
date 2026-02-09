@@ -16,9 +16,8 @@ A disgruntled former employee realizes they still have access to your organizati
   * [inline_policies.json](/evidence_library/IAM/groups/Student-Group/inline_policies.json) lists all inline policies granted to the IAM group. This evidence is gathered by calling the [list_groups_for_user()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/iam/client/list_groups_for_user.html) command in Boto3.
 
 ## Testing Details
-1. Review management's most recent AWS user access review and confirm they have conducted a full review of the permission structure. At a minimum, the review should consider the following elements:
-  * Inline and attached policies granted directly to IAM users.
-  * IAM group membership and the permissions (inline & attached) granted to each group.
+1. Review management's most recent AWS user access review and confirm they have conducted a full review of the permission structure. At a minimum, the review should consider permissions attached to IAM users (inline and attached), IAM group membership, and permissions (inline & attached) granted to each group.
 
 ## Other Resources
 - [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=2005756602)
+- [Example User Access Review](https://docs.google.com/spreadsheets/d/1epwxTlQ885XFQvFFiRAXecGDwrd8W_poTtay5_4ApAA/edit?usp=sharing)
