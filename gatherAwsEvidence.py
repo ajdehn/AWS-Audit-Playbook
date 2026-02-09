@@ -189,7 +189,7 @@ def saveEC2Evidence(config):
                 allVolumes = fetchData(ec2_client.describe_volumes)
                 saveJson(allVolumes, f'audit_evidence/EC2/regions/{region}/allVolumes.json')
             if config['EC2_Tags']:
-                allInstances = fetchData(ec2_client.describe_volumes)
+                allInstances = fetchData(ec2_client.describe_instances)
                 saveJson(allInstances, f'audit_evidence/EC2/regions/{region}/allInstances.json')
             if config['EC2_Public_Security_Groups']:
                 allSecurityGroups = fetchData(ec2_client.describe_security_groups)

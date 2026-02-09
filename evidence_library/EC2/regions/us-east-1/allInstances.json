@@ -1,43 +1,169 @@
 {
-    "Volumes": [
+    "Reservations": [
         {
-            "AvailabilityZoneId": "use1-az5",
-            "Iops": 3000,
-            "VolumeType": "gp3",
-            "MultiAttachEnabled": false,
-            "Throughput": 125,
-            "Operator": {
-                "Managed": false
-            },
-            "VolumeId": "vol-0fad5b6c1c9198060",
-            "Size": 8,
-            "SnapshotId": "snap-09c6080e76e2ee4fc",
-            "AvailabilityZone": "us-east-1f",
-            "State": "in-use",
-            "CreateTime": "2026-02-06 16:22:35.188000+00:00",
-            "Attachments": [
+            "ReservationId": "r-0a4a3257b5b7c64fe",
+            "OwnerId": "111111111111",
+            "Groups": [],
+            "Instances": [
                 {
-                    "DeleteOnTermination": true,
-                    "VolumeId": "vol-0fad5b6c1c9198060",
+                    "Architecture": "x86_64",
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/xvda",
+                            "Ebs": {
+                                "AttachTime": "2026-02-06 16:22:35+00:00",
+                                "DeleteOnTermination": true,
+                                "Status": "attached",
+                                "VolumeId": "vol-0fad5b6c1c9198060"
+                            }
+                        }
+                    ],
+                    "ClientToken": "81a87b1d-f323-4558-8dd6-ee169bbf3908",
+                    "EbsOptimized": true,
+                    "EnaSupport": true,
+                    "Hypervisor": "xen",
+                    "NetworkInterfaces": [
+                        {
+                            "Attachment": {
+                                "AttachTime": "2026-02-06 16:22:34+00:00",
+                                "AttachmentId": "eni-attach-0403d858c67192056",
+                                "DeleteOnTermination": true,
+                                "DeviceIndex": 0,
+                                "Status": "attached",
+                                "NetworkCardIndex": 0
+                            },
+                            "Description": "",
+                            "Groups": [
+                                {
+                                    "GroupId": "sg-0d3a9f0b108d87954",
+                                    "GroupName": "bastion-host-sg"
+                                }
+                            ],
+                            "Ipv6Addresses": [],
+                            "MacAddress": "16:ff:f9:82:45:e9",
+                            "NetworkInterfaceId": "eni-0a8a23ca816562e6e",
+                            "OwnerId": "111111111111",
+                            "PrivateDnsName": "ip-172-31-78-243.ec2.internal",
+                            "PrivateIpAddress": "172.31.78.243",
+                            "PrivateIpAddresses": [
+                                {
+                                    "Primary": true,
+                                    "PrivateDnsName": "ip-172-31-78-243.ec2.internal",
+                                    "PrivateIpAddress": "172.31.78.243"
+                                }
+                            ],
+                            "SourceDestCheck": true,
+                            "Status": "in-use",
+                            "SubnetId": "subnet-0fc75009e10fde021",
+                            "VpcId": "vpc-0e6463c734ce09ced",
+                            "InterfaceType": "interface",
+                            "Operator": {
+                                "Managed": false
+                            }
+                        }
+                    ],
+                    "RootDeviceName": "/dev/xvda",
+                    "RootDeviceType": "ebs",
+                    "SecurityGroups": [
+                        {
+                            "GroupId": "sg-0d3a9f0b108d87954",
+                            "GroupName": "bastion-host-sg"
+                        }
+                    ],
+                    "SourceDestCheck": true,
+                    "StateReason": {
+                        "Code": "Client.UserInitiatedShutdown",
+                        "Message": "Client.UserInitiatedShutdown: User initiated shutdown"
+                    },
+                    "Tags": [
+                        {
+                            "Key": "Name",
+                            "Value": "bastion-host"
+                        }
+                    ],
+                    "VirtualizationType": "hvm",
+                    "CpuOptions": {
+                        "CoreCount": 1,
+                        "ThreadsPerCore": 2
+                    },
+                    "CapacityReservationSpecification": {
+                        "CapacityReservationPreference": "open"
+                    },
+                    "HibernationOptions": {
+                        "Configured": false
+                    },
+                    "MetadataOptions": {
+                        "State": "applied",
+                        "HttpTokens": "required",
+                        "HttpPutResponseHopLimit": 2,
+                        "HttpEndpoint": "enabled",
+                        "HttpProtocolIpv6": "disabled",
+                        "InstanceMetadataTags": "disabled"
+                    },
+                    "EnclaveOptions": {
+                        "Enabled": false
+                    },
+                    "BootMode": "uefi-preferred",
+                    "PlatformDetails": "Linux/UNIX",
+                    "UsageOperation": "RunInstances",
+                    "UsageOperationUpdateTime": "2026-02-06 16:22:34+00:00",
+                    "PrivateDnsNameOptions": {
+                        "HostnameType": "ip-name",
+                        "EnableResourceNameDnsARecord": true,
+                        "EnableResourceNameDnsAAAARecord": false
+                    },
+                    "MaintenanceOptions": {
+                        "AutoRecovery": "default",
+                        "RebootMigration": "default"
+                    },
+                    "CurrentInstanceBootMode": "uefi",
+                    "NetworkPerformanceOptions": {
+                        "BandwidthWeighting": "default"
+                    },
+                    "Operator": {
+                        "Managed": false
+                    },
                     "InstanceId": "i-00ad64923065104d8",
-                    "Device": "/dev/xvda",
-                    "State": "attached",
-                    "AttachTime": "2026-02-06 16:22:35+00:00"
+                    "ImageId": "ami-0532be01f26a3de55",
+                    "State": {
+                        "Code": 80,
+                        "Name": "stopped"
+                    },
+                    "PrivateDnsName": "ip-172-31-78-243.ec2.internal",
+                    "PublicDnsName": "",
+                    "StateTransitionReason": "User initiated (2026-02-06 16:23:09 GMT)",
+                    "KeyName": "IT Audit Guy's Key Pair",
+                    "AmiLaunchIndex": 0,
+                    "ProductCodes": [],
+                    "InstanceType": "t3.micro",
+                    "LaunchTime": "2026-02-06 16:22:34+00:00",
+                    "Placement": {
+                        "AvailabilityZoneId": "use1-az5",
+                        "GroupName": "",
+                        "Tenancy": "default",
+                        "AvailabilityZone": "us-east-1f"
+                    },
+                    "Monitoring": {
+                        "State": "disabled"
+                    },
+                    "SubnetId": "subnet-0fc75009e10fde021",
+                    "VpcId": "vpc-0e6463c734ce09ced",
+                    "PrivateIpAddress": "172.31.78.243"
                 }
-            ],
-            "Encrypted": false
+            ]
         }
     ],
     "ResponseMetadata": {
-        "RequestId": "4a7ed3bc-bd3c-4cad-89a3-1803901f900f",
+        "RequestId": "490e9719-c309-4290-a776-0fa80bddf12e",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "x-amzn-requestid": "4a7ed3bc-bd3c-4cad-89a3-1803901f900f",
+            "x-amzn-requestid": "490e9719-c309-4290-a776-0fa80bddf12e",
             "cache-control": "no-cache, no-store",
             "strict-transport-security": "max-age=31536000; includeSubDomains",
+            "vary": "accept-encoding",
             "content-type": "text/xml;charset=UTF-8",
-            "content-length": "1121",
-            "date": "Fri, 06 Feb 2026 16:25:31 GMT",
+            "content-length": "4688",
+            "date": "Fri, 06 Feb 2026 20:04:55 GMT",
             "server": "AmazonEC2"
         },
         "RetryAttempts": 0
