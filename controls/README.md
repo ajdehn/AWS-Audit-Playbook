@@ -2,5 +2,4 @@
 
 | Control Title  | Control Description | Link to Documentation |
 | ------------- | ------------- | ------------- |
-| IAM MFA  | Content Cell  | Content Cell  |
-| IAM Key Age  | Content Cell  | Content Cell  |
+| IAM MFA  | All users with an active password must have MFA enabled. | [Link](URL)  |
