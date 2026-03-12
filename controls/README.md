@@ -1,19 +1,14 @@
 # Control Library
-| Priority | Control Title | Control Description | Control Documentation | Type |
-| ------------- | ------------- | ------------- | ------------- |------------- |
-| 1 | IAM MFA | All users with an active password must have MFA enabled. | [Link](/controls/IAM_MFA) | Automated |
-| 2 | IAM Key Age | IAM access keys are rotated at least every 90 days. | [Link](/controls/IAM_Key_Age) | Automated |
-| 3 | CloudTrail | At least one multi-region CloudTrail is enabled with log-file validation.| [Link](/controls/Cloud_Trail_Multi_Region) | Automated |
-| 4.1 | S3 Block Public Access | S3 buckets are configured to block public access. | [Link](/controls/S3_Public) | Automated |
-| 4.2 | RDS Block Public Access | RDS instances are configured to block public access. | [Link](/controls/RDS_Public) | Automated |
-| 5 | RDS Backup Retention | RDS backups are retained for at least 14 days. | [Link](/controls/RDS_Backup) | Automated |
-| 6.1 | User Access Review | Management conducts a user access review on at least a quarterly basis. | [Link](/controls/IAM_UAR) | Manual |
-| 6.2 | EC2 Firewall Review | EC2 security groups have the proper tags applied, and have been reviewed in the last year. | [Link](/controls/EC2_SG_Tags) | Automated |
-| 7.1 | GuardDuty Enabled | GuardDuty is enabled for in-scope regions. | [Link](/controls/GD_Enabled) | Automated |
-| 7.1 | GuardDuty Alerts | GuardDuty is configured to send alerts to relevant personnel, for each in-scope region. | [Link](/controls/GD_Alerts) | Manual |
-| 8 | Vulnerability Scans | Management conducts an infrastructure vulnerability scan on at least a quarterly basis. | COMING SOON | Manual |
-| 9.1 | S3 Encryption | S3 buckets are encrypted at rest. | [Link](/controls/S3_Encrypt) | Automated |
-| 9.2 | RDS Encryption | RDS instances in the AWS account are encrypted. | [Link](/controls/RDS_Encrypt) | Automated |
-| 10.1 | RDS Tags | RDS instances have appropriate tags applied. | [Link](/controls/RDS_Tags) | Automated |
-| 10.2 | S3 Tags | S3 buckets have appropriate tags applied. | [Link](/controls/S3_Tags) | Automated |
-| 10.3 | EC2 Tags | EC2 instances have appropriate tags applied. | [Link](/controls/EC2_Tags) | Automated |
+| Priority | Control Description | Type | Control Documentation |
+| ------------- | ------------- | ------------- |------------- |
+| 1 | All users with an active password must have MFA enabled. | Automated | [IAM MFA](/controls/IAM_MFA)<br> |
+| 2 | IAM access keys are rotated at least every 90 days. | Automated | [IAM Key Age](/controls/IAM_Key_Age) |
+| 3 | At least one multi-region CloudTrail is enabled with log-file validation.| Automated | [Cloud Trail Multi Region](/controls/Cloud_Trail_Multi_Region) |
+| 4 | Cloud assets are configured to block public access. | Automated | [S3_Public](/controls/S3_Public)<br>[RDS_Public](/controls/RDS_Public) |
+| 5 | RDS backups are retained for at least 14 days. | Automated | [RDS_Backup](/controls/RDS_Backup) |
+| 6.1 | Management conducts a user access review on at least a quarterly basis. | Manual | [IAM_UAR](/controls/IAM_UAR) |
+| 6.2 | EC2 security groups have the proper tags applied, and have been reviewed in the last year. | Automated | [EC2_SG_Tags](/controls/EC2_SG_Tags) |
+| 7 | GuardDuty is enabled and configured to send alerts to relevant personnel. | Partially Automated | [GD_Enabled](/controls/GD_Enabled)<br>[GD_Alerts](/controls/GD_Alerts) |
+| 8 | Management conducts an infrastructure vulnerability scan on at least a quarterly basis. | Manual |COMING SOON |
+| 9 | Cloud resources are encrypted at rest and in-transit. | Automated | [RDS_Encrypt](/controls/RDS_Encrypt)<br>[S3_Encrypt](/controls/S3_Encrypt) |
+| 10 | Cloud resources are tagged based on the requirements set in the asset management policy. | Automated | [EC2 Tags](/controls/EC2_Tags)<br>[RDS Tags](/controls/RDS_Tags)<br>[S3 Tags](/controls/S3_Tags) |
