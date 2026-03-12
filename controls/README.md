@@ -11,7 +11,7 @@
 | 6.2 | EC2 Firewall Review | EC2 security groups have the proper tags applied, and have been reviewed in the last year. | [Link](/controls/EC2_SG_Tags) | Automated |
 | 7.1 | GuardDuty Enabled | GuardDuty is enabled for in-scope regions. | [Link](/controls/GD_Enabled) | Automated |
 | 7.1 | GuardDuty Alerts | GuardDuty is configured to send alerts to relevant personnel, for each in-scope region. | [Link](/controls/GD_Alerts) | Manual |
-| 8 | Vulnerability Scans | Management conducts an infrastructure vulnerability scan on at least a quarterly basis. | [COMING SOON](/) | Manual |
+| 8 | Vulnerability Scans | Management conducts an infrastructure vulnerability scan on at least a quarterly basis. | COMING SOON | Manual |
 | 9.1 | S3 Encryption | S3 buckets are encrypted at rest. | [Link](/controls/S3_Encrypt) | Automated |
 | 9.2 | RDS Encryption | RDS instances in the AWS account are encrypted. | [Link](/controls/RDS_Encrypt) | Automated |
 | 10.1 | RDS Tags | RDS instances have appropriate tags applied. | [Link](/controls/RDS_Tags) | Automated |
