@@ -1,5 +1,5 @@
 # Control Library
-| Priority | Control Title | Control Description | Link to Documentation | Type |
+| Priority | Control Title | Control Description | Control Documentation | Type |
 | ------------- | ------------- | ------------- | ------------- |------------- |
 | 1 | IAM MFA | All users with an active password must have MFA enabled. | [Link](/controls/IAM_MFA) | Automated |
 | 2 | IAM Key Age | IAM access keys are rotated at least every 90 days. | [Link](/controls/IAM_Key_Age) | Automated |
