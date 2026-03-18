@@ -13,4 +13,4 @@ S3 buckets are configured to encrypt data in-transit.
 3. Confirm there is a rule that blocks traffic if "SecureTransport" is not enforced.
 
 ## Other Resources
-- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=427799283)
+- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=1041868984)
