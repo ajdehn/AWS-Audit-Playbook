@@ -1,0 +1,17 @@
+{
+    "ResponseMetadata": {
+        "RequestId": "VNZ38PHX7HREED29",
+        "HostId": "xwOxK48yJc5IHfTyQKE2wY4iqxtxpWgTc7eBTu+6dUR1vH5FgJHc4hY4J3fww/oJDRnuXzXL7mYXSbCOm+NL26+hrBQvHBuk",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amz-id-2": "xwOxK48yJc5IHfTyQKE2wY4iqxtxpWgTc7eBTu+6dUR1vH5FgJHc4hY4J3fww/oJDRnuXzXL7mYXSbCOm+NL26+hrBQvHBuk",
+            "x-amz-request-id": "VNZ38PHX7HREED29",
+            "date": "Wed, 18 Mar 2026 20:05:31 GMT",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "server": "AmazonS3"
+        },
+        "RetryAttempts": 0
+    },
+    "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::bad-bucket-54321/*\"}]}"
+}

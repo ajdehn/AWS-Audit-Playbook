@@ -26,9 +26,10 @@ def main():
         "RDS_Backup": True,
         "RDS_Encrypt": True,
         "RDS_Public": True,
-        "RDS_Tags": True,     
+        "RDS_Tags": True,
         "S3_Encrypt": True,
         "S3_Public": True,
+        "S3_Secure_Transport": True,
         "S3_Tags": True
     }
 
@@ -62,7 +63,7 @@ def checkConfigFile(config):
         # Check if each control is in the config file, and confirm that the value is boolean.
     allControls = ['Cloud_Trail_Multi_Region', 'EBS_Encryption', 'EC2_Public_Security_Groups', 'EC2_Tags',
                    'GD_Alerts', 'GD_Enabled', 'GD_Findings', 'IAM_Admin', 'IAM_Key_Age', 'IAM_MFA', 'IAM_PWD',
-                   'IAM_UAR', 'RDS_Backup', 'RDS_Encrypt', 'RDS_Public', 'RDS_Tags', 'S3_Encrypt', 'S3_Public', 'S3_Tags']
+                   'IAM_UAR', 'RDS_Backup', 'RDS_Encrypt', 'RDS_Public', 'RDS_Tags', 'S3_Encrypt', 'S3_Secure_Transport', 'S3_Public', 'S3_Tags']
     for controlName in allControls:
         if config.get(controlName) is None:
             raise KeyError(f"Invalid configuration. {controlName} is not in the config file")
@@ -234,6 +235,14 @@ def saveS3Evidence(config):
             except ClientError as e:
                 print(f"Warning: unable to collect S3 public access settings for {bucket['Name']}.")
                 pass
+        if config['S3_Secure_Transport']:
+            # Collect & save bucket policy       
+            try:
+                bucketPolicy = s3_client.get_bucket_policy(Bucket=bucketName)
+                saveJson(bucketPolicy, f"audit_evidence/S3/buckets/{bucketName}/bucket_policy.json")
+            except ClientError as e:
+                print(f"Warning: unable to obtain S3 bucket policy for {bucket['Name']}.")
+                pass        
         if config['S3_Tags']:   
             # Collect & save bucket tags
             try:
