@@ -4,7 +4,7 @@ S3 buckets are configured to encrypt data in-transit.
 ## Required Evidence
 * [all_s3_buckets.json](/evidence_library/S3/all_s3_buckets.json) provides a list of all S3 buckets.
   * This evidence is gathered by calling the [list_buckets()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_buckets.html) command in Boto3.
-* [public_access_settings.json](/evidence_library/S3/buckets/itauditguy/public_access_settings.json) provides the public access settings for an individual S3 bucket.
+* [bucket_policy.json](/evidence_library/S3/buckets/itauditguy/bucket_policy.json) provides the bucket policy which controls access to the S3 bucket.
   * This evidence is gathered by calling the [get_bucket_policy()](https://docs.aws.amazon.com/boto3/latest/reference/services/s3/client/get_bucket_policy.html) command for each S3 bucket.
 
 ## Testing Details
