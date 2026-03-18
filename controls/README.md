@@ -10,5 +10,6 @@
 | 6.2 | Management conducts a firewall review on at least a quarterly basis. | Automated | [EC2_SG_Tags](/controls/EC2_SG_Tags) |
 | 7 | The production environment is monitored for suspicious or anomalous activity. Alerts are sent to the Security team for investigation, when necessary. | Partially Automated | [GD_Enabled](/controls/GD_Enabled)<br>[GD_Alerts](/controls/GD_Alerts) |
 | 8 | Management conducts an infrastructure vulnerability scan on at least a quarterly basis. | Manual | Coming Soon |
-| 9 | Cloud resources are encrypted at rest. | Automated | [RDS_Encrypt](/controls/RDS_Encrypt)<br>[S3_Encrypt](/controls/S3_Encrypt) |
+| 9.1 | Cloud resources are configured to encrypt data in-transit. | Automated | [S3_Secure_Transport](/controls/S3_Secure_Transport)|
+| 9.2 | Cloud resources are encrypted at rest. | Automated | [RDS_Encrypt](/controls/RDS_Encrypt)<br>[S3_Encrypt](/controls/S3_Encrypt) |
 | 10 | Cloud resources are tagged based on the requirements set in the asset management policy. | Automated | [EC2 Tags](/controls/EC2_Tags)<br>[RDS Tags](/controls/RDS_Tags)<br>[S3 Tags](/controls/S3_Tags) |
