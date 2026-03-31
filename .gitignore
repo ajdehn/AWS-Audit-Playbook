@@ -1,3 +1,6 @@
-/audit_evidence
+/tmp
 /controls/_TEMPLATE
 .env
+config.json
+.DS_Store
+src/__pycache__/
