@@ -173,9 +173,7 @@ def test_iam_password_policy(audit, control_id):
     # Retrieve values from config. If not available, set safe defaults.
     control_config = audit.config.get("control_config") or {}
     required_min_length = control_config.get("iam_password_min_length", 14)
-    required_complexity = control_config.get("iam_password_min_complexity_types", 4)
-    required_expiration = control_config.get("iam_password_require_expiration", False)
-    required_max_password_age = control_config.get("iam_password_max_password_age", 365)
+    req_min_complexity_types = control_config.get("iam_password_min_complexity_types", 4)
     required_password_history = control_config.get("iam_password_password_history", 24)
 
     control = Control(
@@ -184,83 +182,83 @@ def test_iam_password_policy(audit, control_id):
             f"IAM passwords must comply with the organizations password complexity requirements."
         ),
         test_procedures=[
-            "Retrieved account password policy using get_account_password_policy.",
-            "Inspected the password configuration to determine if they match the test attributes defined below."
+            "Obtained IAM password configuration by using the account_password_policy() boto3 command.",
+            "Saved password configuration in the audit evidence folder (IAM/password_policy.json)."
+            "Inspected the password configuration (IAM/password_policy.json) to determine if they match the test attributes defined below."
         ],
         test_attributes=[
             f"MinimumPasswordLength must be >= {required_min_length}.",
-            f"At least {required_complexity} complexity types (RequireSymbols, RequireNumbers, "
+            f"At least {req_min_complexity_types} complexity types (RequireSymbols, RequireNumbers, "
             "RequireUppercaseCharacters, and RequireLowercaseCharacters) are set to True.",
             f"PasswordReusePrevention must be >= {required_password_history}."
         ],
         audit=audit
     )
 
+    # Gather evidence
     iam = boto3.client("iam")
     policy = audit.evidence_client.get_aws(
         "IAM/password_policy.json",
         lambda: iam.get_account_password_policy(),
         not_found_codes=["NoSuchEntity"]
     )
-
     if not policy:
         control.result = False
-        control.result_description = "No password policy configured"
+        control.result_description = "No password policy configured."
         return control
 
     password_policy = policy.get("PasswordPolicy", {})
     failures = []
-
-    # --- Minimum length ---
+    # Test password minimum length
     actual_min_length = password_policy.get("MinimumPasswordLength", 0)
     if actual_min_length < required_min_length:
         failures.append(
             f"Minimum password length too short (current={actual_min_length}, required>={required_min_length})"
         )
 
-    # --- Complexity ---
+    # Test password complexity requirements
     complexity_flags = [
         password_policy.get("RequireSymbols", False),
         password_policy.get("RequireNumbers", False),
         password_policy.get("RequireUppercaseCharacters", False),
         password_policy.get("RequireLowercaseCharacters", False),
     ]
-    enabled_complexity_count = sum(complexity_flags)
-    if enabled_complexity_count < required_complexity:
+    actual_num_complexity_types = sum(complexity_flags)
+    if actual_num_complexity_types < req_min_complexity_types:
         failures.append(
-            f"Not enough complexity types enabled (current={enabled_complexity_count}/4, required>={required_complexity}/4)"
+            f"Not enough complexity types enabled (current={actual_num_complexity_types}/4, required>={req_min_complexity_types}/4)"
         )
 
-    # --- Password history ---
-    password_history_count = password_policy.get("PasswordReusePrevention", 0)
-    if password_history_count < required_password_history:
+    # Test password history (number of passwords remembered by AWS)
+    actual_password_history = password_policy.get("PasswordReusePrevention", 0)
+    if actual_password_history < required_password_history:
         failures.append(
-            f"Password history too small (current={password_history_count}, required>={required_password_history})"
+            f"Password history too small (current={actual_password_history}, required>={required_password_history})"
         )
 
-    # --- Expiration ---
+    # Test password expiration, if required by config.json
+    required_expiration = control_config.get("iam_password_require_expiration", False)
     if required_expiration:
+        required_max_password_age = control_config.get("iam_password_max_password_age", 365)        
         expire_enabled = password_policy.get("ExpirePasswords", False)
-        max_age = password_policy.get("MaxPasswordAge")
+        actual_max_password_age = password_policy.get("MaxPasswordAge")
+        # Add password expiration as test attribute.
         control.test_attributes.append(
             f"Passwords must expire within {required_max_password_age} days."
         )
         if not expire_enabled:
-            failures.append("Password expiration is not enabled")
-        elif max_age is None:
-            failures.append("Max password age is not set")
-        elif max_age > required_max_password_age:
+            failures.append("Password expiration is not enabled.")
+        elif actual_max_password_age is None:
+            failures.append("Max password age is not set.")
+        elif actual_max_password_age > required_max_password_age:
             failures.append(
-                f"Password max age too high (current={max_age}, required<={required_max_password_age})"
+                f"Password max age too high (current={max_age}, required<={required_max_password_age}.)"
             )
 
     # --- Final result ---
     control.result = len(failures) == 0
-    if control.result:
-        control.result_description = "Password policy meets requirements."
-    else:
+    if not control.result:
         control.result_description = "; ".join(failures)
-    
     return control
 
 
