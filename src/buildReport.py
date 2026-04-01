@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, LETTER
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, ListFlowable, ListItem, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, ListFlowable, ListItem, PageBreak, KeepTogether
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 BASE_STYLES = getSampleStyleSheet()
@@ -165,40 +165,10 @@ def render_summary_page(controls, styles):
         ("PADDING", (0, 0), (-1, -1), 6),
     ]))
 
-    elements.append(table)
+    elements.append(KeepTogether(table))
     elements.append(Spacer(1, 24))
 
     return elements
-
-def make_cell(text, style, color=None, align=None):
-    """
-    Helper to create consistently styled table cells.
-    """
-    if color:
-        style = ParagraphStyle(
-            name=f"{style.name}_colored",
-            parent=style,
-            textColor=color
-        )
-    if align is not None:
-        style = ParagraphStyle(
-            name=f"{style.name}_aligned",
-            parent=style,
-            alignment=align
-        )
-    return Paragraph(str(text), style)
-
-def build_numbered_list(items, style):
-    flowables = []
-    for i, item in enumerate(items, 1):
-        flowables.append(Paragraph(f"{i}. {item}", style))
-    return flowables
-
-def build_bullet_list(items, style):
-    flowables = []
-    for item in items:
-        flowables.append(Paragraph(f"• {item}", style))
-    return flowables
 
 
 """
@@ -239,16 +209,14 @@ def generate_pdf_report(audit, controls, filename="aws_audit_report.pdf"):
     # Detailed Findings
     for control in controls:
         if not control.is_excluded:
-            elements.append(
-                render_control_summary(control, page_width)
-            )
+            summary_table = render_control_summary(control, page_width)
+            elements.append(KeepTogether(summary_table))
             elements.append(Spacer(1, 16))
             sample_table = render_sample_table(control, page_width)
             if sample_table:
-                elements.append(sample_table)
-                elements.append(Spacer(1, 20))
-            # Create new page for each control
-            elements.append(PageBreak())
+                elements.append(KeepTogether(sample_table))
+
+            elements.append(Spacer(1, 30))
 
     doc.build(elements)
     print(f"Report generated: {filename}")
