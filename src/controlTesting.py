@@ -3,6 +3,7 @@ from typing import List, Dict, Optional
 from utils import is_sample_excluded, check_sample_exclusion, is_control_excluded
 import boto3
 import botocore
+from datetime import datetime, timezone
 
 # NOTE: Result is set to "False" until logic determines sample meets testing criteria.
 @dataclass
@@ -33,6 +34,9 @@ class Control:
     samples: List["Sample"] = field(default_factory=list)
     result: bool = True
     result_description: str = ""
+    num_findings: int = 0
+    num_exclusions: int = 0
+    total_population: int = 0
     is_excluded: bool = False
 
     def __post_init__(self):
@@ -57,25 +61,42 @@ class Control:
 
     def evaluate_all_samples(self):
         if self.is_excluded:
-            return False
-        
-        # Remove excluded samples.
+            self.result = False
+            self.num_findings = 0
+            self.total_population = 0
+            self.num_exclusions = 0
+            return self
+
+        # Determine total population (includes pass, fail, and exclusions)
+        self.total_population = len(self.samples)
+
+        # Count exclusions first
+        self.num_exclusions = sum(1 for s in self.samples if s.is_excluded)
+
+        # Filter in-scope samples
         in_scope_samples = [s for s in self.samples if not s.is_excluded]
 
         if not in_scope_samples:
-            # Decide your policy here:
-            return False  # safer default for audits
+            # No valid samples. Control passes with a population of zero.
+            return self
 
-        return all(s.result for s in in_scope_samples)
+        # Count findings (failures)
+        self.num_findings = sum(1 for s in in_scope_samples if not s.result)
+
+        # Final result
+        self.result = self.num_findings == 0
+        return self
 
 def test_s3_encryption(audit, control_id):
     control = Control(
         control_id=control_id, audit=audit,
         control_description="S3 buckets are encrypted at rest.",
         test_procedures=[
-            "Obtained a list of all S3 buckets via the list_buckets() boto3 command. See S3/buckets.json in the evidence folder.",
-            "Obtained the encryption settings for each bucket by calling the get_bucket_encryption() boto3 command. See S3/[bucket_name]/encryption.json in the evidence folder.",
-            "Inspected the encryption settings to determine if the bucket was encrypted. See test attributes below for more details."
+            "Obtained a list of all S3 buckets by calling the list_buckets() boto3 command.",
+            "Saved the list of all S3 buckets in the audit evidence folder (S3/buckets.json).",
+            "Obtained the encryption settings for each bucket by calling the get_bucket_encryption() boto3 command.",
+            "Saved the encryption settings for each S3 bucket (S3/[bucket_name]/encryption.json).",
+            "Inspected the encryption settings for each bucket to determine if they comply with the test attributes below."
         ],
         test_attributes=["ServerSideEncryptionConfiguration is present in encryption.json."],
         table_headers=["Bucket Name", "Result", "Comments"]
@@ -84,9 +105,9 @@ def test_s3_encryption(audit, control_id):
         # No further testing required.
         return control
     s3 = boto3.client("s3")
-    # Get all buckets
+    # Obtain and save list of all buckets.
     buckets = audit.evidence_client.get("S3/buckets.json", lambda: s3.list_buckets())
-    # Evaluate each bucket
+    # Loop through each bucket
     for bucket in buckets.get("Buckets", []):
         sample = Sample(
             sample_id={"bucket_name": bucket['Name']},
@@ -98,6 +119,7 @@ def test_s3_encryption(audit, control_id):
             # Add excluded sample to control, and move to next bucket.
             control.samples.append(sample)
             continue
+        # Obtain and save bucket's encryption settings.
         enc = audit.evidence_client.get_aws(f"S3/buckets/{bucket['Name']}/encryption.json",
             lambda: s3.get_bucket_encryption(Bucket=bucket['Name']),
             not_found_codes=["ServerSideEncryptionConfigurationNotFoundError"]
@@ -109,6 +131,9 @@ def test_s3_encryption(audit, control_id):
         control.samples.append(sample)
 
     control.evaluate_all_samples()
+    if not control.result:
+        # Document exception language.
+        control.result_description = f"Exceptions Noted. {num_findings} S3 buckets were not encrypted or excluded by management."
     return control
 
 def test_s3_public_access(audit, control_id):
@@ -166,7 +191,7 @@ def test_s3_public_access(audit, control_id):
         control.samples.append(sample)
 
     # Check if all samples passed.
-    control.result = control.evaluate_all_samples()
+    control.evaluate_all_samples()
     return control
 
 def test_iam_password_policy(audit, control_id):
@@ -183,8 +208,8 @@ def test_iam_password_policy(audit, control_id):
         ),
         test_procedures=[
             "Obtained IAM password configuration by using the account_password_policy() boto3 command.",
-            "Saved password configuration in the audit evidence folder (IAM/password_policy.json)."
-            "Inspected the password configuration (IAM/password_policy.json) to determine if they match the test attributes defined below."
+            "Saved password configuration in the audit evidence folder (IAM/password_policy.json).",
+            "Inspected the password configuration to determine if they match the test attributes defined below."
         ],
         test_attributes=[
             f"MinimumPasswordLength must be >= {required_min_length}.",
@@ -261,7 +286,6 @@ def test_iam_password_policy(audit, control_id):
         control.result_description = "; ".join(failures)
     return control
 
-
 def test_root_no_access_keys(audit, control_id):
     control = Control(
         control_id=control_id,
@@ -280,36 +304,21 @@ def test_root_no_access_keys(audit, control_id):
         return control
 
     iam = boto3.client("iam")
-
     summary = audit.evidence_client.get_aws(
         "IAM/account_summary.json",
         lambda: iam.get_account_summary()
     )
 
-    sample = Sample(
-        sample_id={"account": "root"},
-        control_id=control_id
-    )
-
-    sample = check_sample_exclusion(control_id, sample, audit.config)
-    if sample.is_excluded:
-        control.samples.append(sample)
-        control.result = control.evaluate_all_samples()
-        return control
-
     account_summary = summary.get("SummaryMap", {})
     root_keys = account_summary.get("AccountAccessKeysPresent", 0)
 
     if root_keys == 0:
-        sample.result = True
+        control.result = True
     else:
-        sample.comments = f"Root has {root_keys} access key(s)"
+        control.result = False
+        control.result_description = f"Root has {root_keys} access key(s)"
 
-    control.samples.append(sample)
-
-    control.result = control.evaluate_all_samples()
     return control
-
 
 def test_root_mfa_enabled(audit, control_id):
     control = Control(
@@ -335,31 +344,17 @@ def test_root_mfa_enabled(audit, control_id):
         lambda: iam.get_account_summary()
     )
 
-    sample = Sample(
-        sample_id={"account": "root"},
-        control_id=control_id
-    )
-
-    sample = check_sample_exclusion(control_id, sample, audit.config)
-    if sample.is_excluded:
-        control.samples.append(sample)
-        control.result = control.evaluate_all_samples()
-        return control
-
     account_summary = summary.get("SummaryMap", {})
     mfa_enabled = account_summary.get("AccountMFAEnabled", 0)
 
     if mfa_enabled == 1:
-        sample.result = True
+        control.result = True
     else:
-        sample.comments = "Root account does not have MFA enabled"
-
-    control.samples.append(sample)
-
-    control.result = control.evaluate_all_samples()
+        control.result = False
+        control.result_description = "Root account does not have MFA enabled"
+        
     return control
 
-from datetime import datetime, timezone
 
 def test_iam_access_key_age(audit, control_id):
     control_config = audit.config.get("control_config") or {}
@@ -430,7 +425,7 @@ def test_iam_access_key_age(audit, control_id):
 
             control.samples.append(sample)
 
-    control.result = control.evaluate_all_samples()
+    control.evaluate_all_samples()
     return control
 
 def get_all_regions(service_name="rds"):
@@ -487,7 +482,6 @@ def test_rds_encryption_all_regions(audit, control_id):
 
     control.evaluate_all_samples()
     return control
-
 
 def test_rds_public_access_all_regions(audit, control_id):
     control = Control(
