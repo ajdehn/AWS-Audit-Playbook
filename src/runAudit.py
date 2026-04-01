@@ -36,4 +36,4 @@ if __name__ == "__main__":
     controls.append(controlTesting.test_rds_encryption_all_regions(audit, "C1310"))
     controls.append(controlTesting.test_rds_public_access_all_regions(audit, "C1310"))
 
-    generate_pdf_report(audit, controls, "tmp/aws_audit_report.pdf")
+    generate_pdf_report(audit, controls, "AWS", file_name="tmp/aws_audit_report.pdf")
