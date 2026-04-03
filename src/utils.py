@@ -89,3 +89,36 @@ def confirm_delete_folder(folder_path):
             print("Using cached evidence.")
         else:
             print("Invalid character. Folder not deleted.")
+
+"""
+Evaluates required tags against resource tags (S3, RDS, EC2, etc).
+
+Args:
+    sample (Sample): The sample object to update with results.
+    required_tags (list): List of required tag keys.
+    resource_tags (dict): Dictionary of tag key/value pairs from the resource.
+
+Returns:
+    None. Updates sample.result and sample.comments in-place.
+"""
+def evaluate_tags(sample, required_tags, actual_resource_tags):
+    # Normalize keys to lowercase for comparison
+    actual_resource_tags_lower = {k.lower(): v for k, v in actual_resource_tags.items()}
+
+    missing_tags = []
+    empty_tags = []
+
+    for key in required_tags:
+        key_lower = key.lower()
+        if key_lower not in actual_resource_tags_lower:
+            missing_tags.append(key)
+        elif actual_resource_tags_lower[key_lower].strip() == "":
+            empty_tags.append(key)
+
+    if not missing_tags and not empty_tags:
+        sample.result = True
+    else:
+        if missing_tags:
+            sample.comments += f"Missing tags: {missing_tags}. "
+        if empty_tags:
+            sample.comments += f"Empty tag values: {empty_tags}."

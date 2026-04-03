@@ -38,6 +38,7 @@ if __name__ == "__main__":
     controls.append(controlTesting.test_rds_backup_retention(audit, "RDS Backup Retention"))
     controls.append(controlTesting.test_rds_encryption(audit, "RDS Encryption"))
     controls.append(controlTesting.test_rds_public_access(audit, "RDS Public Access"))
+    controls.append(controlTesting.test_rds_tags(audit, "RDS Tags"))
 
     controls.append(controlTesting.test_cloudtrail_global_logging(audit, "CloudTrail Multi-Region"))
     controls.append(controlTesting.test_cloudtrail_log_file_validation(audit, "CloudTrail Log File Validation"))

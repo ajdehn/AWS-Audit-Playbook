@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Any
-from utils import is_control_excluded, process_sample_exclusion
+from utils import is_control_excluded, process_sample_exclusion, evaluate_tags
 import boto3
 import botocore
 from datetime import datetime, timezone, timedelta
@@ -273,27 +273,8 @@ def test_s3_tags(audit, control_id, risk_rating=1):
             not_found_codes=["NoSuchTagSet"]
         )
 
-        bucket_tags = {t["Key"]: t.get("Value", "") for t in tags_response.get("TagSet", [])}
-
-        bucket_tags_lower = {k.lower(): v for k, v in bucket_tags.items()}
-
-        missing_tags = []
-        empty_tags = []
-        for key in required_tags:
-            key_lower = key.lower()
-            if key_lower not in bucket_tags_lower:
-                missing_tags.append(key)
-            elif bucket_tags_lower[key_lower].strip() == "":
-                empty_tags.append(key)
-
-        if not missing_tags and not empty_tags:
-            sample.result = True
-        else:
-            if missing_tags:
-                sample.comments += f"Missing tags: {missing_tags}. "
-            if empty_tags:
-                sample.comments += f"Empty tag values: {empty_tags}."
-
+        actual_bucket_tags = {t["Key"]: t.get("Value", "") for t in tags_response.get("TagSet", [])}
+        evaluate_tags(sample, required_tags, actual_bucket_tags)
         control.samples.append(sample)
 
     control.evaluate_samples()
@@ -771,6 +752,77 @@ def test_rds_public_access(audit, control_id, risk_rating=3):
         control.result_description = f"Exceptions Noted. {control.num_findings} RDS instances are publicly accessible."
     return control
 
+"""
+    Control: RDS instances must have required tags applied with non-empty values.
+"""
+def test_rds_tags(audit, control_id, risk_rating=1):
+    # Get base required tags.
+    control_config = audit.config.get("control_config") or {}
+    base_required_tags = control_config.get("base_required_tags", ["Owner", "Description", "Classification"])
+
+    # Override if 'rds_required_tags' is set
+    required_tags = control_config.get("rds_required_tags", base_required_tags)
+
+    control = Control(
+        control_id=control_id,
+        control_description=(
+            "RDS instances must have required tags applied and tag values must not be empty."
+        ),
+        test_procedures=[
+            "For each in-scope region, obtained the list of DB instances by calling describe_db_instances() boto3 command.",
+            "Saved the list of DB instances in the audit evidence folder (RDS/[region_name]/db_instances.json).",
+            "For each DB instance, obtained its tags using list_tags_for_resource() boto3 command.",
+            f"Inspected each DB instance to determine if the following tag keys exist and have non-empty values: {required_tags}"
+        ],
+        test_attributes=[],
+        audit=audit,
+        table_headers=["Region", "DB Instance", "Result", "Comments"],
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    for region in audit.in_scope_regions:
+        rds = boto3.client("rds", region_name=region)
+
+        instances = audit.evidence_client.get_aws(
+            f"RDS/{region}/db_instances.json",
+            fetch_fn=None,
+            paginator_params={
+                "client": rds,
+                "method_name": "describe_db_instances",
+                "pagination_key": "DBInstances"
+            }
+        )
+
+        for db in instances.get("DBInstances", []):
+            sample = Sample(
+                sample_id={"region": region, "db_instance": db["DBInstanceIdentifier"]},
+                control_id=control_id
+            )
+
+            if process_sample_exclusion(control, sample, audit):
+                continue
+
+            arn = db.get("DBInstanceArn")
+            tags_response = audit.evidence_client.get_aws(
+                f"RDS/{region}/db_instances/{db['DBInstanceIdentifier']}/tags.json",
+                lambda: rds.list_tags_for_resource(ResourceName=arn)
+            )
+
+            actual_db_tags = {t["Key"]: t.get("Value", "") for t in tags_response.get("TagList", [])}
+            
+            evaluate_tags(sample, required_tags, actual_db_tags)
+            control.samples.append(sample)
+
+    control.evaluate_samples()
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} RDS instance(s) missing required tags or have empty values."
+        )
+
+    return control
 
 def test_rds_backup_retention(audit, control_id, risk_rating=1):
     control_config = audit.config.get("control_config") or {}
