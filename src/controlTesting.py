@@ -876,6 +876,180 @@ def test_rds_backup_retention(audit, control_id, risk_rating=1):
         control.result_description = f"Exceptions Noted. {control.num_findings} RDS instances do not have sufficient backup retention (at least {required_rds_retention_days} days)."    
     return control
 
+def test_ebs_volume_encryption(audit, control_id, risk_rating=2):
+    control = Control(
+        control_id=control_id,
+        control_description="EBS volumes are encrypted at rest.",
+        test_procedures=[
+            "For each in-scope region, obtained the list of EBS volumes by calling describe_volumes() boto3 command.",
+            "Saved the list of volumes in the audit evidence folder (EC2/[region_name]/volumes.json).",
+            "Inspected the configuration for each volume to determine if they comply with the test attribute(s) below."
+        ],
+        test_attributes=["Encrypted = True."],
+        audit=audit,
+        table_headers=["Region", "Volume ID", "Result", "Comments"],
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    for region in audit.in_scope_regions:
+        ec2 = boto3.client("ec2", region_name=region)
+
+        volumes = audit.evidence_client.get_aws(
+            f"EC2/{region}/volumes.json",
+            fetch_fn=None,
+            paginator_params={
+                "client": ec2,
+                "method_name": "describe_volumes",
+                "pagination_key": "Volumes"
+            }
+        )
+
+        for volume in volumes.get("Volumes", []):
+            sample = Sample(
+                sample_id={"region": region, "volume_id": volume["VolumeId"]},
+                control_id=control_id
+            )
+
+            if process_sample_exclusion(control, sample, audit):
+                continue
+
+            if volume.get("Encrypted"):
+                sample.result = True
+            else:
+                sample.comments = "EBS volume is not encrypted."
+
+            control.samples.append(sample)
+
+    control.evaluate_samples()
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} EBS volume(s) are not encrypted."
+        )
+
+    return control
+
+def test_ebs_tags(audit, control_id, risk_rating=1):
+    """
+    Control: EBS volumes must have required tags applied with non-empty values.
+    """
+    # Get base required tags.
+    control_config = audit.config.get("control_config") or {}
+    base_required_tags = control_config.get("base_required_tags", ["Owner", "Description", "Classification"])
+
+    # Override if 'ebs_required_tags' is set
+    required_tags = control_config.get("ebs_required_tags", base_required_tags)
+
+    control = Control(
+        control_id=control_id,
+        control_description=(
+            "EBS volumes must have required tags applied and tag values must not be empty."
+        ),
+        test_procedures=[
+            "For each in-scope region, obtained the list of EBS volumes by calling describe_volumes() boto3 command.",
+            "Saved the list of volumes in the audit evidence folder (EC2/[region_name]/volumes.json).",
+            "For each volume, obtained its tags from the 'Tags' attribute.",
+            f"Inspected each EBS volume to determine if the following tag keys exist and have non-empty values: {required_tags}"
+        ],
+        test_attributes=[],
+        audit=audit,
+        table_headers=["Region", "Volume ID", "Result", "Comments"],
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    for region in audit.in_scope_regions:
+        ec2 = boto3.client("ec2", region_name=region)
+
+        volumes = audit.evidence_client.get_aws(
+            f"EC2/{region}/volumes.json",
+            fetch_fn=None,
+            paginator_params={
+                "client": ec2,
+                "method_name": "describe_volumes",
+                "pagination_key": "Volumes"
+            }
+        )
+
+        for volume in volumes.get("Volumes", []):
+            sample = Sample(
+                sample_id={"region": region, "volume_id": volume["VolumeId"]},
+                control_id=control_id
+            )
+
+            if process_sample_exclusion(control, sample, audit):
+                continue
+
+            # EBS tags come in the 'Tags' attribute
+            volume_tags = {t["Key"]: t.get("Value", "") for t in volume.get("Tags", [])}
+
+            # Reuse helper to evaluate tags
+            evaluate_tags(sample, required_tags, volume_tags)
+
+            control.samples.append(sample)
+
+    control.evaluate_samples()
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} EBS volume(s) missing required tags or have empty values."
+        )
+
+    return control
+
+def test_ebs_default_encryption(audit, control_id, risk_rating=0):
+    # NOTE: Risk rating is set to 'Informational'. Not having this set does not mean there are unencrypted EBS volumes.
+    control = Control(
+        control_id=control_id,
+        control_description="EBS volumes must have default encryption enabled in each region.",
+        test_procedures=[
+            "For each in-scope region, checked if EBS default encryption is enabled using get_ebs_encryption_by_default() boto3 command.",
+            "Saved the results in the audit evidence folder (EC2/[region_name]/default_ebs_encryption.json).",
+            "Inspected the configuration for each region to determine compliance with the default encryption setting."
+        ],
+        test_attributes=["EbsEncryptionByDefault = True."],
+        audit=audit,
+        table_headers=["Region", "Result", "Comments"],
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    for region in audit.in_scope_regions:
+        ec2 = boto3.client("ec2", region_name=region)
+
+        default_encryption = audit.evidence_client.get_aws(
+            f"EC2/{region}/default_ebs_encryption.json",
+            lambda: ec2.get_ebs_encryption_by_default()
+        )
+
+        sample = Sample(
+            sample_id={"region": region},
+            control_id=control_id
+        )
+
+        if process_sample_exclusion(control, sample, audit):
+            continue
+
+        if default_encryption.get("EbsEncryptionByDefault"):
+            sample.result = True
+        else:
+            sample.comments = "EBS default encryption is not enabled in this region."
+
+        control.samples.append(sample)
+
+    control.evaluate_samples()
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} region(s) do not have EBS default encryption enabled."
+        )
+
+    return control
+
 def test_cloudtrail_global_logging(audit, control_id, risk_rating=3):
     control = Control(
         control_id=control_id,

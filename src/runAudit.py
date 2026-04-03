@@ -40,14 +40,17 @@ if __name__ == "__main__":
     controls.append(controlTesting.test_rds_public_access(audit, "RDS Public Access"))
     controls.append(controlTesting.test_rds_tags(audit, "RDS Tags"))
 
+    controls.append(controlTesting.test_ebs_volume_encryption(audit, "EBS Volume Encryption"))
+    controls.append(controlTesting.test_ebs_tags(audit, "EBS Tags"))
+    controls.append(controlTesting.test_ebs_default_encryption(audit, "EBS Encryption Default"))
+
     controls.append(controlTesting.test_cloudtrail_global_logging(audit, "CloudTrail Multi-Region"))
     controls.append(controlTesting.test_cloudtrail_log_file_validation(audit, "CloudTrail Log File Validation"))
     controls.append(controlTesting.test_cloudtrail_s3_bucket_protection(audit, "CloudTrail S3 Bucket Protection"))
     controls.append(controlTesting.test_cloudtrail_logging_recent_stops(audit, "CloudTrail Logging Recent Stops"))
 
-    # TODO: Add EC2 checks (tags, EBS Encryption, EBS default encryption)
+    # TODO: Add EC2 checks (Tag, EBS default encryption)
     # TODO: Add S3 object owner check
-    # TODO: Add Tagging Controls (RDS, EC2, EBS)
     # TODO: Add IAM tests (IAM User Unused Keys)
     # TODO: Add GuardDuty tests (GuardDuty Enabled, GuardDuty Alert Resolution)
     # TODO: Add WAF tests
