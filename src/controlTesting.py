@@ -712,3 +712,59 @@ def test_cloudtrail_global_logging(audit, control_id, risk_rating=3):
         )
 
     return control
+
+def test_cloudtrail_log_file_validation(audit, control_id, risk_rating=2):
+    control = Control(
+        control_id=control_id,
+        control_description="All CloudTrail trails have log file validation enabled.",
+        test_procedures=[
+            "Obtained CloudTrail trails using the describe_trails() boto3 command.",
+            "Saved the trail configuration in the audit evidence folder (CloudTrail/trails.json).",
+            "Inspected each trail's configuration to determine if log file validation is enabled."
+        ],
+        test_attributes=[
+            "LogFileValidationEnabled must be True for all trails."
+        ],
+        audit=audit,
+        table_headers=["Trail Name", "Result", "Comments"],
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    ct = boto3.client("cloudtrail")
+    trails = audit.evidence_client.get_aws(
+        "CloudTrail/trails.json",
+        lambda: ct.describe_trails(includeShadowTrails=False)
+    ).get("trailList", [])
+
+    if not trails:
+        control.result = False
+        control.result_description = "No CloudTrails configured."
+        return control
+
+    for trail in trails:
+        trail_name = trail["Name"]
+        sample = Sample(
+            sample_id={"trail_name": trail_name},
+            control_id=control_id
+        )
+
+        if process_sample_exclusion(control, sample, audit):
+            continue
+
+        log_validation = trail.get("LogFileValidationEnabled", False)
+        if log_validation:
+            sample.result = True
+        else:
+            sample.comments = "Log file validation is disabled."
+        control.samples.append(sample)
+
+    control.evaluate_samples()
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} trail(s) do not have log file validation enabled."
+        )
+
+    return control
