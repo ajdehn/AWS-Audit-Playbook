@@ -25,15 +25,16 @@ if __name__ == "__main__":
 
     confirm_delete_folder(audit.evidence_folder)
 
-    # Risk rating: 0 - Informational, 1 - Low, 2 - Medium, 3 - High.
-    controls.append(controlTesting.test_s3_encryption(audit, "S3 Encryption"))
-    controls.append(controlTesting.test_s3_public_access(audit, "S3 Public Access"))
     controls.append(controlTesting.test_root_mfa_enabled(audit, "IAM Root MFA"))
     controls.append(controlTesting.test_root_no_access_keys(audit, "IAM Root Access Key"))
     controls.append(controlTesting.test_iam_users_mfa(audit, "IAM User MFA"))
-
     controls.append(controlTesting.test_iam_access_key_age(audit, "IAM User Key Age"))
     controls.append(controlTesting.test_iam_password_policy(audit, "IAM Password"))
+
+    controls.append(controlTesting.test_s3_encryption(audit, "S3 Encryption"))
+    controls.append(controlTesting.test_s3_public_access(audit, "S3 Public Access"))
+    controls.append(controlTesting.test_s3_tags(audit, "S3 Tags"))
+
     controls.append(controlTesting.test_rds_backup_retention(audit, "RDS Backup Retention"))
     controls.append(controlTesting.test_rds_encryption(audit, "RDS Encryption"))
     controls.append(controlTesting.test_rds_public_access(audit, "RDS Public Access"))
@@ -45,8 +46,7 @@ if __name__ == "__main__":
 
     # TODO: Add EC2 checks (tags, EBS Encryption, EBS default encryption)
     # TODO: Add S3 object owner check
-    # TODO: Add encryption checks (EBS)
-    # TODO: Add Tagging Controls (RDS, S3, EC2, EBS)
+    # TODO: Add Tagging Controls (RDS, EC2, EBS)
     # TODO: Add IAM tests (IAM User Unused Keys)
     # TODO: Add GuardDuty tests (GuardDuty Enabled, GuardDuty Alert Resolution)
     # TODO: Add WAF tests

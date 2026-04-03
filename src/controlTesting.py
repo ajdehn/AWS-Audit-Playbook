@@ -218,6 +218,92 @@ def test_s3_public_access(audit, control_id, risk_rating=3):
         control.result_description = f"Exceptions Noted. {control.num_findings} S3 buckets were not blocking public access."
     return control
 
+"""
+    Control: S3 buckets must have required tags applied with non-empty values.
+"""
+def test_s3_tags(audit, control_id, risk_rating=1):
+    # Get base required tags.
+    control_config = audit.config.get("control_config") or {}
+    base_required_tags = control_config.get("base_required_tags", ["Owner", "Description", "Classification"])
+
+    # Check if 's3_required_tags' is set. If so, override base required tags.
+    control_config = audit.config.get("control_config") or {}
+    s3_required_tags = control_config.get("s3_required_tags")
+    if s3_required_tags:
+        required_tags = s3_required_tags
+    else:
+        required_tags = base_required_tags
+
+    control = Control(
+        control_id=control_id,
+        control_description=(
+            "S3 buckets must have required tags applied and tag values must not be empty."
+        ),
+        test_procedures=[
+            "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
+            "Saved the list of S3 buckets in the audit evidence folder (S3/buckets.json).",
+            "For each bucket, obtained its tags by calling get_bucket_tagging() boto3 command.",
+            "Saved the tags for each bucket in the audit evidence folder (S3/[bucket_name]/tags.json).",
+            f"Inspected each bucket to determine if the following tag keys exist and have non-empty values: {required_tags}"
+        ],
+        test_attributes=[],
+        audit=audit,
+        table_headers=["Bucket Name", "Result", "Comments"],
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    s3 = boto3.client("s3")
+    buckets = audit.evidence_client.get("S3/buckets.json", lambda: s3.list_buckets())
+
+    for bucket in buckets.get("Buckets", []):
+        sample = Sample(
+            sample_id={"bucket_name": bucket["Name"]},
+            control_id=control_id
+        )
+        if process_sample_exclusion(control, sample, audit):
+            continue
+
+        # Fetch bucket tags
+        tags_response = audit.evidence_client.get_aws(
+            f"S3/buckets/{bucket['Name']}/tags.json",
+            lambda: s3.get_bucket_tagging(Bucket=bucket["Name"]),
+            not_found_codes=["NoSuchTagSet"]
+        )
+
+        bucket_tags = {t["Key"]: t.get("Value", "") for t in tags_response.get("TagSet", [])}
+
+        bucket_tags_lower = {k.lower(): v for k, v in bucket_tags.items()}
+
+        missing_tags = []
+        empty_tags = []
+        for key in required_tags:
+            key_lower = key.lower()
+            if key_lower not in bucket_tags_lower:
+                missing_tags.append(key)
+            elif bucket_tags_lower[key_lower].strip() == "":
+                empty_tags.append(key)
+
+        if not missing_tags and not empty_tags:
+            sample.result = True
+        else:
+            if missing_tags:
+                sample.comments += f"Missing tags: {missing_tags}. "
+            if empty_tags:
+                sample.comments += f"Empty tag values: {empty_tags}."
+
+        control.samples.append(sample)
+
+    control.evaluate_samples()
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} bucket(s) missing required tags or have empty values."
+        )
+
+    return control
+
 def test_iam_password_policy(audit, control_id, risk_rating=2):
     # Retrieve values from config. If not available, set safe defaults.
     control_config = audit.config.get("control_config") or {}

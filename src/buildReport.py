@@ -40,11 +40,14 @@ def render_control_summary(control, page_width):
         [Paragraph("Control Description", LABEL_STYLE), Paragraph(control.control_description, VALUE_STYLE)],
         [Paragraph("Risk Rating", LABEL_STYLE), Paragraph(control.risk_rating_str, VALUE_STYLE)],
         [Paragraph("Test Procedures", LABEL_STYLE), test_procedures], 
-        [Paragraph("Test Attributes", LABEL_STYLE), test_attributes],
         [Paragraph("Conclusion", LABEL_STYLE), conclusion],
     ]
 
-        # Add row to summary table if control failed and result_description is populated.
+    if test_attributes:
+        # Add test attributes only when populated.
+        table_data.insert(4, [Paragraph("Test Attributes", LABEL_STYLE), test_attributes])
+
+    # Add row to summary table if control failed and result_description is populated.
     if not control.result and control.result_description:
         table_data.append([Paragraph("Comments", LABEL_STYLE), Paragraph(control.result_description, VALUE_STYLE)])
 
@@ -91,9 +94,7 @@ def render_sample_table(control, page_width):
             row.append(Paragraph("Excluded", CENTER_STYLE))
 
         if not sample.result:
-            # Fail control if one sample fails
-            # TODO: Consider if this is necessary. I thought this would be completed in controlTesting.py
-            control.result = False
+            # Add comments if sample failed.
             row.append(Paragraph(str(sample.comments), VALUE_STYLE))
 
         table_data.append(row)
@@ -123,22 +124,22 @@ def render_summary_page(controls, styles):
     elements.append(Paragraph("Audit Summary", styles["Heading1"]))
     elements.append(Spacer(1, 12))
 
-    summary_data = [
-        ["Total Controls", str(total)],
-        ["Passed", str(passed)],
-        ["Failed", str(failed)],
-        ["Out of Scope", str(excluded)],
+    audit_summary_data = [
+        ["Total Controls", Paragraph(str(total), CENTER_STYLE)],
+        ["Passed", Paragraph(str(passed), CENTER_STYLE)],
+        ["Failed", Paragraph(str(failed), CENTER_STYLE)],
+        ["Out of Scope", Paragraph(str(excluded), CENTER_STYLE)],
     ]
 
-    table = Table(summary_data, colWidths=[200, 100])
+    audit_summary_table = Table(audit_summary_data, colWidths=[200, 100])
 
-    table.setStyle(TableStyle([
+    audit_summary_table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (0, -1), colors.lightgrey),
         ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
         ("PADDING", (0, 0), (-1, -1), 6),
     ]))
 
-    elements.append(table)
+    elements.append(audit_summary_table)
     elements.append(Spacer(1, 24))
 
     control_summary_data = []
@@ -164,17 +165,15 @@ def render_summary_page(controls, styles):
         
         control_summary_data.append(row)
 
-    table = Table(control_summary_data, colWidths=[100, 200, 100, 100])
+    control_summary_table = Table(control_summary_data, colWidths=[100, 200, 75, 125])
 
-    table.setStyle(TableStyle([
+    control_summary_table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
         ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
         ("PADDING", (0, 0), (-1, -1), 6),
     ]))
 
-    elements.append(table)
-    elements.append(PageBreak())
-
+    elements.append(control_summary_table)
     return elements
 
 
@@ -187,7 +186,6 @@ Structure:
     3. Detailed Findings
         - Control Summary
         - Sample Findings
-        - TODO: Exclusions (Option to select summary or detail version)
 """
 def generate_pdf_report(audit, controls, tool_name, file_name="tmp/audit_report.pdf"):
     doc = SimpleDocTemplate(file_name, pagesize=letter,
