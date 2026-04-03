@@ -28,16 +28,17 @@ if __name__ == "__main__":
     # Risk rating: 0 - Informational, 1 - Low, 2 - Medium, 3 - High.
     controls.append(controlTesting.test_s3_encryption(audit, "S3 Encryption"))
     controls.append(controlTesting.test_s3_public_access(audit, "S3 Public Access"))
-    controls.append(controlTesting.test_iam_password_policy(audit, "IAM Password"))
     controls.append(controlTesting.test_root_mfa_enabled(audit, "IAM Root MFA"))
     controls.append(controlTesting.test_root_no_access_keys(audit, "IAM Root Access Key"))
-
+    controls.append(controlTesting.test_iam_users_mfa(audit, "IAM User MFA"))
+    
     controls.append(controlTesting.test_iam_access_key_age(audit, "IAM User Key Age"))
+    controls.append(controlTesting.test_iam_password_policy(audit, "IAM Password"))
     controls.append(controlTesting.test_rds_backup_retention(audit, "RDS Backup Retention"))
     controls.append(controlTesting.test_rds_encryption(audit, "RDS Encryption"))
     controls.append(controlTesting.test_rds_public_access(audit, "RDS Public Access"))
+
     controls.append(controlTesting.test_cloudtrail_global_logging(audit, "CloudTrail Multi-Region"))
-    
     controls.append(controlTesting.test_cloudtrail_log_file_validation(audit, "CloudTrail Log File Validation"))
 
     # TODO: Add default settings (new EBS volumes encrypted by default)

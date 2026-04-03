@@ -384,6 +384,85 @@ def test_root_mfa_enabled(audit, control_id, risk_rating=3):
         
     return control
 
+def test_iam_users_mfa(audit, control_id, risk_rating=3):
+    control = Control(
+        control_id=control_id,
+        control_description="IAM users with an active console password have MFA enabled.",
+        test_procedures=[
+            "Obtained a list of IAM users by calling the list_users() boto3 command.",
+            "Saved the list of users in the audit evidence folder (IAM/users.json).",
+            "For each user, checked if they have a console login profile using get_login_profile() boto3 command.",
+            "Saved the login profile for each user in the audit evidence folder (IAM/users/[user_name]/login_profile.json).",
+            "For users with a login profile, obtained MFA devices using list_mfa_devices() boto3 command.",
+            "Saved the MFA devices for each user in the audit evidence folder (IAM/users/[user_name]/mfa_devices.json).",
+            "Inspected each user's MFA devices to determine if at least one MFA device is enabled."
+        ],
+        test_attributes=[
+            "Each IAM user with console access must have at least one MFA device enabled."
+        ],
+        audit=audit,
+        table_headers=["User Name", "Result", "Comments"],
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    iam = boto3.client("iam")
+    users = audit.evidence_client.get_aws(
+        "IAM/users.json",
+        lambda: iam.list_users()
+    ).get("Users", [])
+
+    for user in users:
+        username = user["UserName"]
+        sample = Sample(
+            sample_id={"user": username},
+            control_id=control_id
+        )
+
+        if process_sample_exclusion(control, sample, audit):
+            continue
+
+        # Check if user has a console password
+        try:
+            audit.evidence_client.get_aws(
+                f"IAM/users/{username}/login_profile.json",
+                lambda: iam.get_login_profile(UserName=username),
+                not_found_codes=["NoSuchEntity"]
+            )
+        except botocore.exceptions.ClientError as e:
+            code = e.response["Error"]["Code"]
+            if code == "NoSuchEntity":
+                sample.is_excluded = True
+                sample.comments = "User has no console password (programmatic access only)."
+                control.samples.append(sample)
+                continue
+            else:
+                raise
+
+        # Check MFA devices
+        mfa_devices = audit.evidence_client.get_aws(
+            f"IAM/users/{username}/mfa_devices.json",
+            lambda: iam.list_mfa_devices(UserName=username)
+        ).get("MFADevices", [])
+
+        if mfa_devices:
+            sample.result = True
+        else:
+            sample.comments = "No MFA device enabled for this user."
+
+        control.samples.append(sample)
+
+    control.evaluate_samples()
+
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} IAM user(s) with console access do not have MFA enabled."
+        )
+
+    return control
+
 def test_iam_access_key_age(audit, control_id, risk_rating=3):
     control_config = audit.config.get("control_config") or {}
     max_age_days = control_config.get("iam_key_max_age", 365)
@@ -716,7 +795,7 @@ def test_cloudtrail_global_logging(audit, control_id, risk_rating=3):
 def test_cloudtrail_log_file_validation(audit, control_id, risk_rating=2):
     control = Control(
         control_id=control_id,
-        control_description="All CloudTrail trails have log file validation enabled.",
+        control_description="CloudTrail trails have log file validation enabled.",
         test_procedures=[
             "Obtained CloudTrail trails using the describe_trails() boto3 command.",
             "Saved the trail configuration in the audit evidence folder (CloudTrail/trails.json).",
