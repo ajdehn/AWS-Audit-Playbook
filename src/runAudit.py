@@ -25,15 +25,24 @@ if __name__ == "__main__":
     # TODO: Check if control is excluded before performing testing.
     confirm_delete_folder(audit.evidence_folder)
 
-    controls.append(controlTesting.test_s3_encryption(audit, "C1000"))
-    controls.append(controlTesting.test_s3_public_access(audit, "C1010"))
-    controls.append(controlTesting.test_iam_password_policy(audit, "C1110"))
-    controls.append(controlTesting.test_root_mfa_enabled(audit, "C1120"))
-    
-    controls.append(controlTesting.test_root_no_access_keys(audit, "C1130"))
-    controls.append(controlTesting.test_iam_access_key_age(audit, "C1140"))
-    controls.append(controlTesting.test_rds_backup_retention_all_regions(audit, "C1300"))
-    controls.append(controlTesting.test_rds_encryption_all_regions(audit, "C1310"))
-    controls.append(controlTesting.test_rds_public_access_all_regions(audit, "C1310"))
+    controls.append(controlTesting.test_s3_encryption(audit, "S3 Encryption"))
+    controls.append(controlTesting.test_s3_public_access(audit, "S3 Public Access"))
+    controls.append(controlTesting.test_iam_password_policy(audit, "IAM Password"))
+    controls.append(controlTesting.test_root_mfa_enabled(audit, "IAM Root MFA"))
+    controls.append(controlTesting.test_root_no_access_keys(audit, "IAM Root Access Key"))
 
-    generate_pdf_report(audit, controls, "tmp/aws_audit_report.pdf")
+    controls.append(controlTesting.test_iam_access_key_age(audit, "IAM User Key Age"))
+    controls.append(controlTesting.test_rds_backup_retention(audit, "RDS Backup Retention"))
+    controls.append(controlTesting.test_rds_encryption(audit, "RDS Encryption"))
+    controls.append(controlTesting.test_rds_public_access(audit, "RDS Public Access"))
+
+    # TODO: Add control criticality / severity score (High, Medium, Low, Informational)
+    # TODO: Add default settings (new EBS volumes encrypted by default)
+    # TODO: Add CloudTrail configuration checks (log-file validation, multi-region, etc)
+    # TODO: Add S3 object owner check
+    # TODO: Add encryption checks (EBS)
+    # TODO: Add Tagging Controls (RDS, S3, EC2, EBS)
+    # TODO: Add IAM tests (IAM User MFA, IAM User Unused Keys)
+    # TODO: Add GuardDuty tests (GuardDuty Enabled, GuardDuty Alert Resolution)
+
+    generate_pdf_report(audit, controls, "AWS", file_name="tmp/aws_audit_report.pdf")

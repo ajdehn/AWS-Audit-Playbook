@@ -9,7 +9,7 @@ BASE_STYLES = getSampleStyleSheet()
 # Define style constants
 LABEL_STYLE = ParagraphStyle(name="Label", fontSize=9, fontName="Helvetica-Bold")
 VALUE_STYLE = ParagraphStyle(name="Value", fontSize=9, fontName="Helvetica")
-LIST_STYLE = ParagraphStyle(name="List", parent=VALUE_STYLE)
+LIST_STYLE = ParagraphStyle(name="List", parent=VALUE_STYLE, spaceAfter=6)
 CENTER_STYLE = ParagraphStyle(name="Center", parent=VALUE_STYLE, alignment=1)
 HEADER_BG = colors.lightgrey
 PASS_COLOR = "green"
@@ -33,15 +33,19 @@ def render_control_summary(control, page_width):
         f"<font color='{PASS_COLOR if control.result else FAIL_COLOR}'><b>{'Pass' if control.result else 'Fail'}</b></font>",
         VALUE_STYLE
     )
-
+    
     # Build summary table
     table_data = [ 
         [Paragraph("Control ID", LABEL_STYLE), Paragraph(control.control_id, VALUE_STYLE)], 
-        [Paragraph("Control Description", LABEL_STYLE), Paragraph(control.control_description, VALUE_STYLE)], 
-        [Paragraph("Conclusion", LABEL_STYLE), conclusion], 
+        [Paragraph("Control Description", LABEL_STYLE), Paragraph(control.control_description, VALUE_STYLE)],
         [Paragraph("Test Procedures", LABEL_STYLE), test_procedures], 
         [Paragraph("Test Attributes", LABEL_STYLE), test_attributes],
+        [Paragraph("Conclusion", LABEL_STYLE), conclusion],
     ]
+
+        # Add row to summary table if control failed and result_description is populated.
+    if not control.result and control.result_description:
+        table_data.append([Paragraph("Comments", LABEL_STYLE), Paragraph(control.result_description, VALUE_STYLE)])
 
     table_width = page_width - 2 * 72
     table = Table(table_data, colWidths=[table_width * 0.25, table_width * 0.75])
@@ -182,9 +186,9 @@ Structure:
         - Sample Findings
         - TODO: Exclusions (Option to select summary or detail version)
 """
-def generate_pdf_report(audit, controls, filename="aws_audit_report.pdf"):
-    doc = SimpleDocTemplate(filename, pagesize=letter,
-    title="AWS Audit Report", author="AJ Dehn", subject="Summarizes audit findings from AWS")
+def generate_pdf_report(audit, controls, tool_name, file_name="tmp/audit_report.pdf"):
+    doc = SimpleDocTemplate(file_name, pagesize=letter,
+    title=f"{tool_name} Audit Report", author="AJ Dehn", subject=f"Summarizes audit findings from {tool_name}")
     styles = getSampleStyleSheet()
     page_width, _ = LETTER
     elements = []
@@ -192,7 +196,7 @@ def generate_pdf_report(audit, controls, filename="aws_audit_report.pdf"):
     # ---------------------------
     # Header
     # ---------------------------
-    elements.append(Paragraph("AWS Audit Report", styles["Title"]))
+    elements.append(Paragraph(f"{tool_name} Audit Report", styles["Title"]))
     elements.append(Spacer(1, 12))
     elements.append(
         Paragraph(
@@ -219,7 +223,7 @@ def generate_pdf_report(audit, controls, filename="aws_audit_report.pdf"):
             elements.append(Spacer(1, 30))
 
     doc.build(elements)
-    print(f"Report generated: {filename}")
+    print(f"Report generated: {file_name}")
 
 
 def parse_dt(dt_str):
