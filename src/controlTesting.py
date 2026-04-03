@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional
-from utils import is_sample_excluded, is_control_excluded, process_sample_exclusion
+from utils import is_control_excluded, process_sample_exclusion
 import boto3
 import botocore
 from datetime import datetime, timezone
@@ -370,7 +370,7 @@ def test_iam_access_key_age(audit, control_id):
 
     control = Control(
         control_id=control_id,
-        control_description=f"IAM access keys are rotated at least every {max_age_days}.",
+        control_description=f"IAM access keys are rotated at least every {max_age_days} days.",
         test_procedures=[
             "Obtained a list of IAM users by calling the list_users() boto3 command.",
             "Saved the list of IAM users in the audit evidence folder (IAM/users.json).",
