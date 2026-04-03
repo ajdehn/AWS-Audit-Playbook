@@ -812,7 +812,7 @@ def test_rds_tags(audit, control_id, risk_rating=1):
             )
 
             actual_db_tags = {t["Key"]: t.get("Value", "") for t in tags_response.get("TagList", [])}
-            
+
             evaluate_tags(sample, required_tags, actual_db_tags)
             control.samples.append(sample)
 
