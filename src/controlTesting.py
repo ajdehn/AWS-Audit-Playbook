@@ -51,7 +51,6 @@ class Control:
         )
 
         if self.is_excluded:
-            self.result = False
             self.result_description = "Control is excluded. See exclusions.json"
 
     def __str__(self):
@@ -100,6 +99,12 @@ class Control:
         # Final result
         self.result = self.num_findings == 0
         return self
+
+def get_aws_account_id():
+    client = boto3.client("sts")
+    response = client.get_caller_identity()
+    aws_account_id = response["Account"]
+    return aws_account_id
 
 def test_s3_encryption(audit, control_id, risk_rating=2):
     control = Control(
