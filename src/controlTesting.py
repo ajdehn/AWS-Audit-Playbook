@@ -29,6 +29,8 @@ class Control:
     test_procedures: List[str]
     test_attributes: List[str]
     audit: object
+    # Rating Matrix: 0 - Informational, 1 - Low, 2 - Medium, 3 - High.
+    risk_rating: int    
     table_headers: Optional[List[str]] = None
     include_sample_number: bool = False
     samples: List["Sample"] = field(default_factory=list)
@@ -38,8 +40,10 @@ class Control:
     num_exclusions: int = 0
     total_population: int = 0
     is_excluded: bool = False
+    risk_rating_str: str = ""
 
     def __post_init__(self):
+        self.risk_rating_str = self.create_risk_str()
         # Set exclusion status AFTER object is created
         self.is_excluded = is_control_excluded(
             self.control_id,
@@ -54,10 +58,19 @@ class Control:
         return (
             f"control_id: {self.control_id}\n"
             f"control_description: {self.control_description}\n"
+            f"risk_rating: {self.risk_rating}\n"
             f"is_excluded: {self.is_excluded}\n"
             f"result: {'Pass' if self.result else 'Fail'}\n"
             f"result_description: {self.result_description}\n"
         )
+
+    def create_risk_str(self):
+        if self.risk_rating == 0: return "Informational"
+        elif self.risk_rating == 1: return "Low"
+        elif self.risk_rating == 2: return "Medium"
+        elif self.risk_rating == 3: return "High"
+        else:
+            raise ValueError(f"Invalid risk rating: {self.risk_rating}. Accepted values are 0 - 3.")
 
     def evaluate_samples(self):
         if self.is_excluded:
@@ -87,7 +100,7 @@ class Control:
         self.result = self.num_findings == 0
         return self
 
-def test_s3_encryption(audit, control_id):
+def test_s3_encryption(audit, control_id, risk_rating=2):
     control = Control(
         control_id=control_id, audit=audit,
         control_description="S3 buckets are encrypted at rest.",
@@ -99,7 +112,8 @@ def test_s3_encryption(audit, control_id):
             "Inspected the encryption settings for each bucket to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=["ServerSideEncryptionConfiguration is present in encryption.json."],
-        table_headers=["Bucket Name", "Result", "Comments"]
+        table_headers=["Bucket Name", "Result", "Comments"],
+        risk_rating=risk_rating
     )
     if control.is_excluded:
         # No further testing required.
@@ -136,7 +150,7 @@ def test_s3_encryption(audit, control_id):
         control.result_description = f"Exceptions Noted. {control.num_findings} S3 buckets were not encrypted."
     return control
 
-def test_s3_public_access(audit, control_id):
+def test_s3_public_access(audit, control_id, risk_rating=3):
     control = Control(
         control_id=control_id,
         control_description="S3 buckets are configured to block public access.",
@@ -149,7 +163,8 @@ def test_s3_public_access(audit, control_id):
         ],
         test_attributes=["BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets are set to true."],
         audit=audit,
-        table_headers=["Bucket Name", "Result", "Comments"]
+        table_headers=["Bucket Name", "Result", "Comments"],
+        risk_rating=risk_rating
     )
 
     if control.is_excluded:
@@ -201,7 +216,7 @@ def test_s3_public_access(audit, control_id):
         control.result_description = f"Exceptions Noted. {control.num_findings} S3 buckets were not blocking public access."
     return control
 
-def test_iam_password_policy(audit, control_id):
+def test_iam_password_policy(audit, control_id, risk_rating=2):
     # Retrieve values from config. If not available, set safe defaults.
     control_config = audit.config.get("control_config") or {}
     required_min_length = control_config.get("iam_password_min_length", 14)
@@ -224,7 +239,8 @@ def test_iam_password_policy(audit, control_id):
             "RequireUppercaseCharacters, and RequireLowercaseCharacters) are set to True.",
             f"PasswordReusePrevention must be >= {required_password_history}."
         ],
-        audit=audit
+        audit=audit,
+        risk_rating=risk_rating
     )
 
     # Gather evidence
@@ -294,7 +310,7 @@ def test_iam_password_policy(audit, control_id):
         control.result_description = "Exceptions Noted. " + control.result_description
     return control
 
-def test_root_no_access_keys(audit, control_id):
+def test_root_no_access_keys(audit, control_id, risk_rating=3):
     control = Control(
         control_id=control_id,
         control_description="Root account does not have any active access keys.",      
@@ -306,7 +322,8 @@ def test_root_no_access_keys(audit, control_id):
         test_attributes=[
             "AccountAccessKeysPresent must be 0."
         ],
-        audit=audit
+        audit=audit,
+        risk_rating = risk_rating
     )
 
     if control.is_excluded:
@@ -329,7 +346,7 @@ def test_root_no_access_keys(audit, control_id):
 
     return control
 
-def test_root_mfa_enabled(audit, control_id):
+def test_root_mfa_enabled(audit, control_id, risk_rating=3):
     control = Control(
         control_id=control_id,
         control_description="Root account has MFA enabled.",
@@ -341,7 +358,8 @@ def test_root_mfa_enabled(audit, control_id):
         test_attributes=[
             "AccountMFAEnabled must be 1."
         ],
-        audit=audit
+        audit=audit,
+        risk_rating=risk_rating
     )
 
     if control.is_excluded:
@@ -364,7 +382,7 @@ def test_root_mfa_enabled(audit, control_id):
         
     return control
 
-def test_iam_access_key_age(audit, control_id):
+def test_iam_access_key_age(audit, control_id, risk_rating=3):
     control_config = audit.config.get("control_config") or {}
     max_age_days = control_config.get("iam_key_max_age", 365)
 
@@ -382,7 +400,8 @@ def test_iam_access_key_age(audit, control_id):
             f"'CREATE_DATE <= {max_age_days} days ago (for keys with an 'ACTIVE' status)."
         ],
         audit=audit,
-        table_headers=["User", "Access Key ID", "Result", "Comments"]
+        table_headers=["User", "Access Key ID", "Result", "Comments"],
+        risk_rating=risk_rating
     )
 
     if control.is_excluded:
@@ -443,7 +462,6 @@ def test_iam_access_key_age(audit, control_id):
     return control
 
 """
-    TODO: Move logic to when audit is created and save in_scope_regions variable.
     NOTE: Used by region based tests (EC2, RDS, SNS, GuardDuty, etc)
     Return in-scope AWS regions based on config.json. If not set, return result from describe_regions.
     Raises:
@@ -466,16 +484,16 @@ def get_regions(audit):
 
     # Pull from config and lower-case region values
     control_config = audit.config.get("control_config") or {}
-    in_scope_regions = control_config.get("in_scope_regions", [])
-    in_scope_regions = [r.lower() for r in in_scope_regions]
+    config_regions = control_config.get("in_scope_regions", [])
+    config_regions = [r.lower() for r in config_regions]
 
-    if not in_scope_regions:
-        # in_scope_regions not set in config value. Return available regions.
+    if not config_regions:
+        # in_scope_regions not set in config value. Return all available regions.
         return sorted(available_regions)
 
     # Check for invalid regions
-    in_scope_set = set(in_scope_regions)
-    invalid_regions = in_scope_set - available_regions
+    config_regions_set = set(config_regions)
+    invalid_regions = config_regions_set - available_regions
     if invalid_regions:
         raise ValueError(
             f"Invalid regions in config: {sorted(invalid_regions)}. "
@@ -483,10 +501,10 @@ def get_regions(audit):
         )
 
     # Return validated regions
-    return [r for r in in_scope_regions if r in available_regions]
+    return [r for r in config_regions if r in available_regions]
 
 
-def test_rds_encryption(audit, control_id):
+def test_rds_encryption(audit, control_id, risk_rating=2):
     control = Control(
         control_id=control_id,
         control_description="RDS instances are encrypted at rest.",
@@ -497,13 +515,14 @@ def test_rds_encryption(audit, control_id):
         ],
         test_attributes=["StorageEncrypted = True."],
         audit=audit,
-        table_headers=["Region", "DB Instance", "Result", "Comments"]
+        table_headers=["Region", "DB Instance", "Result", "Comments"],
+        risk_rating=risk_rating        
     )
 
     if control.is_excluded:
         return control
 
-    for region in get_regions(audit):
+    for region in audit.in_scope_regions:
         rds = boto3.client("rds", region_name=region)
 
         instances = audit.evidence_client.get_aws(
@@ -537,7 +556,7 @@ def test_rds_encryption(audit, control_id):
         control.result_description = f"Exceptions Noted. {control.num_findings} RDS instances are not encrypted."
     return control
 
-def test_rds_public_access(audit, control_id):
+def test_rds_public_access(audit, control_id, risk_rating=3):
     control = Control(
         control_id=control_id,
         control_description="RDS instances are not publicly accessible.",
@@ -548,13 +567,14 @@ def test_rds_public_access(audit, control_id):
         ],
         test_attributes=["PubliclyAccessible must be False."],
         audit=audit,
-        table_headers=["Region", "DB Instance", "Result", "Comments"]
+        table_headers=["Region", "DB Instance", "Result", "Comments"],
+        risk_rating=risk_rating        
     )
 
     if control.is_excluded:
         return control
 
-    for region in get_regions(audit):
+    for region in audit.in_scope_regions:
         rds = boto3.client("rds", region_name=region)
 
         instances = audit.evidence_client.get_aws(
@@ -585,7 +605,7 @@ def test_rds_public_access(audit, control_id):
     return control
 
 
-def test_rds_backup_retention(audit, control_id):
+def test_rds_backup_retention(audit, control_id, risk_rating=1):
     control_config = audit.config.get("control_config") or {}
     required_rds_retention_days = control_config.get("rds_backup_retention_days", 14)
     control = Control(
@@ -598,13 +618,14 @@ def test_rds_backup_retention(audit, control_id):
         ],
         test_attributes=[f"BackupRetentionPeriod must be >= {required_rds_retention_days} days."],
         audit=audit,
-        table_headers=["Region", "DB Instance", "Result", "Comments"]
+        table_headers=["Region", "DB Instance", "Result", "Comments"],
+        risk_rating=risk_rating        
     )
 
     if control.is_excluded:
         return control
 
-    for region in get_regions(audit):
+    for region in audit.in_scope_regions:
         rds = boto3.client("rds", region_name=region)
 
         instances = audit.evidence_client.get_aws(

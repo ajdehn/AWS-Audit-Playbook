@@ -13,6 +13,7 @@ class Audit:
         self.evidence_folder = evidence_folder                      # Name of the evidence_folder
         self.config = load_config(config_file_path)                 # Control and sample exclusions
         self.evidence_client = EvidenceClient(base_path=evidence_folder, debug=False)
+        self.in_scope_regions = controlTesting.get_regions(self)
 
 if __name__ == "__main__":
     # Load variables from .env file
@@ -25,6 +26,7 @@ if __name__ == "__main__":
     # TODO: Check if control is excluded before performing testing.
     confirm_delete_folder(audit.evidence_folder)
 
+    # Risk rating: 0 - Informational, 1 - Low, 2 - Medium, 3 - High.
     controls.append(controlTesting.test_s3_encryption(audit, "S3 Encryption"))
     controls.append(controlTesting.test_s3_public_access(audit, "S3 Public Access"))
     controls.append(controlTesting.test_iam_password_policy(audit, "IAM Password"))

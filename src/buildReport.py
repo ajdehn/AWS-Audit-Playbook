@@ -38,6 +38,7 @@ def render_control_summary(control, page_width):
     table_data = [ 
         [Paragraph("Control ID", LABEL_STYLE), Paragraph(control.control_id, VALUE_STYLE)], 
         [Paragraph("Control Description", LABEL_STYLE), Paragraph(control.control_description, VALUE_STYLE)],
+        [Paragraph("Risk Rating", LABEL_STYLE), Paragraph(control.risk_rating_str, VALUE_STYLE)],
         [Paragraph("Test Procedures", LABEL_STYLE), test_procedures], 
         [Paragraph("Test Attributes", LABEL_STYLE), test_attributes],
         [Paragraph("Conclusion", LABEL_STYLE), conclusion],
@@ -153,7 +154,7 @@ def render_summary_page(controls, styles):
         row.append(Paragraph(str(control.control_description), VALUE_STYLE))
         if control.is_excluded:
             control_result = "Out of Scope"
-        else:
+        else:     
             control_result = "Pass" if control.result else "Fail"
         row.append(Paragraph(control_result, VALUE_STYLE))
         # TODO: Add control exclusion rationale to table.
