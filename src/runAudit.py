@@ -49,7 +49,8 @@ if __name__ == "__main__":
     controls.append(controlTesting.test_cloudtrail_s3_bucket_protection(audit, "CloudTrail S3 Bucket Protection"))
     controls.append(controlTesting.test_cloudtrail_logging_recent_stops(audit, "CloudTrail Logging Recent Stops"))
 
-    # TODO: Add EC2 checks (Tag, EBS default encryption)
+    # TODO: Add AWS Client Cache
+    # TODO: Add EC2 checks (Tags)
     # TODO: Add S3 object owner check
     # TODO: Add IAM tests (IAM User Unused Keys)
     # TODO: Add GuardDuty tests (GuardDuty Enabled, GuardDuty Alert Resolution)
