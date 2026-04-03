@@ -3,7 +3,7 @@ from typing import List, Dict, Optional, Any
 from utils import is_control_excluded, process_sample_exclusion
 import boto3
 import botocore
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 # NOTE: Result is set to "False" until logic determines sample meets testing criteria.
 @dataclass
@@ -844,6 +844,170 @@ def test_cloudtrail_log_file_validation(audit, control_id, risk_rating=2):
     if not control.result:
         control.result_description = (
             f"Exceptions Noted. {control.num_findings} trail(s) do not have log file validation enabled."
+        )
+
+    return control
+
+def test_cloudtrail_s3_bucket_protection(audit, control_id, risk_rating=3):
+    control = Control(
+        control_id=control_id,
+        control_description="CloudTrail S3 buckets are configured to block public access.",
+        test_procedures=[
+            "Obtained a list of CloudTrails by calling the list_trails() boto3 command.",
+            "Saved the list of trails in the audit evidence folder (CloudTrail/trails.json).",
+            "For each trail, obtained the S3 bucket name and checked the bucket's public access block settings using get_public_access_block() boto3 command.",
+            "Saved the public access block settings for each bucket in the audit evidence folder (CloudTrail/buckets/[bucket_name]/public_access_block.json).",
+            "Inspected the public access block settings for each S3 bucket containing CloudTrail logs to determine if they comply with the test attribute(s) below."
+        ],
+        test_attributes=[
+            "CloudTrail S3 buckets must block public access (BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets = True)."
+        ],
+        audit=audit,
+        table_headers=["Trail Name", "Bucket Name", "Result", "Comments"],
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    ct = boto3.client("cloudtrail")
+    trails = audit.evidence_client.get_aws(
+        "CloudTrail/trails.json",
+        lambda: ct.list_trails()
+    ).get("Trails", [])
+
+    for trail in trails:
+        trail_name = trail.get("Name")
+        bucket_name = trail.get("S3BucketName")
+
+        sample = Sample(
+            sample_id={"trail_name": trail_name, "bucket_name": bucket_name},
+            control_id=control_id
+        )
+
+        if process_sample_exclusion(control, sample, audit):
+            continue
+
+        if not bucket_name:
+            sample.comments = "Trail does not have an associated S3 bucket."
+            control.samples.append(sample)
+            continue
+
+        # Fetch public access block
+        public_access_block = audit.evidence_client.get_aws(
+            f"CloudTrail/buckets/{bucket_name}/public_access_block.json",
+            lambda: boto3.client("s3").get_public_access_block(Bucket=bucket_name),
+            not_found_codes=["NoSuchPublicAccessBlockConfiguration"]
+        )
+
+        if not public_access_block:
+            sample.comments = "No Public Access Block configuration found."
+            control.samples.append(sample)
+            continue
+
+        config = public_access_block.get("PublicAccessBlockConfiguration", {})
+        block_acls = config.get("BlockPublicAcls", False)
+        ignore_acls = config.get("IgnorePublicAcls", False)
+        block_policy = config.get("BlockPublicPolicy", False)
+        restrict_buckets = config.get("RestrictPublicBuckets", False)
+
+        # Determine result
+        if all([block_acls, ignore_acls, block_policy, restrict_buckets]):
+            sample.result = True
+        else:
+            sample.comments = "One or more public access settings are not enabled."
+
+        control.samples.append(sample)
+
+    control.evaluate_samples()
+
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} CloudTrail bucket(s) are not fully protected."
+        )
+
+    return control
+
+"""
+    Ensure CloudTrail logging has not been stopped within the configured lookback period.
+"""
+def test_cloudtrail_logging_recent_stops(audit, control_id, risk_rating=3):
+    control_config = audit.config.get("control_config") or {}
+    lookback_days = control_config.get("cloudtrail_logging_lookback_days", 365)
+
+    control = Control(
+        control_id=control_id,
+        control_description=(
+            f"CloudTrail logging has not been stopped in the last {lookback_days} days."
+        ),
+        test_procedures=[
+            "Obtained a list of CloudTrails by calling the list_trails() boto3 command.",
+            "Saved the list of trails in the audit evidence folder (CloudTrail/trails.json).",
+            "For each trail, called get_trail_status() to check IsLogging and StopLoggingTime.",
+            f"Saved each trail's status in the audit evidence folder (CloudTrail/trails_status/[trail_name].json).",
+            f"Inspected the 'TimeLoggingStopped' variable to determine if logging has been stopped in the last {lookback_days} days."
+        ],
+        test_attributes=[
+            f"'TimeLoggingStopped' must be empty OR is more than {lookback_days} days ago."
+        ],
+        audit=audit,
+        table_headers=["Trail Name", "Is Logging", "Last Stop Time", "Result", "Comments"],
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    ct = boto3.client("cloudtrail")
+    trails = audit.evidence_client.get_aws(
+        "CloudTrail/trails.json",
+        lambda: ct.list_trails()
+    ).get("Trails", [])
+
+    now = datetime.now(timezone.utc)
+    lookback_threshold = now - timedelta(days=lookback_days)
+
+    for trail in trails:
+        trail_name = trail.get("Name")
+        sample = Sample(
+            sample_id={"trail_name": trail_name},
+            control_id=control_id
+        )
+
+        if process_sample_exclusion(control, sample, audit):
+            continue
+
+        status = audit.evidence_client.get_aws(
+            f"CloudTrail/trails_status/{trail_name}.json",
+            lambda: ct.get_trail_status(Name=trail_name)
+        )
+
+        is_logging = status.get("IsLogging", False)
+        stop_time = status.get("StopLoggingTime")
+
+        # Convert StopLoggingTime to datetime if present
+        if stop_time:
+            if isinstance(stop_time, str):
+                stop_time = datetime.fromisoformat(stop_time.replace("Z", "+00:00"))
+
+        # Determine result
+        if not is_logging:
+            sample.result = False
+            sample.comments = "CloudTrail logging is currently stopped."
+        elif stop_time and stop_time >= lookback_threshold:
+            sample.result = False
+            sample.comments = f"Logging was stopped recently on {stop_time.isoformat()}."
+        else:
+            sample.result = True
+
+        control.samples.append(sample)
+
+    control.evaluate_samples()
+
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} trail(s) have logging stopped "
+            f"currently or within the last {lookback_days} days."
         )
 
     return control

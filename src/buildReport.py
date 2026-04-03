@@ -154,11 +154,13 @@ def render_summary_page(controls, styles):
         row.append(Paragraph(str(control.control_description), VALUE_STYLE))
         if control.is_excluded:
             control_result = "Out of Scope"
-        else:     
+            row.append(Paragraph(control_result, CENTER_STYLE))
+        else:
             control_result = "Pass" if control.result else "Fail"
-        row.append(Paragraph(control_result, VALUE_STYLE))
+            result_color = PASS_COLOR if control.result else FAIL_COLOR
+            row.append(Paragraph(f"<font color='{result_color}'>{control_result}</font>", CENTER_STYLE))
         # TODO: Add control exclusion rationale to table.
-        row.append(Paragraph("", VALUE_STYLE))
+        row.append(Paragraph(control.result_description, VALUE_STYLE))
         
         control_summary_data.append(row)
 
@@ -170,8 +172,8 @@ def render_summary_page(controls, styles):
         ("PADDING", (0, 0), (-1, -1), 6),
     ]))
 
-    elements.append(KeepTogether(table))
-    elements.append(Spacer(1, 24))
+    elements.append(table)
+    elements.append(PageBreak())
 
     return elements
 

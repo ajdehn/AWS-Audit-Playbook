@@ -31,7 +31,7 @@ if __name__ == "__main__":
     controls.append(controlTesting.test_root_mfa_enabled(audit, "IAM Root MFA"))
     controls.append(controlTesting.test_root_no_access_keys(audit, "IAM Root Access Key"))
     controls.append(controlTesting.test_iam_users_mfa(audit, "IAM User MFA"))
-    
+
     controls.append(controlTesting.test_iam_access_key_age(audit, "IAM User Key Age"))
     controls.append(controlTesting.test_iam_password_policy(audit, "IAM Password"))
     controls.append(controlTesting.test_rds_backup_retention(audit, "RDS Backup Retention"))
@@ -40,13 +40,15 @@ if __name__ == "__main__":
 
     controls.append(controlTesting.test_cloudtrail_global_logging(audit, "CloudTrail Multi-Region"))
     controls.append(controlTesting.test_cloudtrail_log_file_validation(audit, "CloudTrail Log File Validation"))
+    controls.append(controlTesting.test_cloudtrail_s3_bucket_protection(audit, "CloudTrail S3 Bucket Protection"))
+    controls.append(controlTesting.test_cloudtrail_logging_recent_stops(audit, "CloudTrail Logging Recent Stops"))
 
-    # TODO: Add default settings (new EBS volumes encrypted by default)
-    # TODO: Add CloudTrail configuration checks (log-file validation, multi-region, etc)
+    # TODO: Add EC2 checks (tags, EBS Encryption, EBS default encryption)
     # TODO: Add S3 object owner check
     # TODO: Add encryption checks (EBS)
     # TODO: Add Tagging Controls (RDS, S3, EC2, EBS)
-    # TODO: Add IAM tests (IAM User MFA, IAM User Unused Keys)
+    # TODO: Add IAM tests (IAM User Unused Keys)
     # TODO: Add GuardDuty tests (GuardDuty Enabled, GuardDuty Alert Resolution)
+    # TODO: Add WAF tests
 
     generate_pdf_report(audit, controls, "AWS", file_name="tmp/aws_audit_report.pdf")
