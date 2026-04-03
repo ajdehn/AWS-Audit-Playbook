@@ -23,7 +23,6 @@ if __name__ == "__main__":
     print("Running the AWS Audit Playbook (maintained by AJ Dehn - AuditOps.io)\n")
     controls = []
 
-    # TODO: Check if control is excluded before performing testing.
     confirm_delete_folder(audit.evidence_folder)
 
     # Risk rating: 0 - Informational, 1 - Low, 2 - Medium, 3 - High.
@@ -38,7 +37,6 @@ if __name__ == "__main__":
     controls.append(controlTesting.test_rds_encryption(audit, "RDS Encryption"))
     controls.append(controlTesting.test_rds_public_access(audit, "RDS Public Access"))
 
-    # TODO: Add control criticality / severity score (High, Medium, Low, Informational)
     # TODO: Add default settings (new EBS volumes encrypted by default)
     # TODO: Add CloudTrail configuration checks (log-file validation, multi-region, etc)
     # TODO: Add S3 object owner check

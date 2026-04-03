@@ -220,8 +220,10 @@ def generate_pdf_report(audit, controls, tool_name, file_name="tmp/audit_report.
             sample_table = render_sample_table(control, page_width)
             if sample_table:
                 elements.append(KeepTogether(sample_table))
-
-            elements.append(Spacer(1, 30))
+                # Create new page if control includes sample table.
+                elements.append(PageBreak())
+            else:
+                elements.append(Spacer(1, 30))
 
     doc.build(elements)
     print(f"Report generated: {file_name}")

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 from utils import is_control_excluded, process_sample_exclusion
 import boto3
 import botocore
@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 # NOTE: Result is set to "False" until logic determines sample meets testing criteria.
 @dataclass
 class Sample:
-    sample_id: Dict
+    sample_id: Dict[str, Any]
     control_id: str
     result: bool = False
     is_excluded: bool = False
@@ -28,7 +28,7 @@ class Control:
     control_description: str
     test_procedures: List[str]
     test_attributes: List[str]
-    audit: object
+    audit: Audit
     # Rating Matrix: 0 - Informational, 1 - Low, 2 - Medium, 3 - High.
     risk_rating: int    
     table_headers: Optional[List[str]] = None
@@ -91,6 +91,7 @@ class Control:
 
         if not in_scope_samples:
             # No valid samples. Control passes with a population of zero.
+            self.result = True
             return self
 
         # Count findings (failures)
@@ -102,7 +103,7 @@ class Control:
 
 def test_s3_encryption(audit, control_id, risk_rating=2):
     control = Control(
-        control_id=control_id, audit=audit,
+        control_id=control_id,
         control_description="S3 buckets are encrypted at rest.",
         test_procedures=[
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
@@ -112,6 +113,7 @@ def test_s3_encryption(audit, control_id, risk_rating=2):
             "Inspected the encryption settings for each bucket to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=["ServerSideEncryptionConfiguration is present in encryption.json."],
+        audit=audit,
         table_headers=["Bucket Name", "Result", "Comments"],
         risk_rating=risk_rating
     )
@@ -352,7 +354,7 @@ def test_root_mfa_enabled(audit, control_id, risk_rating=3):
         control_description="Root account has MFA enabled.",
         test_procedures=[
             "Obtained the AWS account summary by calling the get_account_summary() boto3 command.",
-            "Saved the account summary in the audit evidence folder (IAM/account_summary.json)"
+            "Saved the account summary in the audit evidence folder (IAM/account_summary.json)",
             "Inspected the account summary to determine if it complies with the test attribute(s) below."
         ],
         test_attributes=[
@@ -547,7 +549,7 @@ def test_rds_encryption(audit, control_id, risk_rating=2):
             if db.get("StorageEncrypted"):
                 sample.result = True
             else:
-                sample.comments = "Exceptions Noted. RDS instance is not encrypted."
+                sample.comments = "RDS instance is not encrypted."
 
             control.samples.append(sample)
     control.evaluate_samples()
