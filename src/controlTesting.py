@@ -658,3 +658,57 @@ def test_rds_backup_retention(audit, control_id, risk_rating=1):
         # Document exception language.
         control.result_description = f"Exceptions Noted. {control.num_findings} RDS instances do not have sufficient backup retention (at least {required_rds_retention_days} days)."    
     return control
+
+def test_cloudtrail_global_logging(audit, control_id, risk_rating=3):
+    control = Control(
+        control_id=control_id,
+        control_description="At least one multi-region CloudTrail trail has logging enabled.",
+        test_procedures=[
+            "Obtained CloudTrail trails using the describe_trails() boto3 command.",
+            "Saved the trail configuration in the audit evidence folder (CloudTrail/trails.json).",
+            "Obtained the status of each multi-region trail using the get_trail_status() boto3 command.",
+            "Saved the trail status in the audit evidence folder (CloudTrail/[trail_name]/status.json).",
+            "Inspected the trail configuration and status to determine if at least one multi-region trail has logging enabled."
+        ],
+        test_attributes=[
+            "At least one trail must have IsMultiRegionTrail = True and IsLogging = True."
+        ],
+        audit=audit,
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    ct = boto3.client("cloudtrail")
+    trails = audit.evidence_client.get_aws(
+        "CloudTrail/trails.json",
+        lambda: ct.describe_trails(includeShadowTrails=False)
+    ).get("trailList", [])
+
+    if not trails:
+        control.result = False
+        control.result_description = "No CloudTrails founds."
+        return control
+
+    found_valid_trail = False
+    for trail in trails:
+        if not trail.get("IsMultiRegionTrail", False):
+            continue
+        status = audit.evidence_client.get_aws(
+            f"CloudTrail/{trail['Name']}/status.json",
+            lambda: ct.get_trail_status(Name=trail["TrailARN"])
+        )
+        if status.get("IsLogging", False):
+            found_valid_trail = True
+            break
+
+    if found_valid_trail:
+        control.result = True
+    else:
+        control.result = False
+        control.result_description = (
+            "Exceptions Noted. No multi-region CloudTrail trail with active logging was found."
+        )
+
+    return control

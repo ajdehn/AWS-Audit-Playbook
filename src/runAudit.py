@@ -36,6 +36,7 @@ if __name__ == "__main__":
     controls.append(controlTesting.test_rds_backup_retention(audit, "RDS Backup Retention"))
     controls.append(controlTesting.test_rds_encryption(audit, "RDS Encryption"))
     controls.append(controlTesting.test_rds_public_access(audit, "RDS Public Access"))
+    controls.append(controlTesting.test_cloudtrail_global_logging(audit, "CloudTrail 01"))
 
     # TODO: Add default settings (new EBS volumes encrypted by default)
     # TODO: Add CloudTrail configuration checks (log-file validation, multi-region, etc)
