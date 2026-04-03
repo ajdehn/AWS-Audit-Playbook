@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional
-from utils import is_sample_excluded, check_sample_exclusion, is_control_excluded
+from utils import is_sample_excluded, check_sample_exclusion, is_control_excluded, process_sample_exclusion
 import boto3
 import botocore
 from datetime import datetime, timezone
@@ -92,11 +92,11 @@ def test_s3_encryption(audit, control_id):
         control_id=control_id, audit=audit,
         control_description="S3 buckets are encrypted at rest.",
         test_procedures=[
-            "Obtained a list of all S3 buckets by calling the list_buckets() boto3 command.",
-            "Saved the list of all S3 buckets in the audit evidence folder (S3/buckets.json).",
+            "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
+            "Saved the list of S3 buckets in the audit evidence folder (S3/buckets.json).",
             "Obtained the encryption settings for each bucket by calling the get_bucket_encryption() boto3 command.",
             "Saved the encryption settings for each S3 bucket (S3/[bucket_name]/encryption.json).",
-            "Inspected the encryption settings for each bucket to determine if they comply with the test attributes below."
+            "Inspected the encryption settings for each bucket to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=["ServerSideEncryptionConfiguration is present in encryption.json."],
         table_headers=["Bucket Name", "Result", "Comments"]
@@ -104,8 +104,9 @@ def test_s3_encryption(audit, control_id):
     if control.is_excluded:
         # No further testing required.
         return control
+    
     s3 = boto3.client("s3")
-    # Obtain and save list of all buckets.
+    # Obtain and save list of buckets.
     buckets = audit.evidence_client.get("S3/buckets.json", lambda: s3.list_buckets())
     # Loop through each bucket
     for bucket in buckets.get("Buckets", []):
@@ -113,12 +114,11 @@ def test_s3_encryption(audit, control_id):
             sample_id={"bucket_name": bucket['Name']},
             control_id=control_id
         )
-        # Check if sample is excluded
-        sample = check_sample_exclusion(control_id, sample, audit.config)
-        if sample.is_excluded:
-            # Add excluded sample to control, and move to next bucket.
-            control.samples.append(sample)
-            continue
+
+        if process_sample_exclusion(control, sample, audit):
+            # Move to next sample, if excluded.
+            continue        
+
         # Obtain and save bucket's encryption settings.
         enc = audit.evidence_client.get_aws(f"S3/buckets/{bucket['Name']}/encryption.json",
             lambda: s3.get_bucket_encryption(Bucket=bucket['Name']),
@@ -133,7 +133,7 @@ def test_s3_encryption(audit, control_id):
     control.evaluate_all_samples()
     if not control.result:
         # Document exception language.
-        control.result_description = f"Exceptions Noted. {num_findings} S3 buckets were not encrypted or excluded by management."
+        control.result_description = f"Exceptions Noted. {control.num_findings} S3 buckets were not encrypted."
     return control
 
 def test_s3_public_access(audit, control_id):
@@ -141,17 +141,22 @@ def test_s3_public_access(audit, control_id):
         control_id=control_id,
         control_description="S3 buckets are configured to block public access.",
         test_procedures=[
-            "Retrieved a list of all S3 buckets via the list_buckets() boto3 command. See S3/buckets.json in the evidence folder.",
-            "Retrieved the public access block settings for each bucket by calling the get_public_access_block() boto3 command. See S3/[bucket_name]/public_access_block.json in the evidence folder.",
-            "Inspected the public access settings to determine if the bucket was blocking public access. See test attributes below for more details."
+            "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
+            "Saved the list of S3 buckets in the audit evidence folder (S3/buckets.json).",
+            "Obtained the public access block settings for each bucket by calling the get_public_access_block() boto3 command.",
+            "Saved the public access block settings for each S3 bucket (S3/[bucket_name]/public_access_block.json).",
+            "Inspected the public access block settings for each bucket to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=["BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets are set to true."],
         audit=audit,
         table_headers=["Bucket Name", "Result", "Comments"]
     )
 
+    if control.is_excluded:
+        return control
+
     s3 = boto3.client("s3")
-    # Get all buckets
+    # Obtain and save list of buckets.
     buckets = audit.evidence_client.get("S3/buckets.json", lambda: s3.list_buckets())
     # Evaluate each bucket
     for bucket in buckets.get("Buckets", []):
@@ -159,15 +164,14 @@ def test_s3_public_access(audit, control_id):
             sample_id={"bucket_name": bucket["Name"]},
             control_id=control_id
         )
-        # Check if sample is excluded
-        sample = check_sample_exclusion(control_id, sample, audit.config)
-        if sample.is_excluded:
-            # Add excluded sample to control
-            control.samples.append(sample)
+
+        if process_sample_exclusion(control, sample, audit):
+            # Move to next sample, if excluded.
             continue
+        
         # Fetch public access block
         public_access_block = audit.evidence_client.get_aws(
-            f"S3/buckets/{bucket["Name"]}/public_access_block.json",
+            f"S3/buckets/{bucket['Name']}/public_access_block.json",
             lambda: s3.get_public_access_block(Bucket=bucket["Name"]),
             not_found_codes=["NoSuchPublicAccessBlockConfiguration"]
         )
@@ -190,8 +194,11 @@ def test_s3_public_access(audit, control_id):
             sample.comments = "One or more public access settings are disabled"
         control.samples.append(sample)
 
-    # Check if all samples passed.
+
     control.evaluate_all_samples()
+    if not control.result:
+        # Document exception language.
+        control.result_description = f"Exceptions Noted. {control.num_findings} S3 buckets were not blocking public access."
     return control
 
 def test_iam_password_policy(audit, control_id):
@@ -205,11 +212,11 @@ def test_iam_password_policy(audit, control_id):
         control_id=control_id,
         control_description=(
             f"IAM passwords must comply with the organizations password complexity requirements."
-        ),
+        ),      
         test_procedures=[
             "Obtained IAM password configuration by using the account_password_policy() boto3 command.",
-            "Saved password configuration in the audit evidence folder (IAM/password_policy.json).",
-            "Inspected the password configuration to determine if they match the test attributes defined below."
+            "Saved the password configuration in the audit evidence folder (IAM/password_policy.json).",
+            "Inspected the password configuration to determine if they comply with the test attribute(s) defined below."
         ],
         test_attributes=[
             f"MinimumPasswordLength must be >= {required_min_length}.",
@@ -277,22 +284,24 @@ def test_iam_password_policy(audit, control_id):
             failures.append("Max password age is not set.")
         elif actual_max_password_age > required_max_password_age:
             failures.append(
-                f"Password max age too high (current={max_age}, required<={required_max_password_age}.)"
+                f"Password max age too high (current={actual_max_password_age}, required<={required_max_password_age}.)"
             )
 
     # --- Final result ---
     control.result = len(failures) == 0
     if not control.result:
         control.result_description = "; ".join(failures)
+        control.result_description = "Exceptions Noted. " + control.result_description
     return control
 
 def test_root_no_access_keys(audit, control_id):
     control = Control(
         control_id=control_id,
-        control_description="Root account does not have any active access keys.",
+        control_description="Root account does not have any active access keys.",      
         test_procedures=[
-            "Retrieved account summary using get_account_summary() boto3 command.",
-            "Inspected the account summary to determine if they match the test attributes defined below."
+            "Obtained the AWS account summary by calling the get_account_summary() boto3 command.",
+            "Saved the account summary in the audit evidence folder (IAM/account_summary.json)",
+            "Inspected the account summary to determine if it complies with the test attribute(s) below."
         ],
         test_attributes=[
             "AccountAccessKeysPresent must be 0."
@@ -316,7 +325,7 @@ def test_root_no_access_keys(audit, control_id):
         control.result = True
     else:
         control.result = False
-        control.result_description = f"Root has {root_keys} access key(s)"
+        control.result_description = f"Exceptions Noted. Root account has {root_keys} access key(s)"
 
     return control
 
@@ -325,8 +334,9 @@ def test_root_mfa_enabled(audit, control_id):
         control_id=control_id,
         control_description="Root account has MFA enabled.",
         test_procedures=[
-            "Retrieved account summary using get_account_summary.",
-            "Checked AccountMFAEnabled value."
+            "Obtained the AWS account summary by calling the get_account_summary() boto3 command.",
+            "Saved the account summary in the audit evidence folder (IAM/account_summary.json)"
+            "Inspected the account summary to determine if it complies with the test attribute(s) below."
         ],
         test_attributes=[
             "AccountMFAEnabled must be 1."
@@ -338,7 +348,6 @@ def test_root_mfa_enabled(audit, control_id):
         return control
 
     iam = boto3.client("iam")
-
     summary = audit.evidence_client.get_aws(
         "IAM/account_summary.json",
         lambda: iam.get_account_summary()
@@ -351,10 +360,9 @@ def test_root_mfa_enabled(audit, control_id):
         control.result = True
     else:
         control.result = False
-        control.result_description = "Root account does not have MFA enabled"
+        control.result_description = "Exceptions Noted. Root account does not have MFA enabled"
         
     return control
-
 
 def test_iam_access_key_age(audit, control_id):
     control_config = audit.config.get("control_config") or {}
@@ -362,14 +370,16 @@ def test_iam_access_key_age(audit, control_id):
 
     control = Control(
         control_id=control_id,
-        control_description="IAM access keys are rotated within the required timeframe.",
+        control_description=f"IAM access keys are rotated at least every {max_age_days}.",
         test_procedures=[
-            "Retrieved all IAM users.",
-            "Retrieved access keys for each user.",
-            "Calculated key age using CreateDate."
+            "Obtained a list of IAM users by calling the list_users() boto3 command.",
+            "Saved the list of IAM users in the audit evidence folder (IAM/users.json).",
+            "Obtained the access keys attached to each IAM user by calling the list_access_keys() boto3 command.",
+            "Saved the access keys for each user IAM/users/[user_name]/access_keys.json",
+            "Inspected the 'AccessKeyMetadata' for each user to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=[
-            f"Access keys must be <= {max_age_days} days old."
+            f"'CREATE_DATE <= {max_age_days} days ago (for keys with an 'ACTIVE' status)."
         ],
         audit=audit,
         table_headers=["User", "Access Key ID", "Result", "Comments"]
@@ -403,8 +413,10 @@ def test_iam_access_key_age(audit, control_id):
                 control_id=control_id
             )
             if key["Status"] != "Active":
-                sample.result = True
+                # Exclude, but don't pass inactive keys.
+                sample.is_excluded = True
                 sample.comments = "N/A - key is inactive"
+                control.samples.append(sample)
                 continue
             sample = check_sample_exclusion(control_id, sample, audit.config)
             if sample.is_excluded:
@@ -426,29 +438,70 @@ def test_iam_access_key_age(audit, control_id):
             control.samples.append(sample)
 
     control.evaluate_all_samples()
+    if not control.result:
+        # Document exception language.
+        control.result_description = f"Exceptions Noted. {control.num_findings} active IAM keys are older than {max_age_days} days old."
     return control
 
-def get_all_regions(service_name="rds"):
-    """Return all active regions for a given AWS service."""
+"""
+    TODO: Move logic to when audit is created and save in_scope_regions variable.
+    NOTE: Used by region based tests (EC2, RDS, SNS, GuardDuty, etc)
+    Return in-scope AWS regions based on config.json. If not set, return result from describe_regions.
+    Raises:
+        ValueError: If config contains invalid regions.
+"""
+def get_all_regions(audit):
     ec2 = boto3.client("ec2")
-    regions = [r["RegionName"] for r in ec2.describe_regions()["Regions"]]
-    return regions
+    all_regions = audit.evidence_client.get_aws(
+        "EC2/regions.json",
+        lambda: ec2.describe_regions(
+            AllRegions=True,
+            Filters=[
+                {
+                    "Name": "opt-in-status",
+                    "Values": ["opt-in-not-required", "opted-in"]}
+            ]
+        )
+    )
+    available_regions = {r["RegionName"] for r in all_regions["Regions"]}
+
+    # Pull from config and lower-case region values
+    control_config = audit.config.get("control_config") or {}
+    in_scope_regions = control_config.get("in_scope_regions", [])
+    in_scope_regions = [r.lower() for r in in_scope_regions]
+
+    if not in_scope_regions:
+        # in_scope_regions not set in config value. Return available regions.
+        return sorted(available_regions)
+
+    # Check for invalid regions
+    in_scope_set = set(in_scope_regions)
+    invalid_regions = in_scope_set - available_regions
+    if invalid_regions:
+        raise ValueError(
+            f"Invalid regions in config: {sorted(invalid_regions)}. "
+            f"Valid regions are: {sorted(available_regions)}"
+        )
+
+    # Return validated regions
+    return [r for r in in_scope_regions if r in available_regions]
 
 
 def test_rds_encryption_all_regions(audit, control_id):
     control = Control(
         control_id=control_id,
-        control_description="RDS instances are encrypted at rest across all regions.",
+        control_description="RDS instances are encrypted at rest.",
         test_procedures=[
-            "Retrieved all RDS instances in all regions.",
-            "Checked storage encryption setting for each instance."
+            "For each in-scope region, obtained the list of DB instances by calling the describe_db_instances() boto3 command.",
+            "Saved the list of DB instances (RDS/[region_name]/db_instances.json).",
+            "Inspected the database configuration for each instance(s) to determine if they comply with the test attribute(s) below."
         ],
-        test_attributes=["StorageEncrypted must be True."],
+        test_attributes=["StorageEncrypted = True."],
         audit=audit,
         table_headers=["Region", "DB Instance", "Result", "Comments"]
     )
 
-    for region in get_all_regions("rds"):
+    for region in get_all_regions(audit):
         rds = boto3.client("rds", region_name=region)
 
         instances = audit.evidence_client.get_aws(
@@ -469,18 +522,21 @@ def test_rds_encryption_all_regions(audit, control_id):
                 control_id=control_id
             )
 
-            if handle_sample_exclusion(control_id, sample, audit.config):
+            sample = check_sample_exclusion(control_id, sample, audit.config)
+            if sample.is_excluded:
                 control.samples.append(sample)
                 continue
 
             if db.get("StorageEncrypted"):
                 sample.result = True
             else:
-                sample.comments = "Storage encryption disabled"
+                sample.comments = "Exceptions Noted. RDS instance is not encrypted."
 
             control.samples.append(sample)
-
     control.evaluate_all_samples()
+    if not control.result:
+        # Document exception language.
+        control.result_description = f"Exceptions Noted. {control.num_findings} RDS instances are not encrypted."
     return control
 
 def test_rds_public_access_all_regions(audit, control_id):
@@ -488,19 +544,20 @@ def test_rds_public_access_all_regions(audit, control_id):
         control_id=control_id,
         control_description="RDS instances are not publicly accessible.",
         test_procedures=[
-            "Retrieved all RDS instances in all regions.",
-            "Checked PubliclyAccessible flag."
+            "For each in-scope region, obtained the list of DB instances by calling the describe_db_instances() boto3 command.",
+            "Saved the list of DB instances (RDS/[region_name]/db_instances.json).",
+            "Inspected the database configuration for each instance(s) to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=["PubliclyAccessible must be False."],
         audit=audit,
         table_headers=["Region", "DB Instance", "Result", "Comments"]
     )
 
-    for region in get_all_regions("rds"):
+    for region in get_all_regions(audit):
         rds = boto3.client("rds", region_name=region)
 
         instances = audit.evidence_client.get(
-            f"RDS/{region}/instances.json",
+            f"RDS/{region}/db_instances.json",
             lambda: rds.describe_db_instances()
         )
 
@@ -512,7 +569,8 @@ def test_rds_public_access_all_regions(audit, control_id):
                 control_id=control_id
             )
 
-            if handle_sample_exclusion(control_id, sample, audit.config):
+            sample = check_sample_exclusion(control_id, sample, audit.config)
+            if sample.is_excluded:
                 control.samples.append(sample)
                 continue
 
@@ -524,29 +582,33 @@ def test_rds_public_access_all_regions(audit, control_id):
             control.samples.append(sample)
 
     control.evaluate_all_samples()
+    if not control.result:
+        # Document exception language.
+        control.result_description = f"Exceptions Noted. {control.num_findings} RDS instances are publicly accessible."
     return control
 
 
 def test_rds_backup_retention_all_regions(audit, control_id):
     control_config = audit.config.get("control_config") or {}
-    required_rds_retention_days = control_config.get("rds_backup_retention_days", 0)
+    required_rds_retention_days = control_config.get("rds_backup_retention_days", 14)
     control = Control(
         control_id=control_id,
-        control_description="RDS instances have adequate backup retention across all regions.",
+        control_description=f"RDS backups are retained for at least {required_rds_retention_days} days.",
         test_procedures=[
-            "Retrieved all RDS instances in all regions.",
-            "Checked BackupRetentionPeriod."
+            "For each in-scope region, obtained the list of DB instances by calling the describe_db_instances() boto3 command.",
+            "Saved the list of DB instances (RDS/[region_name]/db_instances.json).",
+            "Inspected the database configuration for each instance(s) to determine if they comply with the test attribute(s) below."
         ],
-        test_attributes=[f"Backup retention must be >= {required_rds_retention_days} days."],
+        test_attributes=[f"BackupRetentionPeriod must be >= {required_rds_retention_days} days."],
         audit=audit,
         table_headers=["Region", "DB Instance", "Result", "Comments"]
     )
 
-    for region in get_all_regions("rds"):
+    for region in get_all_regions(audit):
         rds = boto3.client("rds", region_name=region)
 
         instances = audit.evidence_client.get(
-            f"RDS/{region}/instances.json",
+            f"RDS/{region}/db_instances.json",
             lambda: rds.describe_db_instances()
         )
 
@@ -558,7 +620,8 @@ def test_rds_backup_retention_all_regions(audit, control_id):
                 control_id=control_id
             )
 
-            if handle_sample_exclusion(control_id, sample, audit.config):
+            sample = check_sample_exclusion(control_id, sample, audit.config)
+            if sample.is_excluded:
                 control.samples.append(sample)
                 continue
 
@@ -567,9 +630,12 @@ def test_rds_backup_retention_all_regions(audit, control_id):
             if actual_retention_days >= required_rds_retention_days:
                 sample.result = True
             else:
-                sample.comments = f"Retention is {retention} days"
+                sample.comments = f"Retention is {actual_retention_days} days"
 
             control.samples.append(sample)
 
     control.evaluate_all_samples()
+    if not control.result:
+        # Document exception language.
+        control.result_description = f"Exceptions Noted. {control.num_findings} RDS instances do not have sufficient backup retention (at least {required_rds_retention_days} days)."    
     return control

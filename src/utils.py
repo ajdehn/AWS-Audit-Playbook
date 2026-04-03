@@ -54,6 +54,19 @@ def is_exclusion_active(exclusion):
         return exp_date >= today
     return False
 
+def process_sample_exclusion(control, sample, audit):
+    sample = check_sample_exclusion(control.control_id, sample, audit.config)
+    if sample.is_excluded:
+        control.samples.append(sample)
+        return True
+    return False
+
+def process_control_pass_fail(sample, condition, fail_msg):
+    if condition:
+        sample.result = True
+    else:
+        sample.comments = fail_msg
+
 def check_sample_exclusion(control_id, sample, config):
     if is_sample_excluded(control_id, sample, config):
         sample.is_excluded = True
