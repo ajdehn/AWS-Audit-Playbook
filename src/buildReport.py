@@ -14,7 +14,22 @@ CENTER_STYLE = ParagraphStyle(name="Center", parent=VALUE_STYLE, alignment=1)
 HEADER_BG = colors.lightgrey
 PASS_COLOR = "green"
 FAIL_COLOR = "red"
+# Highlight first row of table.
+TABLE_STYLE_HIGHLIGHT_ROW = TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+    ])
 
+# Highlight first row of table.
+TABLE_STYLE_HIGHLIGHT_COLUMN = TableStyle([
+        ("BACKGROUND", (0, 0), (0, -1), colors.lightgrey),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("BOX", (0, 0), (-1, -1), 0.5, colors.black),
+        ("INNERGRID", (0, 0), (-1, -1), 0.25, colors.grey),
+        ("PADDING", (0, 0), (-1, -1), 6),
+    ])
 """
     Render 2-column control summary table.
 """
@@ -35,27 +50,25 @@ def render_control_summary(control, page_width):
     )
     
     # Build summary table
-    table_data = [ 
+    table_data = [
         [Paragraph("Control ID", LABEL_STYLE), Paragraph(control.control_id, VALUE_STYLE)], 
         [Paragraph("Control Description", LABEL_STYLE), Paragraph(control.control_description, VALUE_STYLE)],
+        [Paragraph("Risk Rating", LABEL_STYLE), Paragraph(control.risk_rating_str, VALUE_STYLE)],
         [Paragraph("Test Procedures", LABEL_STYLE), test_procedures], 
-        [Paragraph("Test Attributes", LABEL_STYLE), test_attributes],
         [Paragraph("Conclusion", LABEL_STYLE), conclusion],
     ]
 
-        # Add row to summary table if control failed and result_description is populated.
+    if test_attributes:
+        # Add test attributes only when populated.
+        table_data.insert(4, [Paragraph("Test Attributes", LABEL_STYLE), test_attributes])
+
+    # Add row to summary table if control failed and result_description is populated.
     if not control.result and control.result_description:
         table_data.append([Paragraph("Comments", LABEL_STYLE), Paragraph(control.result_description, VALUE_STYLE)])
 
     table_width = page_width - 2 * 72
     table = Table(table_data, colWidths=[table_width * 0.25, table_width * 0.75])
-    table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (0, -1), colors.lightgrey),
-        ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ("BOX", (0, 0), (-1, -1), 0.5, colors.black),
-        ("INNERGRID", (0, 0), (-1, -1), 0.25, colors.grey),
-        ("PADDING", (0, 0), (-1, -1), 6),
-    ]))
+    table.setStyle(TABLE_STYLE_HIGHLIGHT_COLUMN)
 
     return table
 
@@ -90,9 +103,7 @@ def render_sample_table(control, page_width):
             row.append(Paragraph("Excluded", CENTER_STYLE))
 
         if not sample.result:
-            # Fail control if one sample fails
-            # TODO: Consider if this is necessary. I thought this would be completed in controlTesting.py
-            control.result = False
+            # Add comments if sample failed.
             row.append(Paragraph(str(sample.comments), VALUE_STYLE))
 
         table_data.append(row)
@@ -101,17 +112,12 @@ def render_sample_table(control, page_width):
     col_width = table_width / len(table_data[0]) # divide evenly across columns
     col_widths = [col_width] * len(table_data[0])
     table = Table(table_data, colWidths=col_widths)
-    table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-    ]))
+    table.setStyle(TABLE_STYLE_HIGHLIGHT_ROW)
 
     return table
 
 def render_summary_page(controls, styles):
-    """Build summary page with pass/fail counts."""
+    """Build summary elements with pass/fail counts."""
     total = len(controls)
     passed = sum(1 for c in controls if c.result)
     excluded = sum(1 for c in controls if c.is_excluded)
@@ -119,25 +125,19 @@ def render_summary_page(controls, styles):
 
     elements = []
 
-    elements.append(Paragraph("Audit Summary", styles["Heading1"]))
-    elements.append(Spacer(1, 12))
-
-    summary_data = [
-        ["Total Controls", str(total)],
-        ["Passed", str(passed)],
-        ["Failed", str(failed)],
-        ["Out of Scope", str(excluded)],
+    audit_summary_data = [
+        [Paragraph("Number of controls", LABEL_STYLE), Paragraph(str(total), VALUE_STYLE)], 
+        [Paragraph("Passed", LABEL_STYLE), Paragraph(str(passed), VALUE_STYLE)],
+        [Paragraph("Failed", LABEL_STYLE), Paragraph(str(failed), VALUE_STYLE)],
+        [Paragraph("Out of Scope", LABEL_STYLE), Paragraph(str(excluded), VALUE_STYLE)]
     ]
 
-    table = Table(summary_data, colWidths=[200, 100])
+    elements.append(Paragraph("Control Summary", styles["Heading1"]))
+    elements.append(Spacer(1, 12))
 
-    table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (0, -1), colors.lightgrey),
-        ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
-        ("PADDING", (0, 0), (-1, -1), 6),
-    ]))
-
-    elements.append(table)
+    audit_summary_table = Table(audit_summary_data, colWidths=[150, 100], hAlign="LEFT")
+    audit_summary_table.setStyle(TABLE_STYLE_HIGHLIGHT_COLUMN)
+    elements.append(audit_summary_table)
     elements.append(Spacer(1, 24))
 
     control_summary_data = []
@@ -153,25 +153,19 @@ def render_summary_page(controls, styles):
         row.append(Paragraph(str(control.control_description), VALUE_STYLE))
         if control.is_excluded:
             control_result = "Out of Scope"
+            row.append(Paragraph(control_result, CENTER_STYLE))
         else:
             control_result = "Pass" if control.result else "Fail"
-        row.append(Paragraph(control_result, VALUE_STYLE))
+            result_color = PASS_COLOR if control.result else FAIL_COLOR
+            row.append(Paragraph(f"<font color='{result_color}'>{control_result}</font>", CENTER_STYLE))
         # TODO: Add control exclusion rationale to table.
-        row.append(Paragraph("", VALUE_STYLE))
+        row.append(Paragraph(control.result_description, VALUE_STYLE))
         
         control_summary_data.append(row)
 
-    table = Table(control_summary_data, colWidths=[100, 200, 100, 100])
-
-    table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
-        ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
-        ("PADDING", (0, 0), (-1, -1), 6),
-    ]))
-
-    elements.append(KeepTogether(table))
-    elements.append(Spacer(1, 24))
-
+    control_summary_table = Table(control_summary_data, colWidths=[100, 200, 75, 125])
+    control_summary_table.setStyle(TABLE_STYLE_HIGHLIGHT_ROW)
+    elements.append(control_summary_table)
     return elements
 
 
@@ -184,27 +178,35 @@ Structure:
     3. Detailed Findings
         - Control Summary
         - Sample Findings
-        - TODO: Exclusions (Option to select summary or detail version)
 """
 def generate_pdf_report(audit, controls, tool_name, file_name="tmp/audit_report.pdf"):
+
+    # Sort controls by controls that are failing, and then by risk rating.
+    controls = sorted(controls, key=lambda c: (c.result, -c.risk_rating))
+
     doc = SimpleDocTemplate(file_name, pagesize=letter,
     title=f"{tool_name} Audit Report", author="AJ Dehn", subject=f"Summarizes audit findings from {tool_name}")
     styles = getSampleStyleSheet()
     page_width, _ = LETTER
     elements = []
 
-    # ---------------------------
-    # Header
-    # ---------------------------
+    # Header and audit metadata
     elements.append(Paragraph(f"{tool_name} Audit Report", styles["Title"]))
     elements.append(Spacer(1, 12))
-    elements.append(
-        Paragraph(
-            f"<b>Date:</b> {datetime.now(timezone.utc).strftime('%Y-%m-%d')}",
-            styles["Normal"]
-        )
-    )
+
+    elements.append(Paragraph("Audit Summary", styles["Heading1"]))
     elements.append(Spacer(1, 12))
+
+    audit_metadata = [
+        [Paragraph("Prepared By", LABEL_STYLE), Paragraph("AJ Dehn", VALUE_STYLE)], 
+        [Paragraph("Date", LABEL_STYLE), Paragraph(str(datetime.now(timezone.utc).strftime('%Y-%m-%d')), VALUE_STYLE)],
+        [Paragraph("AWS Account ID", LABEL_STYLE), Paragraph(str(audit.aws_account_id), VALUE_STYLE)]
+    ]
+
+    audit_metadata_table = Table(audit_metadata, colWidths=[150, 100], hAlign="LEFT")
+    audit_metadata_table.setStyle(TABLE_STYLE_HIGHLIGHT_COLUMN)
+    elements.append(audit_metadata_table)
+    elements.append(Spacer(1, 24))
 
     # Summary Page
     elements.extend(render_summary_page(controls, styles))
@@ -219,8 +221,10 @@ def generate_pdf_report(audit, controls, tool_name, file_name="tmp/audit_report.
             sample_table = render_sample_table(control, page_width)
             if sample_table:
                 elements.append(KeepTogether(sample_table))
-
-            elements.append(Spacer(1, 30))
+                # Create new page if control includes sample table.
+                elements.append(PageBreak())
+            else:
+                elements.append(Spacer(1, 30))
 
     doc.build(elements)
     print(f"Report generated: {file_name}")
