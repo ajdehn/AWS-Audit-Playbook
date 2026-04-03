@@ -29,11 +29,11 @@ if __name__ == "__main__":
     controls.append(controlTesting.test_s3_public_access(audit, "C1010"))
     controls.append(controlTesting.test_iam_password_policy(audit, "C1110"))
     controls.append(controlTesting.test_root_mfa_enabled(audit, "C1120"))
-    
     controls.append(controlTesting.test_root_no_access_keys(audit, "C1130"))
+
     controls.append(controlTesting.test_iam_access_key_age(audit, "C1140"))
-    controls.append(controlTesting.test_rds_backup_retention_all_regions(audit, "C1300"))
-    controls.append(controlTesting.test_rds_encryption_all_regions(audit, "C1310"))
-    controls.append(controlTesting.test_rds_public_access_all_regions(audit, "C1310"))
+    controls.append(controlTesting.test_rds_backup_retention(audit, "C1300"))
+    controls.append(controlTesting.test_rds_encryption(audit, "C1310"))
+    controls.append(controlTesting.test_rds_public_access(audit, "C1310"))
 
     generate_pdf_report(audit, controls, "AWS", file_name="tmp/aws_audit_report.pdf")
