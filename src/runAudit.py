@@ -50,11 +50,10 @@ if __name__ == "__main__":
     controls.append(controlTesting.test_ebs_tags(audit, "EBS Tags"))
     controls.append(controlTesting.test_ebs_default_encryption(audit, "EBS Encryption Default"))
     controls.append(controlTesting.test_ec2_tags(audit, "EC2 Tags"))
-    # TODO: Add EC2_Tags
     # TODO: Add EC2_SG_Tags
     # TODO: Add EC2 Public Ports (22, RDS, all ports, etc)
 
-    # TODO: Add Lambda Tags
+    controls.append(controlTesting.test_lambda_tags(audit, "Lambda Tags"))
 
     controls.append(controlTesting.test_cloudtrail_global_logging(audit, "CloudTrail Multi-Region"))
     controls.append(controlTesting.test_cloudtrail_log_file_validation(audit, "CloudTrail Log File Validation"))

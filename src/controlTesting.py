@@ -1271,6 +1271,79 @@ def test_ebs_default_encryption(audit, control_id, risk_rating=0):
 
     return control
 
+def test_lambda_tags(audit, control_id, risk_rating=1):
+    # Get base required tags.
+    control_config = audit.config.get("control_config") or {}
+    base_required_tags = control_config.get("base_required_tags", ["Owner", "Description", "Classification"])
+
+    # Override if 'lambda_required_tags' is set
+    required_tags = control_config.get("lambda_required_tags", base_required_tags)
+
+    control = Control(
+        control_id=control_id,
+        control_description=(
+            "Lambda functions must have required tags applied and tag values must not be empty."
+        ),
+        test_procedures=[
+            "For each in-scope region, obtained the list of Lambda functions by calling list_functions() boto3 command.",
+            "Saved the list of functions in the audit evidence folder (Lambda/[region_name]/functions.json).",
+            "For each function, obtained its tags using list_tags() boto3 command.",
+            "Saved the tags for each function in the audit evidence folder (Lambda/[region_name]/functions/[function_name]/tags.json).",
+            f"Inspected each Lambda function to determine if the following tag keys exist and have non-empty values: {required_tags}"
+        ],
+        test_attributes=[],
+        audit=audit,
+        table_headers=["Region", "Function Name", "Result", "Comments"],
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    for region in audit.in_scope_regions:
+        lambda_client = boto3.client("lambda", region_name=region)
+
+        functions = audit.evidence_client.get_aws(
+            f"Lambda/{region}/functions.json",
+            fetch_fn=None,
+            paginator_params={
+                "client": lambda_client,
+                "method_name": "list_functions",
+                "pagination_key": "Functions"
+            }
+        )
+
+        for fn in functions.get("Functions", []):
+            sample = Sample(
+                sample_id={
+                    "region": region,
+                    "function_name": fn["FunctionName"]
+                },
+                control_id=control_id
+            )
+
+            if process_sample_exclusion(control, sample, audit):
+                continue
+
+            # Fetch tags via ARN
+            arn = fn.get("FunctionArn")
+            tags_response = audit.evidence_client.get_aws(
+                f"Lambda/{region}/functions/{fn['FunctionName']}/tags.json",
+                lambda: lambda_client.list_tags(Resource=arn)
+            )
+
+            lambda_tags = tags_response.get("Tags", {})
+            evaluate_tags(sample, required_tags, lambda_tags)
+            control.samples.append(sample)
+
+    control.evaluate_samples()
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} Lambda function(s) missing required tags or have empty values."
+        )
+
+    return control
+
 def test_cloudtrail_global_logging(audit, control_id, risk_rating=3):
     control = Control(
         control_id=control_id,
