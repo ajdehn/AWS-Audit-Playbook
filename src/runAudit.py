@@ -42,29 +42,30 @@ if __name__ == "__main__":
     controls.append(controlTesting.test_rds_backup_retention(audit, "RDS Backup Retention"))
     controls.append(controlTesting.test_rds_encryption(audit, "RDS Encryption"))
     controls.append(controlTesting.test_rds_public_access(audit, "RDS Public Access"))
+    controls.append(controlTesting.test_rds_auto_minor_version_upgrade(audit, "RDS Automatic Upgrades"))
+    controls.append(controlTesting.test_rds_deletion_protection(audit, "RDS Deletion Protection"))
     controls.append(controlTesting.test_rds_tags(audit, "RDS Tags"))
-    # TODO: Add RDS_Auto_Upgrade
-    # TODO: Add RDS_Deletion_Protection
 
     controls.append(controlTesting.test_ebs_volume_encryption(audit, "EBS Volume Encryption"))
-    controls.append(controlTesting.test_ebs_tags(audit, "EBS Tags"))
     controls.append(controlTesting.test_ebs_default_encryption(audit, "EBS Encryption Default"))
-    # TODO: Add EC2_Tags
-    # TODO: Add EC2_SG_Tags
+    controls.append(controlTesting.test_ebs_tags(audit, "EBS Tags"))
+    controls.append(controlTesting.test_ec2_tags(audit, "EC2 Tags"))
+    controls.append(controlTesting.test_ec2_security_group_tags(audit, "EC2 Security Group Tags"))
     # TODO: Add EC2 Public Ports (22, RDS, all ports, etc)
 
-    # TODO: Add Lambda Tags
+    controls.append(controlTesting.test_lambda_tags(audit, "Lambda Tags"))
 
     controls.append(controlTesting.test_cloudtrail_global_logging(audit, "CloudTrail Multi-Region"))
     controls.append(controlTesting.test_cloudtrail_log_file_validation(audit, "CloudTrail Log File Validation"))
     controls.append(controlTesting.test_cloudtrail_s3_bucket_protection(audit, "CloudTrail S3 Bucket Protection"))
     controls.append(controlTesting.test_cloudtrail_logging_recent_stops(audit, "CloudTrail Logging Recent Stops"))
 
+    controls.append(controlTesting.test_waf_enabled(audit, "Web Application Firewall Enabled"))
+    # TODO: Add WAF Tags
+
     # TODO: Add AWS Client Cache
     # TODO: Add GuardDuty Enabled for regions with resources.
     # TODO: Add GuardDuty findings resolved within a set time period.
     # TODO: Add GuardDuty findings sent to EventBridge every 15 minutes (default is 6 hours).
-    # TODO: Add WAF enabled on relevant resources (Application Load Balancers, API Gateway, etc)
-    # TODO: Add WAF Tags
 
     generate_pdf_report(audit, controls, "AWS", file_name="tmp/aws_audit_report.pdf")

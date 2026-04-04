@@ -881,6 +881,289 @@ def test_rds_backup_retention(audit, control_id, risk_rating=1):
         control.result_description = f"Exceptions Noted. {control.num_findings} RDS instances do not have sufficient backup retention (at least {required_rds_retention_days} days)."    
     return control
 
+def test_rds_auto_minor_version_upgrade(audit, control_id, risk_rating=1):
+    control = Control(
+        control_id=control_id,
+        control_description="RDS instances have automatic minor version upgrades enabled.",
+        test_procedures=[
+            "For each in-scope region, obtained the list of DB instances by calling the describe_db_instances() boto3 command.",
+            "Saved the list of DB instances (RDS/[region_name]/db_instances.json).",
+            "Inspected the database configuration for each instance to determine if automatic minor version upgrades are enabled."
+        ],
+        test_attributes=["AutoMinorVersionUpgrade = True."],
+        audit=audit,
+        table_headers=["Region", "DB Instance", "Result", "Comments"],
+        risk_rating=risk_rating        
+    )
+
+    if control.is_excluded:
+        return control
+
+    for region in audit.in_scope_regions:
+        rds = boto3.client("rds", region_name=region)
+
+        instances = audit.evidence_client.get_aws(
+            f"RDS/{region}/db_instances.json",
+            fetch_fn=None,
+            paginator_params={
+                "client": rds,
+                "method_name": "describe_db_instances",
+                "pagination_key": "DBInstances"
+            }
+        )
+
+        for db in instances.get("DBInstances", []):
+            sample = Sample(
+                sample_id={
+                    "region": region,
+                    "db_instance": db["DBInstanceIdentifier"]
+                },
+                control_id=control_id
+            )
+
+            if process_sample_exclusion(control, sample, audit):
+                continue
+
+            if db.get("AutoMinorVersionUpgrade"):
+                sample.result = True
+            else:
+                sample.comments = "Automatic minor version upgrades are not enabled."
+
+            control.samples.append(sample)
+
+    control.evaluate_samples()
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} RDS instance(s) do not have automatic minor version upgrades enabled."
+        )
+
+    return control
+
+def test_rds_deletion_protection(audit, control_id, risk_rating=2):
+    control = Control(
+        control_id=control_id,
+        control_description="RDS instances have deletion protection enabled at the cluster or instance level.",
+        test_procedures=[
+            "For each in-scope region, obtained the list of DB instances and DB clusters using describe_db_instances() and describe_db_clusters() boto3 commands.",
+            "Saved the list of DB instances (RDS/[region_name]/db_instances.json) and DB clusters (RDS/[region_name]/db_clusters.json).",
+            "Inspected each DB instance and associated cluster (if applicable) to determine if deletion protection is enabled."
+        ],
+        test_attributes=["DeletionProtection = True (cluster OR instance)."],
+        audit=audit,
+        table_headers=["Region", "DB Instance", "Result", "Comments"],
+        risk_rating=risk_rating        
+    )
+
+    if control.is_excluded:
+        return control
+
+    for region in audit.in_scope_regions:
+        rds = boto3.client("rds", region_name=region)
+
+        # Get DB instances
+        instances = audit.evidence_client.get_aws(
+            f"RDS/{region}/db_instances.json",
+            fetch_fn=None,
+            paginator_params={
+                "client": rds,
+                "method_name": "describe_db_instances",
+                "pagination_key": "DBInstances"
+            }
+        )
+
+        # Get DB clusters
+        clusters = audit.evidence_client.get_aws(
+            f"RDS/{region}/db_clusters.json",
+            fetch_fn=None,
+            paginator_params={
+                "client": rds,
+                "method_name": "describe_db_clusters",
+                "pagination_key": "DBClusters"
+            }
+        )
+
+        # Build lookup for cluster deletion protection
+        cluster_map = {
+            c["DBClusterIdentifier"]: c.get("DeletionProtection", False)
+            for c in clusters.get("DBClusters", [])
+        }
+
+        for db in instances.get("DBInstances", []):
+            sample = Sample(
+                sample_id={
+                    "region": region,
+                    "db_instance": db["DBInstanceIdentifier"]
+                },
+                control_id=control_id
+            )
+
+            if process_sample_exclusion(control, sample, audit):
+                continue
+
+            instance_protection = db.get("DeletionProtection", False)
+            cluster_id = db.get("DBClusterIdentifier")
+            # Check if deletion protection is enabled at the cluster level.
+            if cluster_id:
+                cluster_protection = cluster_map.get(cluster_id, False)
+            else:
+                cluster_protection = False
+
+            # Pass if either instance OR cluster has deletion protection
+            if instance_protection or cluster_protection:
+                sample.result = True
+            else:
+                if cluster_id:
+                    sample.comments = "Deletion protection is not enabled at either the instance or cluster level."
+                else:
+                    sample.comments = "Deletion protection is not enabled at the instance level."
+            control.samples.append(sample)
+
+    control.evaluate_samples()
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} RDS instance(s) do not have deletion protection enabled."
+        )
+
+    return control
+
+def test_ec2_security_group_tags(audit, control_id, risk_rating=1):
+    # Get required tags.
+    control_config = audit.config.get("control_config") or {}
+    required_tags = control_config.get("ec2_sg_required_tags", ["Owner", "Description", "ReviewedBy", "LastReviewedDate"])
+
+    control = Control(
+        control_id=control_id,
+        control_description=(
+            "EC2 security groups must have required tags applied and tag values must not be empty."
+        ),
+        test_procedures=[
+            "For each in-scope region, obtained the list of EC2 security groups by calling describe_security_groups() boto3 command.",
+            "Saved the list of security groups in the audit evidence folder (EC2/[region_name]/security_groups.json).",
+            "For each security group, obtained its tags from the 'Tags' attribute.",
+            f"Inspected each security group's tags to determine if the following tag keys exist and have non-empty values: {required_tags}"
+        ],
+        test_attributes=[],
+        audit=audit,
+        table_headers=["Region", "Security Group ID", "Result", "Comments"],
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    for region in audit.in_scope_regions:
+        ec2 = boto3.client("ec2", region_name=region)
+
+        security_groups = audit.evidence_client.get_aws(
+            f"EC2/{region}/security_groups.json",
+            fetch_fn=None,
+            paginator_params={
+                "client": ec2,
+                "method_name": "describe_security_groups",
+                "pagination_key": "SecurityGroups"
+            }
+        )
+
+        for sg in security_groups.get("SecurityGroups", []):
+            sample = Sample(
+                sample_id={
+                    "region": region,
+                    "security_group_id": sg["GroupId"]
+                },
+                control_id=control_id
+            )
+
+            if process_sample_exclusion(control, sample, audit):
+                continue
+
+            # Security group tags
+            actual_sg_tags = {
+                t["Key"]: t.get("Value", "")
+                for t in sg.get("Tags", [])
+            }
+
+            evaluate_tags(sample, required_tags, actual_sg_tags)
+            control.samples.append(sample)
+
+    control.evaluate_samples()
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} security group(s) missing required tags or have empty values."
+        )
+
+    return control
+
+def test_ec2_tags(audit, control_id, risk_rating=1):
+    # Get base required tags.
+    control_config = audit.config.get("control_config") or {}
+    base_required_tags = control_config.get("base_required_tags", ["Owner", "Description", "Classification"])
+
+    # Override if 'ec2_required_tags' is set
+    required_tags = control_config.get("ec2_required_tags", base_required_tags)
+
+    control = Control(
+        control_id=control_id,
+        control_description=(
+            "EC2 instances must have required tags applied and tag values must not be empty."
+        ),
+        test_procedures=[
+            "For each in-scope region, obtained the list of EC2 instances by calling describe_instances() boto3 command.",
+            "Saved the list of instances in the audit evidence folder (EC2/[region_name]/instances.json).",
+            "For each instance, obtained its tags from the 'Tags' attribute.",
+            f"Inspected each EC2 instance to determine if the following tag keys exist and have non-empty values: {required_tags}"
+        ],
+        test_attributes=[],
+        audit=audit,
+        table_headers=["Region", "Instance ID", "Result", "Comments"],
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    for region in audit.in_scope_regions:
+        ec2 = boto3.client("ec2", region_name=region)
+
+        instances = audit.evidence_client.get_aws(
+            f"EC2/{region}/instances.json",
+            fetch_fn=None,
+            paginator_params={
+                "client": ec2,
+                "method_name": "describe_instances",
+                "pagination_key": "Reservations"
+            }
+        )
+
+        for reservation in instances.get("Reservations", []):
+            for instance in reservation.get("Instances", []):
+                sample = Sample(
+                    sample_id={
+                        "region": region,
+                        "instance_id": instance["InstanceId"]
+                    },
+                    control_id=control_id
+                )
+
+                if process_sample_exclusion(control, sample, audit):
+                    continue
+
+                # EC2 tags come in the 'Tags' attribute
+                instance_tags = {
+                    t["Key"]: t.get("Value", "")
+                    for t in instance.get("Tags", [])
+                }
+
+                evaluate_tags(sample, required_tags, instance_tags)
+                control.samples.append(sample)
+
+    control.evaluate_samples()
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} EC2 instance(s) missing required tags or have empty values."
+        )
+
+    return control
+
 def test_ebs_volume_encryption(audit, control_id, risk_rating=2):
     control = Control(
         control_id=control_id,
@@ -1051,6 +1334,79 @@ def test_ebs_default_encryption(audit, control_id, risk_rating=0):
     if not control.result:
         control.result_description = (
             f"Exceptions Noted. {control.num_findings} region(s) do not have EBS default encryption enabled."
+        )
+
+    return control
+
+def test_lambda_tags(audit, control_id, risk_rating=1):
+    # Get base required tags.
+    control_config = audit.config.get("control_config") or {}
+    base_required_tags = control_config.get("base_required_tags", ["Owner", "Description", "Classification"])
+
+    # Override if 'lambda_required_tags' is set
+    required_tags = control_config.get("lambda_required_tags", base_required_tags)
+
+    control = Control(
+        control_id=control_id,
+        control_description=(
+            "Lambda functions must have required tags applied and tag values must not be empty."
+        ),
+        test_procedures=[
+            "For each in-scope region, obtained the list of Lambda functions by calling list_functions() boto3 command.",
+            "Saved the list of functions in the audit evidence folder (Lambda/[region_name]/functions.json).",
+            "For each function, obtained its tags using list_tags() boto3 command.",
+            "Saved the tags for each function in the audit evidence folder (Lambda/[region_name]/functions/[function_name]/tags.json).",
+            f"Inspected each Lambda function to determine if the following tag keys exist and have non-empty values: {required_tags}"
+        ],
+        test_attributes=[],
+        audit=audit,
+        table_headers=["Region", "Function Name", "Result", "Comments"],
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    for region in audit.in_scope_regions:
+        lambda_client = boto3.client("lambda", region_name=region)
+
+        functions = audit.evidence_client.get_aws(
+            f"Lambda/{region}/functions.json",
+            fetch_fn=None,
+            paginator_params={
+                "client": lambda_client,
+                "method_name": "list_functions",
+                "pagination_key": "Functions"
+            }
+        )
+
+        for fn in functions.get("Functions", []):
+            sample = Sample(
+                sample_id={
+                    "region": region,
+                    "function_name": fn["FunctionName"]
+                },
+                control_id=control_id
+            )
+
+            if process_sample_exclusion(control, sample, audit):
+                continue
+
+            # Fetch tags via ARN
+            arn = fn.get("FunctionArn")
+            tags_response = audit.evidence_client.get_aws(
+                f"Lambda/{region}/functions/{fn['FunctionName']}/tags.json",
+                lambda: lambda_client.list_tags(Resource=arn)
+            )
+
+            lambda_tags = tags_response.get("Tags", {})
+            evaluate_tags(sample, required_tags, lambda_tags)
+            control.samples.append(sample)
+
+    control.evaluate_samples()
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} Lambda function(s) missing required tags or have empty values."
         )
 
     return control
@@ -1325,6 +1681,116 @@ def test_cloudtrail_logging_recent_stops(audit, control_id, risk_rating=3):
         control.result_description = (
             f"Exceptions Noted. {control.num_findings} trail(s) have logging stopped "
             f"currently or within the last {lookback_days} days."
+        )
+
+    return control
+
+def test_waf_enabled(audit, control_id, risk_rating=2):
+    control = Control(
+        control_id=control_id,
+        control_description="WAF is enabled on Application Load Balancers and API Gateways.",
+        test_procedures=[
+            "For each in-scope region, obtained the list of Application Load Balancers using describe_load_balancers() boto3 command.",
+            "Saved the list of load balancers in the audit evidence folder (ELBv2/[region_name]/load_balancers.json).",
+            "For each load balancer, checked for WAF association using get_web_acl_for_resource() boto3 command.",
+            "Saved the WAF association results (ELBv2/[region_name]/load_balancers/[load_balancer_name]/waf.json).",
+            "For each in-scope region, obtained the list of API Gateways.",
+            "Checked each API Gateway for WAF association.",
+            "Saved the WAF association results (APIGateway/[region_name]/[api_id]/waf.json).",
+            "Inspected each resource to determine if a WAF Web ACL is associated."
+        ],
+        test_attributes=["WAF Web ACL associated = True."],
+        audit=audit,
+        table_headers=["Region", "Resource Type", "Resource ID", "Result", "Comments"],
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    for region in audit.in_scope_regions:
+        waf = boto3.client("wafv2", region_name=region)
+        elbv2 = boto3.client("elbv2", region_name=region)
+        apigw = boto3.client("apigateway", region_name=region)
+
+        # ALBs
+        lbs = audit.evidence_client.get_aws(
+            f"ELBv2/{region}/load_balancers.json",
+            fetch_fn=None,
+            paginator_params={
+                "client": elbv2,
+                "method_name": "describe_load_balancers",
+                "pagination_key": "LoadBalancers"
+            }
+        )
+
+        for lb in lbs.get("LoadBalancers", []):
+            if lb.get("Type") != "application":
+                continue  # Only ALBs
+
+            sample = Sample(
+                sample_id={
+                    "region": region,
+                    "resource_type": "ALB",
+                    "resource_id": lb["LoadBalancerName"]
+                },
+                control_id=control_id
+            )
+
+            if process_sample_exclusion(control, sample, audit):
+                continue
+
+            arn = lb.get("LoadBalancerArn")
+
+            waf_assoc = audit.evidence_client.get_aws(
+                f"ELBv2/{region}/load_balancers/{lb['LoadBalancerName']}/waf.json",
+                lambda: waf.get_web_acl_for_resource(ResourceArn=arn)
+            )
+
+            if waf_assoc.get("WebACL"):
+                sample.result = True
+            else:
+                sample.comments = "No WAF Web ACL associated."
+
+            control.samples.append(sample)
+
+        # API Gateway (REST APIs)
+        apis = audit.evidence_client.get_aws(
+            f"APIGateway/{region}/rest_apis.json",
+            lambda: apigw.get_rest_apis()
+        )
+
+        for api in apis.get("items", []):
+            sample = Sample(
+                sample_id={
+                    "region": region,
+                    "resource_type": "API Gateway",
+                    "resource_id": api["id"]
+                },
+                control_id=control_id
+            )
+
+            if process_sample_exclusion(control, sample, audit):
+                continue
+
+            resource_arn = f"arn:aws:apigateway:{region}::/restapis/{api['id']}/stages"
+
+            waf_assoc = audit.evidence_client.get_aws(
+                f"APIGateway/{region}/{api['id']}/waf.json",
+                lambda: waf.get_web_acl_for_resource(ResourceArn=resource_arn)
+            )
+
+            if waf_assoc.get("WebACL"):
+                sample.result = True
+            else:
+                sample.comments = "No WAF Web ACL associated."
+
+            control.samples.append(sample)
+
+    control.evaluate_samples()
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} resource(s) do not have WAF enabled."
         )
 
     return control
