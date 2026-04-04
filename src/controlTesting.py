@@ -1026,6 +1026,77 @@ def test_rds_deletion_protection(audit, control_id, risk_rating=2):
 
     return control
 
+def test_ec2_tags(audit, control_id, risk_rating=1):
+    # Get base required tags.
+    control_config = audit.config.get("control_config") or {}
+    base_required_tags = control_config.get("base_required_tags", ["Owner", "Description", "Classification"])
+
+    # Override if 'ec2_required_tags' is set
+    required_tags = control_config.get("ec2_required_tags", base_required_tags)
+
+    control = Control(
+        control_id=control_id,
+        control_description=(
+            "EC2 instances must have required tags applied and tag values must not be empty."
+        ),
+        test_procedures=[
+            "For each in-scope region, obtained the list of EC2 instances by calling describe_instances() boto3 command.",
+            "Saved the list of instances in the audit evidence folder (EC2/[region_name]/instances.json).",
+            "For each instance, obtained its tags from the 'Tags' attribute.",
+            f"Inspected each EC2 instance to determine if the following tag keys exist and have non-empty values: {required_tags}"
+        ],
+        test_attributes=[],
+        audit=audit,
+        table_headers=["Region", "Instance ID", "Result", "Comments"],
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    for region in audit.in_scope_regions:
+        ec2 = boto3.client("ec2", region_name=region)
+
+        instances = audit.evidence_client.get_aws(
+            f"EC2/{region}/instances.json",
+            fetch_fn=None,
+            paginator_params={
+                "client": ec2,
+                "method_name": "describe_instances",
+                "pagination_key": "Reservations"
+            }
+        )
+
+        for reservation in instances.get("Reservations", []):
+            for instance in reservation.get("Instances", []):
+                sample = Sample(
+                    sample_id={
+                        "region": region,
+                        "instance_id": instance["InstanceId"]
+                    },
+                    control_id=control_id
+                )
+
+                if process_sample_exclusion(control, sample, audit):
+                    continue
+
+                # EC2 tags come in the 'Tags' attribute
+                instance_tags = {
+                    t["Key"]: t.get("Value", "")
+                    for t in instance.get("Tags", [])
+                }
+
+                evaluate_tags(sample, required_tags, instance_tags)
+                control.samples.append(sample)
+
+    control.evaluate_samples()
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} EC2 instance(s) missing required tags or have empty values."
+        )
+
+    return control
+
 def test_ebs_volume_encryption(audit, control_id, risk_rating=2):
     control = Control(
         control_id=control_id,

@@ -49,6 +49,7 @@ if __name__ == "__main__":
     controls.append(controlTesting.test_ebs_volume_encryption(audit, "EBS Volume Encryption"))
     controls.append(controlTesting.test_ebs_tags(audit, "EBS Tags"))
     controls.append(controlTesting.test_ebs_default_encryption(audit, "EBS Encryption Default"))
+    controls.append(controlTesting.test_ec2_tags(audit, "EC2 Tags"))
     # TODO: Add EC2_Tags
     # TODO: Add EC2_SG_Tags
     # TODO: Add EC2 Public Ports (22, RDS, all ports, etc)
