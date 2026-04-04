@@ -881,6 +881,64 @@ def test_rds_backup_retention(audit, control_id, risk_rating=1):
         control.result_description = f"Exceptions Noted. {control.num_findings} RDS instances do not have sufficient backup retention (at least {required_rds_retention_days} days)."    
     return control
 
+def test_rds_auto_minor_version_upgrade(audit, control_id, risk_rating=1):
+    control = Control(
+        control_id=control_id,
+        control_description="RDS instances have automatic minor version upgrades enabled.",
+        test_procedures=[
+            "For each in-scope region, obtained the list of DB instances by calling the describe_db_instances() boto3 command.",
+            "Saved the list of DB instances (RDS/[region_name]/db_instances.json).",
+            "Inspected the database configuration for each instance to determine if automatic minor version upgrades are enabled."
+        ],
+        test_attributes=["AutoMinorVersionUpgrade = True."],
+        audit=audit,
+        table_headers=["Region", "DB Instance", "Result", "Comments"],
+        risk_rating=risk_rating        
+    )
+
+    if control.is_excluded:
+        return control
+
+    for region in audit.in_scope_regions:
+        rds = boto3.client("rds", region_name=region)
+
+        instances = audit.evidence_client.get_aws(
+            f"RDS/{region}/db_instances.json",
+            fetch_fn=None,
+            paginator_params={
+                "client": rds,
+                "method_name": "describe_db_instances",
+                "pagination_key": "DBInstances"
+            }
+        )
+
+        for db in instances.get("DBInstances", []):
+            sample = Sample(
+                sample_id={
+                    "region": region,
+                    "db_instance": db["DBInstanceIdentifier"]
+                },
+                control_id=control_id
+            )
+
+            if process_sample_exclusion(control, sample, audit):
+                continue
+
+            if db.get("AutoMinorVersionUpgrade"):
+                sample.result = True
+            else:
+                sample.comments = "Automatic minor version upgrades are not enabled."
+
+            control.samples.append(sample)
+
+    control.evaluate_samples()
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} RDS instance(s) do not have automatic minor version upgrades enabled."
+        )
+
+    return control
+
 def test_ebs_volume_encryption(audit, control_id, risk_rating=2):
     control = Control(
         control_id=control_id,
