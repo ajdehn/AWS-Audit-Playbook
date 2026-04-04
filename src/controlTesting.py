@@ -1026,6 +1026,73 @@ def test_rds_deletion_protection(audit, control_id, risk_rating=2):
 
     return control
 
+def test_ec2_security_group_tags(audit, control_id, risk_rating=1):
+    # Get required tags.
+    control_config = audit.config.get("control_config") or {}
+    required_tags = control_config.get("ec2_sg_required_tags", ["Owner", "Description", "ReviewedBy", "LastReviewedDate"])
+
+    control = Control(
+        control_id=control_id,
+        control_description=(
+            "EC2 security groups must have required tags applied and tag values must not be empty."
+        ),
+        test_procedures=[
+            "For each in-scope region, obtained the list of EC2 security groups by calling describe_security_groups() boto3 command.",
+            "Saved the list of security groups in the audit evidence folder (EC2/[region_name]/security_groups.json).",
+            "For each security group, obtained its tags from the 'Tags' attribute.",
+            f"Inspected each security group's tags to determine if the following tag keys exist and have non-empty values: {required_tags}"
+        ],
+        test_attributes=[],
+        audit=audit,
+        table_headers=["Region", "Security Group ID", "Result", "Comments"],
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    for region in audit.in_scope_regions:
+        ec2 = boto3.client("ec2", region_name=region)
+
+        security_groups = audit.evidence_client.get_aws(
+            f"EC2/{region}/security_groups.json",
+            fetch_fn=None,
+            paginator_params={
+                "client": ec2,
+                "method_name": "describe_security_groups",
+                "pagination_key": "SecurityGroups"
+            }
+        )
+
+        for sg in security_groups.get("SecurityGroups", []):
+            sample = Sample(
+                sample_id={
+                    "region": region,
+                    "security_group_id": sg["GroupId"]
+                },
+                control_id=control_id
+            )
+
+            if process_sample_exclusion(control, sample, audit):
+                continue
+
+            # Security group tags
+            actual_sg_tags = {
+                t["Key"]: t.get("Value", "")
+                for t in sg.get("Tags", [])
+            }
+
+            evaluate_tags(sample, required_tags, actual_sg_tags)
+            control.samples.append(sample)
+
+    control.evaluate_samples()
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} security group(s) missing required tags or have empty values."
+        )
+
+    return control
+
 def test_ec2_tags(audit, control_id, risk_rating=1):
     # Get base required tags.
     control_config = audit.config.get("control_config") or {}
