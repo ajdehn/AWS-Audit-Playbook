@@ -1684,3 +1684,113 @@ def test_cloudtrail_logging_recent_stops(audit, control_id, risk_rating=3):
         )
 
     return control
+
+def test_waf_enabled(audit, control_id, risk_rating=2):
+    control = Control(
+        control_id=control_id,
+        control_description="WAF is enabled on Application Load Balancers and API Gateways.",
+        test_procedures=[
+            "For each in-scope region, obtained the list of Application Load Balancers using describe_load_balancers() boto3 command.",
+            "Saved the list of load balancers in the audit evidence folder (ELBv2/[region_name]/load_balancers.json).",
+            "For each load balancer, checked for WAF association using get_web_acl_for_resource() boto3 command.",
+            "Saved the WAF association results (ELBv2/[region_name]/load_balancers/[load_balancer_name]/waf.json).",
+            "For each in-scope region, obtained the list of API Gateways.",
+            "Checked each API Gateway for WAF association.",
+            "Saved the WAF association results (APIGateway/[region_name]/[api_id]/waf.json).",
+            "Inspected each resource to determine if a WAF Web ACL is associated."
+        ],
+        test_attributes=["WAF Web ACL associated = True."],
+        audit=audit,
+        table_headers=["Region", "Resource Type", "Resource ID", "Result", "Comments"],
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    for region in audit.in_scope_regions:
+        waf = boto3.client("wafv2", region_name=region)
+        elbv2 = boto3.client("elbv2", region_name=region)
+        apigw = boto3.client("apigateway", region_name=region)
+
+        # ALBs
+        lbs = audit.evidence_client.get_aws(
+            f"ELBv2/{region}/load_balancers.json",
+            fetch_fn=None,
+            paginator_params={
+                "client": elbv2,
+                "method_name": "describe_load_balancers",
+                "pagination_key": "LoadBalancers"
+            }
+        )
+
+        for lb in lbs.get("LoadBalancers", []):
+            if lb.get("Type") != "application":
+                continue  # Only ALBs
+
+            sample = Sample(
+                sample_id={
+                    "region": region,
+                    "resource_type": "ALB",
+                    "resource_id": lb["LoadBalancerName"]
+                },
+                control_id=control_id
+            )
+
+            if process_sample_exclusion(control, sample, audit):
+                continue
+
+            arn = lb.get("LoadBalancerArn")
+
+            waf_assoc = audit.evidence_client.get_aws(
+                f"ELBv2/{region}/load_balancers/{lb['LoadBalancerName']}/waf.json",
+                lambda: waf.get_web_acl_for_resource(ResourceArn=arn)
+            )
+
+            if waf_assoc.get("WebACL"):
+                sample.result = True
+            else:
+                sample.comments = "No WAF Web ACL associated."
+
+            control.samples.append(sample)
+
+        # API Gateway (REST APIs)
+        apis = audit.evidence_client.get_aws(
+            f"APIGateway/{region}/rest_apis.json",
+            lambda: apigw.get_rest_apis()
+        )
+
+        for api in apis.get("items", []):
+            sample = Sample(
+                sample_id={
+                    "region": region,
+                    "resource_type": "API Gateway",
+                    "resource_id": api["id"]
+                },
+                control_id=control_id
+            )
+
+            if process_sample_exclusion(control, sample, audit):
+                continue
+
+            resource_arn = f"arn:aws:apigateway:{region}::/restapis/{api['id']}/stages"
+
+            waf_assoc = audit.evidence_client.get_aws(
+                f"APIGateway/{region}/{api['id']}/waf.json",
+                lambda: waf.get_web_acl_for_resource(ResourceArn=resource_arn)
+            )
+
+            if waf_assoc.get("WebACL"):
+                sample.result = True
+            else:
+                sample.comments = "No WAF Web ACL associated."
+
+            control.samples.append(sample)
+
+    control.evaluate_samples()
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} resource(s) do not have WAF enabled."
+        )
+
+    return control

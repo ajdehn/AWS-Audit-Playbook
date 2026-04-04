@@ -47,10 +47,10 @@ if __name__ == "__main__":
     controls.append(controlTesting.test_rds_tags(audit, "RDS Tags"))
 
     controls.append(controlTesting.test_ebs_volume_encryption(audit, "EBS Volume Encryption"))
-    controls.append(controlTesting.test_ebs_tags(audit, "EBS Tags"))
     controls.append(controlTesting.test_ebs_default_encryption(audit, "EBS Encryption Default"))
+    controls.append(controlTesting.test_ebs_tags(audit, "EBS Tags"))
     controls.append(controlTesting.test_ec2_tags(audit, "EC2 Tags"))
-    # TODO: Add EC2_SG_Tags
+    controls.append(controlTesting.test_ec2_security_group_tags(audit, "EC2 Security Group Tags"))
     # TODO: Add EC2 Public Ports (22, RDS, all ports, etc)
 
     controls.append(controlTesting.test_lambda_tags(audit, "Lambda Tags"))
@@ -60,11 +60,12 @@ if __name__ == "__main__":
     controls.append(controlTesting.test_cloudtrail_s3_bucket_protection(audit, "CloudTrail S3 Bucket Protection"))
     controls.append(controlTesting.test_cloudtrail_logging_recent_stops(audit, "CloudTrail Logging Recent Stops"))
 
+    controls.append(controlTesting.test_waf_enabled(audit, "Web Application Firewall Enabled"))
+    # TODO: Add WAF Tags
+
     # TODO: Add AWS Client Cache
     # TODO: Add GuardDuty Enabled for regions with resources.
     # TODO: Add GuardDuty findings resolved within a set time period.
     # TODO: Add GuardDuty findings sent to EventBridge every 15 minutes (default is 6 hours).
-    # TODO: Add WAF enabled on relevant resources (Application Load Balancers, API Gateway, etc)
-    # TODO: Add WAF Tags
 
     generate_pdf_report(audit, controls, "AWS", file_name="tmp/aws_audit_report.pdf")
