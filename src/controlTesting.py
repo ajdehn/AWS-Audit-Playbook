@@ -939,6 +939,93 @@ def test_rds_auto_minor_version_upgrade(audit, control_id, risk_rating=1):
 
     return control
 
+def test_rds_deletion_protection(audit, control_id, risk_rating=2):
+    control = Control(
+        control_id=control_id,
+        control_description="RDS instances have deletion protection enabled at the cluster or instance level.",
+        test_procedures=[
+            "For each in-scope region, obtained the list of DB instances and DB clusters using describe_db_instances() and describe_db_clusters() boto3 commands.",
+            "Saved the list of DB instances (RDS/[region_name]/db_instances.json) and DB clusters (RDS/[region_name]/db_clusters.json).",
+            "Inspected each DB instance and associated cluster (if applicable) to determine if deletion protection is enabled."
+        ],
+        test_attributes=["DeletionProtection = True (cluster OR instance)."],
+        audit=audit,
+        table_headers=["Region", "DB Instance", "Result", "Comments"],
+        risk_rating=risk_rating        
+    )
+
+    if control.is_excluded:
+        return control
+
+    for region in audit.in_scope_regions:
+        rds = boto3.client("rds", region_name=region)
+
+        # Get DB instances
+        instances = audit.evidence_client.get_aws(
+            f"RDS/{region}/db_instances.json",
+            fetch_fn=None,
+            paginator_params={
+                "client": rds,
+                "method_name": "describe_db_instances",
+                "pagination_key": "DBInstances"
+            }
+        )
+
+        # Get DB clusters
+        clusters = audit.evidence_client.get_aws(
+            f"RDS/{region}/db_clusters.json",
+            fetch_fn=None,
+            paginator_params={
+                "client": rds,
+                "method_name": "describe_db_clusters",
+                "pagination_key": "DBClusters"
+            }
+        )
+
+        # Build lookup for cluster deletion protection
+        cluster_map = {
+            c["DBClusterIdentifier"]: c.get("DeletionProtection", False)
+            for c in clusters.get("DBClusters", [])
+        }
+
+        for db in instances.get("DBInstances", []):
+            sample = Sample(
+                sample_id={
+                    "region": region,
+                    "db_instance": db["DBInstanceIdentifier"]
+                },
+                control_id=control_id
+            )
+
+            if process_sample_exclusion(control, sample, audit):
+                continue
+
+            instance_protection = db.get("DeletionProtection", False)
+            cluster_id = db.get("DBClusterIdentifier")
+            # Check if deletion protection is enabled at the cluster level.
+            if cluster_id:
+                cluster_protection = cluster_map.get(cluster_id, False)
+            else:
+                cluster_protection = False
+
+            # Pass if either instance OR cluster has deletion protection
+            if instance_protection or cluster_protection:
+                sample.result = True
+            else:
+                if cluster_id:
+                    sample.comments = "Deletion protection is not enabled at either the instance or cluster level."
+                else:
+                    sample.comments = "Deletion protection is not enabled at the instance level."
+            control.samples.append(sample)
+
+    control.evaluate_samples()
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} RDS instance(s) do not have deletion protection enabled."
+        )
+
+    return control
+
 def test_ebs_volume_encryption(audit, control_id, risk_rating=2):
     control = Control(
         control_id=control_id,
