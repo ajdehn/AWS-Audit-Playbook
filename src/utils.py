@@ -2,6 +2,37 @@ import json
 import os
 import shutil
 from datetime import datetime, timezone
+import boto3
+from dotenv import load_dotenv
+
+def create_session(session_name="auditops-assume-role"):
+    load_dotenv()
+    use_iam_role = os.getenv("use_iam_role", "false").lower() == "true"
+
+    # Not using IAM role.
+    if not use_iam_role:
+        return boto3.Session()
+
+    role_arn = os.getenv("role_arn")
+    external_id = os.getenv("external_id")
+    # Use IAM role.
+    sts = boto3.client("sts")
+    response = sts.assume_role(
+        RoleArn=role_arn,
+        ExternalId=external_id,
+        RoleSessionName=session_name
+    )
+    creds = response["Credentials"]
+
+    return boto3.Session(
+        aws_access_key_id=creds["AccessKeyId"],
+        aws_secret_access_key=creds["SecretAccessKey"],
+        aws_session_token=creds["SessionToken"]
+    )
+
+def get_aws_account_id(audit):
+    sts = audit.session.client("sts")
+    return sts.get_caller_identity()["Account"]
 
 """
     Saves a json file to a specified path

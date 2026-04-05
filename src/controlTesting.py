@@ -5,7 +5,7 @@ import boto3
 import botocore
 from datetime import datetime, timezone, timedelta
 
-# NOTE: Result is set to "False" until logic determines sample meets testing criteria.
+# NOTE: Sample results are set to "False" until logic determines sample passes the testing criteria.
 @dataclass
 class Sample:
     sample_id: Dict[str, Any]
@@ -100,11 +100,26 @@ class Control:
         self.result = self.num_findings == 0
         return self
 
-def get_aws_account_id():
-    client = boto3.client("sts")
-    response = client.get_caller_identity()
-    aws_account_id = response["Account"]
-    return aws_account_id
+
+def run_control_safely(audit, control_fn, control_id):
+    try:
+        return control_fn(audit, control_id)
+    except Exception as e:
+        # Create a failed control object
+        control = Control(
+            control_id=control_id,
+            control_description=f"{control_id} (Execution Failed)",
+            test_procedures=["Control execution failed."],
+            test_attributes=[],
+            audit=audit,
+            table_headers=["Error"],
+            risk_rating=3
+        )
+        control.result = False
+        control.result_description = f"Control execution failed. Please manually investigate."
+        print(f"ERROR: Running {control_id} test failed. Moving to the next test.")
+
+        return control
 
 def test_s3_encryption(audit, control_id, risk_rating=2):
     control = Control(
@@ -126,7 +141,7 @@ def test_s3_encryption(audit, control_id, risk_rating=2):
         # No further testing required.
         return control
     
-    s3 = boto3.client("s3")
+    s3 = audit.session.client("s3")
     # Obtain and save list of buckets.
     buckets = audit.evidence_client.get("S3/buckets.json", lambda: s3.list_buckets())
     # Loop through each bucket
@@ -177,7 +192,7 @@ def test_s3_public_access(audit, control_id, risk_rating=3):
     if control.is_excluded:
         return control
 
-    s3 = boto3.client("s3")
+    s3 = audit.session.client("s3")
     # Obtain and save list of buckets.
     buckets = audit.evidence_client.get("S3/buckets.json", lambda: s3.list_buckets())
     # Evaluate each bucket
@@ -226,6 +241,7 @@ def test_s3_public_access(audit, control_id, risk_rating=3):
 """
     Control: S3 buckets must have required tags applied with non-empty values.
 """
+# TODO: Update logic for opt-in regions
 def test_s3_tags(audit, control_id, risk_rating=1):
     # Get base required tags.
     control_config = audit.config.get("control_config") or {}
@@ -260,7 +276,7 @@ def test_s3_tags(audit, control_id, risk_rating=1):
     if control.is_excluded:
         return control
 
-    s3 = boto3.client("s3")
+    s3 = audit.session.client("s3")
     buckets = audit.evidence_client.get("S3/buckets.json", lambda: s3.list_buckets())
 
     for bucket in buckets.get("Buckets", []):
@@ -318,7 +334,7 @@ def test_iam_password_policy(audit, control_id, risk_rating=2):
     )
 
     # Gather evidence
-    iam = boto3.client("iam")
+    iam = audit.session.client("iam")
     policy = audit.evidence_client.get_aws(
         "IAM/password_policy.json",
         lambda: iam.get_account_password_policy(),
@@ -403,7 +419,7 @@ def test_root_no_access_keys(audit, control_id, risk_rating=3):
     if control.is_excluded:
         return control
 
-    iam = boto3.client("iam")
+    iam = audit.session.client("iam")
     summary = audit.evidence_client.get_aws(
         "IAM/account_summary.json",
         lambda: iam.get_account_summary()
@@ -439,7 +455,7 @@ def test_root_mfa_enabled(audit, control_id, risk_rating=3):
     if control.is_excluded:
         return control
 
-    iam = boto3.client("iam")
+    iam = audit.session.client("iam")
     summary = audit.evidence_client.get_aws(
         "IAM/account_summary.json",
         lambda: iam.get_account_summary()
@@ -480,7 +496,7 @@ def test_iam_users_mfa(audit, control_id, risk_rating=3):
     if control.is_excluded:
         return control
 
-    iam = boto3.client("iam")
+    iam = audit.session.client("iam")
     users = audit.evidence_client.get_aws(
         "IAM/users.json",
         lambda: iam.list_users()
@@ -498,7 +514,7 @@ def test_iam_users_mfa(audit, control_id, risk_rating=3):
 
         # Check if user has a console password
         try:
-            audit.evidence_client.get_aws(
+            login_profile = audit.evidence_client.get_aws(
                 f"IAM/users/{username}/login_profile.json",
                 lambda: iam.get_login_profile(UserName=username),
                 not_found_codes=["NoSuchEntity"]
@@ -512,6 +528,14 @@ def test_iam_users_mfa(audit, control_id, risk_rating=3):
                 continue
             else:
                 raise
+
+        # Check if login profile in null.
+        login_profile = login_profile or {}
+        if not login_profile.get("LoginProfile"):
+            sample.result = True
+            sample.comments = "User has no console password (programmatic access only)."
+            control.samples.append(sample)
+            continue
 
         # Check MFA devices
         mfa_devices = audit.evidence_client.get_aws(
@@ -560,7 +584,7 @@ def test_iam_access_key_age(audit, control_id, risk_rating=3):
     if control.is_excluded:
         return control
 
-    iam = boto3.client("iam")
+    iam = audit.session.client("iam")
     users = audit.evidence_client.get_aws(
         "IAM/users.json",
         lambda: iam.list_users()
@@ -621,7 +645,7 @@ def test_iam_access_key_age(audit, control_id, risk_rating=3):
         ValueError: If config contains invalid regions.
 """
 def get_regions(audit):
-    ec2 = boto3.client("ec2")
+    ec2 = audit.session.client("ec2")
     regions = audit.evidence_client.get_aws(
         "EC2/regions.json",
         lambda: ec2.describe_regions(
@@ -676,7 +700,7 @@ def test_rds_encryption(audit, control_id, risk_rating=2):
         return control
 
     for region in audit.in_scope_regions:
-        rds = boto3.client("rds", region_name=region)
+        rds = audit.session.client("rds", region_name=region)
 
         instances = audit.evidence_client.get_aws(
                 f"RDS/{region}/db_instances.json",
@@ -728,7 +752,7 @@ def test_rds_public_access(audit, control_id, risk_rating=3):
         return control
 
     for region in audit.in_scope_regions:
-        rds = boto3.client("rds", region_name=region)
+        rds = audit.session.client("rds", region_name=region)
 
         instances = audit.evidence_client.get_aws(
             f"RDS/{region}/db_instances.json",
@@ -789,7 +813,7 @@ def test_rds_tags(audit, control_id, risk_rating=1):
         return control
 
     for region in audit.in_scope_regions:
-        rds = boto3.client("rds", region_name=region)
+        rds = audit.session.client("rds", region_name=region)
 
         instances = audit.evidence_client.get_aws(
             f"RDS/{region}/db_instances.json",
@@ -850,7 +874,7 @@ def test_rds_backup_retention(audit, control_id, risk_rating=1):
         return control
 
     for region in audit.in_scope_regions:
-        rds = boto3.client("rds", region_name=region)
+        rds = audit.session.client("rds", region_name=region)
 
         instances = audit.evidence_client.get_aws(
             f"RDS/{region}/db_instances.json",
@@ -900,7 +924,7 @@ def test_rds_auto_minor_version_upgrade(audit, control_id, risk_rating=1):
         return control
 
     for region in audit.in_scope_regions:
-        rds = boto3.client("rds", region_name=region)
+        rds = audit.session.client("rds", region_name=region)
 
         instances = audit.evidence_client.get_aws(
             f"RDS/{region}/db_instances.json",
@@ -958,7 +982,7 @@ def test_rds_deletion_protection(audit, control_id, risk_rating=2):
         return control
 
     for region in audit.in_scope_regions:
-        rds = boto3.client("rds", region_name=region)
+        rds = audit.session.client("rds", region_name=region)
 
         # Get DB instances
         instances = audit.evidence_client.get_aws(
@@ -1052,7 +1076,7 @@ def test_ec2_security_group_tags(audit, control_id, risk_rating=1):
         return control
 
     for region in audit.in_scope_regions:
-        ec2 = boto3.client("ec2", region_name=region)
+        ec2 = audit.session.client("ec2", region_name=region)
 
         security_groups = audit.evidence_client.get_aws(
             f"EC2/{region}/security_groups.json",
@@ -1122,7 +1146,7 @@ def test_ec2_tags(audit, control_id, risk_rating=1):
         return control
 
     for region in audit.in_scope_regions:
-        ec2 = boto3.client("ec2", region_name=region)
+        ec2 = audit.session.client("ec2", region_name=region)
 
         instances = audit.evidence_client.get_aws(
             f"EC2/{region}/instances.json",
@@ -1183,7 +1207,7 @@ def test_ebs_volume_encryption(audit, control_id, risk_rating=2):
         return control
 
     for region in audit.in_scope_regions:
-        ec2 = boto3.client("ec2", region_name=region)
+        ec2 = audit.session.client("ec2", region_name=region)
 
         volumes = audit.evidence_client.get_aws(
             f"EC2/{region}/volumes.json",
@@ -1251,7 +1275,7 @@ def test_ebs_tags(audit, control_id, risk_rating=1):
         return control
 
     for region in audit.in_scope_regions:
-        ec2 = boto3.client("ec2", region_name=region)
+        ec2 = audit.session.client("ec2", region_name=region)
 
         volumes = audit.evidence_client.get_aws(
             f"EC2/{region}/volumes.json",
@@ -1308,7 +1332,7 @@ def test_ebs_default_encryption(audit, control_id, risk_rating=0):
         return control
 
     for region in audit.in_scope_regions:
-        ec2 = boto3.client("ec2", region_name=region)
+        ec2 = audit.session.client("ec2", region_name=region)
 
         default_encryption = audit.evidence_client.get_aws(
             f"EC2/{region}/default_ebs_encryption.json",
@@ -1368,7 +1392,7 @@ def test_lambda_tags(audit, control_id, risk_rating=1):
         return control
 
     for region in audit.in_scope_regions:
-        lambda_client = boto3.client("lambda", region_name=region)
+        lambda_client = audit.session.client("lambda", region_name=region)
 
         functions = audit.evidence_client.get_aws(
             f"Lambda/{region}/functions.json",
@@ -1432,7 +1456,7 @@ def test_cloudtrail_global_logging(audit, control_id, risk_rating=3):
     if control.is_excluded:
         return control
 
-    ct = boto3.client("cloudtrail")
+    ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
         "CloudTrail/trails.json",
         lambda: ct.describe_trails(includeShadowTrails=False)
@@ -1485,7 +1509,7 @@ def test_cloudtrail_log_file_validation(audit, control_id, risk_rating=2):
     if control.is_excluded:
         return control
 
-    ct = boto3.client("cloudtrail")
+    ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
         "CloudTrail/trails.json",
         lambda: ct.describe_trails(includeShadowTrails=False)
@@ -1543,7 +1567,7 @@ def test_cloudtrail_s3_bucket_protection(audit, control_id, risk_rating=3):
     if control.is_excluded:
         return control
 
-    ct = boto3.client("cloudtrail")
+    ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
         "CloudTrail/trails.json",
         lambda: ct.list_trails()
@@ -1569,7 +1593,7 @@ def test_cloudtrail_s3_bucket_protection(audit, control_id, risk_rating=3):
         # Fetch public access block
         public_access_block = audit.evidence_client.get_aws(
             f"CloudTrail/buckets/{bucket_name}/public_access_block.json",
-            lambda: boto3.client("s3").get_public_access_block(Bucket=bucket_name),
+            lambda: audit.session.client("s3").get_public_access_block(Bucket=bucket_name),
             not_found_codes=["NoSuchPublicAccessBlockConfiguration"]
         )
 
@@ -1631,7 +1655,7 @@ def test_cloudtrail_logging_recent_stops(audit, control_id, risk_rating=3):
     if control.is_excluded:
         return control
 
-    ct = boto3.client("cloudtrail")
+    ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
         "CloudTrail/trails.json",
         lambda: ct.list_trails()
@@ -1709,9 +1733,9 @@ def test_waf_enabled(audit, control_id, risk_rating=2):
         return control
 
     for region in audit.in_scope_regions:
-        waf = boto3.client("wafv2", region_name=region)
-        elbv2 = boto3.client("elbv2", region_name=region)
-        apigw = boto3.client("apigateway", region_name=region)
+        waf = audit.session.client("wafv2", region_name=region)
+        elbv2 = audit.session.client("elbv2", region_name=region)
+        apigw = audit.session.client("apigateway", region_name=region)
 
         # ALBs
         lbs = audit.evidence_client.get_aws(
