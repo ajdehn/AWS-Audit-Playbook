@@ -1,5 +1,5 @@
 # About
-This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/). The goal of this project is to help auditors conduct **AWS audits, without screenshots**.
+This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) founder of [AuditOps.io](https://www.auditops.io/). The goal of this project is to help auditors conduct **AWS audits, without screenshots**.
 
 # Summary
 To accomplish this vision, we are building the following:
@@ -9,14 +9,16 @@ To accomplish this vision, we are building the following:
 - An example [audit workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?usp=sharing) to document audit results.
 
 # Setup Instructions
-1. Install the dependencies via `pip install -r requirements.txt`
+1. Pre-requisites: Install Git, Python, and the AWS CLI.
+2. Clone the Github repository.
+3. Install the dependencies via `pip install -r requirements.txt`
     * The playbook requires the boto3 library, v1.39 or newer.  This command will install boto3 and its dependencies.
-2. Create an IAM user in the AWS account you want to audit. Attach the [Security Audit](https://docs.aws.amazon.com/aws-managed-policy/latest/reference/SecurityAudit.html) policy to the user.
+4. Create an IAM user in the AWS account you want to audit.
+5. Give the IAM user [Security Audit](https://docs.aws.amazon.com/aws-managed-policy/latest/reference/SecurityAudit.html) permissions.
     * AWS Best Practices recommend attaching policies first to a group and then adding the user, as opposed to attaching policies directly to the user.  Creating a group and attaching the SecurityAudit policy can be completed during user creation, if manually creating an IAM user for this script.
     * NOTE: The [script](./src/gatherEvidence.py) can also be configured to run through an IAM role. This would require auditors to maintain a separate AWS account, so this will be released as part of a future version of the project.
-3. Create an access key for the IAM user created in Step 2: [AWS Docs](https://docs.aws.amazon.com/keyspaces/latest/devguide/create.keypair.html)
+6. Create an access key for the IAM user created in Step 2: [AWS Docs](https://docs.aws.amazon.com/keyspaces/latest/devguide/create.keypair.html)
     * NOTE: Access keys can only be viewed once, at the time of creation.  They must be stored securely elsewhere for future use.
-4. Install the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-5. Configure the access key created in Step 3 on your local machine using the 'aws configure' command [Video Tutorial](https://youtu.be/RLx5qVZSTyE?si=7fqyxFzThDaB-mGQ).
-6. Configure the auditScope variable in src/gatherEvidence.py. Specify which regions are in-scope, and set controls that are out of scope as "False" to avoid collecting unnecesary evidence.
-7. Run the command 'python src/gatherEvidence.py'
+7. Configure the access key created in Step 3 on your local machine using the 'aws configure' command [Video Tutorial](https://youtu.be/RLx5qVZSTyE?si=7fqyxFzThDaB-mGQ).
+8. Configure the auditScope variable in src/gatherEvidence.py. Specify which regions are in-scope, and set controls that are out of scope as "False" to avoid collecting unnecesary evidence.
+9. Run the command 'python src/gatherEvidence.py'
