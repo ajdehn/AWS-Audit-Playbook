@@ -121,6 +121,50 @@ def run_control_safely(audit, control_fn, control_id):
 
         return control
 
+def run_all_tests(audit):
+    control_definitions = [
+        ("IAM Root MFA", test_root_mfa_enabled),
+        ("IAM Root Access Key", test_root_no_access_keys),
+        ("IAM User MFA", test_iam_users_mfa),
+        ("IAM User Key Age", test_iam_access_key_age),
+        ("IAM Password", test_iam_password_policy),
+        ("S3 Encryption", test_s3_encryption),
+        ("S3 Public Access", test_s3_public_access),
+        ("S3 Tags", test_s3_tags),
+        ("RDS Backup Retention", test_rds_backup_retention),
+        ("RDS Encryption", test_rds_encryption),
+        ("RDS Public Access", test_rds_public_access),
+        ("RDS Automatic Upgrades", test_rds_auto_minor_version_upgrade),
+        ("RDS Deletion Protection", test_rds_deletion_protection),
+        ("RDS Tags", test_rds_tags),
+        ("EBS Volume Encryption", test_ebs_volume_encryption),
+        ("EBS Encryption Default", test_ebs_default_encryption),
+        ("EBS Tags", test_ebs_tags),
+        ("EC2 Tags", test_ec2_tags),
+        ("EC2 Security Group Tags", test_ec2_security_group_tags),
+        ("Lambda Tags", test_lambda_tags),
+        ("CloudTrail Multi-Region", test_cloudtrail_global_logging),
+        ("CloudTrail Log File Validation", test_cloudtrail_log_file_validation),
+        ("CloudTrail S3 Bucket Protection", test_cloudtrail_s3_bucket_protection),
+        ("CloudTrail Logging Recent Stops", test_cloudtrail_logging_recent_stops),
+        ("Web Application Firewall Enabled", test_waf_enabled),
+    ]
+
+    controls = []
+    for control_id, control_fn in control_definitions:
+        controls.append(run_control_safely(audit, control_fn, control_id))
+
+    # TODO: Add IAM tests (IAM User Stale Access Keys)
+    # TODO: Add S3 secure transport test
+    # TODO: Add S3 object owner check
+    # TODO: Add EC2 Public Ports (22, RDS, all ports, etc)
+    # TODO: Add WAF Tags
+    # TODO: Add GuardDuty Enabled for regions with resources.
+    # TODO: Add GuardDuty findings resolved within a set time period.
+    # TODO: Add GuardDuty findings sent to EventBridge every 15 minutes (default is 6 hours).
+
+    return controls
+
 def test_s3_encryption(audit, control_id, risk_rating=2):
     control = Control(
         control_id=control_id,

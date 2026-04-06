@@ -3,32 +3,55 @@ import os
 import shutil
 from datetime import datetime, timezone
 import boto3
+from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 
 def create_session(session_name="auditops-assume-role"):
     load_dotenv()
-    use_iam_role = os.getenv("use_iam_role", "false").lower() == "true"
-
-    # Not using IAM role.
-    if not use_iam_role:
-        return boto3.Session()
 
     role_arn = os.getenv("role_arn")
     external_id = os.getenv("external_id")
-    # Use IAM role.
-    sts = boto3.client("sts")
-    response = sts.assume_role(
-        RoleArn=role_arn,
-        ExternalId=external_id,
-        RoleSessionName=session_name
-    )
-    creds = response["Credentials"]
 
+    # Normalize empty strings → None
+    role_arn = role_arn.strip() if role_arn else None
+    external_id = external_id.strip() if external_id else None
+
+    # No role provided, use default credentials.
+    if not role_arn and not external_id:
+        return boto3.Session()
+
+    # Check if role_arn and external_id are set.
+    if not role_arn or not external_id:
+        raise ValueError(
+            "Both 'role_arn' and 'external_id' must be set in the environment to assume a role."
+        )
+
+    # Assume role
+    try:
+        sts = boto3.client("sts")
+        response = sts.assume_role(
+            RoleArn=role_arn,
+            ExternalId=external_id,
+            RoleSessionName=session_name
+        )
+    except ClientError as e:
+        error_code = e.response["Error"]["Code"]
+        error_msg = e.response["Error"]["Message"]
+
+        raise RuntimeError(
+            f"Failed to assume IAM role.\n"
+            f"RoleArn: {role_arn}\n"
+            f"ErrorCode: {error_code}\n"
+            f"Message: {error_msg}"
+        ) from e
+
+    creds = response["Credentials"]
     return boto3.Session(
         aws_access_key_id=creds["AccessKeyId"],
         aws_secret_access_key=creds["SecretAccessKey"],
         aws_session_token=creds["SessionToken"]
     )
+
 
 def get_aws_account_id(audit):
     sts = audit.session.client("sts")
