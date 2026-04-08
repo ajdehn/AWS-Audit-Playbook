@@ -95,7 +95,7 @@ Returns True if the control is excluded.
 """
 def is_control_excluded(control_id, config):
     for e in config.get("control_exclusions", {}).get(control_id, []):
-        if is_exclusion_active(e):
+        if e and is_exclusion_active(e):
             return True
     return False
 
