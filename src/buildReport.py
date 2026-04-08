@@ -9,6 +9,7 @@ BASE_STYLES = getSampleStyleSheet()
 # Define style constants
 LABEL_STYLE = ParagraphStyle(name="Label", fontSize=9, fontName="Helvetica-Bold")
 VALUE_STYLE = ParagraphStyle(name="Value", fontSize=9, fontName="Helvetica")
+LARGE_VALUE_STYLE = ParagraphStyle(name ='LargeValue', parent=VALUE_STYLE, fontSize=11, leading=15,spaceAfter=2)
 LIST_STYLE = ParagraphStyle(name="List", parent=VALUE_STYLE, spaceAfter=6)
 CENTER_STYLE = ParagraphStyle(name="Center", parent=VALUE_STYLE, alignment=1)
 HEADER_BG = colors.lightgrey
@@ -30,6 +31,68 @@ TABLE_STYLE_HIGHLIGHT_COLUMN = TableStyle([
         ("INNERGRID", (0, 0), (-1, -1), 0.25, colors.grey),
         ("PADDING", (0, 0), (-1, -1), 6),
     ])
+
+def format_count_with_pct(count, total):
+    if total == 0:
+        return f"{count} (0%)"
+    pct = (count / total) * 100
+    return f"{count} ({pct:.1f}%)"
+
+"""
+    Build first page of the audit report.
+"""
+def render_audit_cover_page(audit, tool_name, styles, controls):
+    elements = []
+    # Header and audit metadata
+    elements.append(Paragraph(f"{tool_name} Audit Report", styles["Title"]))
+    elements.append(Spacer(1, 12))
+
+    elements.append(Paragraph("Audit Summary", styles["Heading1"]))
+    elements.append(Spacer(1, 12))
+
+    date_str = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+    total = len(controls)
+    passed = sum(1 for c in controls if c.result)
+    excluded = sum(1 for c in controls if c.is_excluded)
+    failed = total - passed - excluded
+
+    audit_metadata = [
+        [Paragraph("Prepared By", LABEL_STYLE), Paragraph("AJ Dehn", VALUE_STYLE)], 
+        [Paragraph("Date", LABEL_STYLE), Paragraph(str(date_str), VALUE_STYLE)],
+        [Paragraph("AWS Account ID", LABEL_STYLE), Paragraph(str(audit.aws_account_id), VALUE_STYLE)],
+        [Paragraph("Number of controls", LABEL_STYLE), Paragraph(str(total), VALUE_STYLE)], 
+        [Paragraph("Passed", LABEL_STYLE), Paragraph(format_count_with_pct(passed, total), VALUE_STYLE)],
+        [Paragraph("Failed", LABEL_STYLE), Paragraph(format_count_with_pct(failed, total), VALUE_STYLE)],
+        [Paragraph("Out of Scope", LABEL_STYLE), Paragraph(format_count_with_pct(excluded, total), VALUE_STYLE)]
+    ]
+
+    audit_metadata_table = Table(audit_metadata, colWidths=[150, 100], hAlign="LEFT")
+    audit_metadata_table.setStyle(TABLE_STYLE_HIGHLIGHT_COLUMN)
+    elements.append(audit_metadata_table)
+    elements.append(Spacer(1, 24))
+
+
+    # --- Disclaimers Section ---
+    elements.append(Paragraph("Notes / Disclaimers", styles["Heading1"]))
+    elements.append(Spacer(1, 8))
+
+    disclaimers_list = ListFlowable(
+        [
+            ListItem(Paragraph("This project is maintained by AJ Dehn (founder of AuditOps.io).", LARGE_VALUE_STYLE)),
+            ListItem(Paragraph("Evidence supporting this audit was gathered directly from boto3 (AWS software development kit 'SDK' for Python).", LARGE_VALUE_STYLE)),
+            ListItem(Paragraph("Please review controlTesting.py for additional information on how evidence was gathered and testing was performed.", LARGE_VALUE_STYLE)),
+            ListItem(Paragraph("Conclusions in this report can be supported by a JSON file in the audit evidence folder.", LARGE_VALUE_STYLE)),
+            ListItem(Paragraph(f"Evidence used to produce this audit was gathered on {date_str}. Configurations may have changed since this report was generated.", LARGE_VALUE_STYLE))
+        ],
+        bulletType='bullet', bulletFontSize=11
+)    
+
+    elements.append(disclaimers_list)
+    elements.append(Spacer(1, 8))
+    elements.append(PageBreak())
+
+    return elements
+
 """
     Render 2-column control summary table.
 """
@@ -79,6 +142,9 @@ def render_sample_table(control, page_width):
     if not control.table_headers:
         return None
 
+    # Sort failing samples to top of the table.
+    control.samples = sorted(control.samples, key=lambda s: (s.result))
+
     table_data = []
     # Header row
     table_data.append([
@@ -116,29 +182,12 @@ def render_sample_table(control, page_width):
 
     return table
 
+"""Build summary elements with pass/fail counts."""
 def render_summary_page(controls, styles):
-    """Build summary elements with pass/fail counts."""
-    total = len(controls)
-    passed = sum(1 for c in controls if c.result)
-    excluded = sum(1 for c in controls if c.is_excluded)
-    failed = total - passed - excluded
-
     elements = []
-
-    audit_summary_data = [
-        [Paragraph("Number of controls", LABEL_STYLE), Paragraph(str(total), VALUE_STYLE)], 
-        [Paragraph("Passed", LABEL_STYLE), Paragraph(str(passed), VALUE_STYLE)],
-        [Paragraph("Failed", LABEL_STYLE), Paragraph(str(failed), VALUE_STYLE)],
-        [Paragraph("Out of Scope", LABEL_STYLE), Paragraph(str(excluded), VALUE_STYLE)]
-    ]
 
     elements.append(Paragraph("Control Summary", styles["Heading1"]))
     elements.append(Spacer(1, 12))
-
-    audit_summary_table = Table(audit_summary_data, colWidths=[150, 100], hAlign="LEFT")
-    audit_summary_table.setStyle(TABLE_STYLE_HIGHLIGHT_COLUMN)
-    elements.append(audit_summary_table)
-    elements.append(Spacer(1, 24))
 
     control_summary_data = []
     # Header row
@@ -173,8 +222,8 @@ def render_summary_page(controls, styles):
 Build audit report summarizing findings.
 
 Structure:
-    1. Header
-    2. Summary Page
+    1. Cover Page
+    2. Controls Summary
     3. Detailed Findings
         - Control Summary
         - Sample Findings
@@ -190,23 +239,7 @@ def generate_pdf_report(audit, controls, tool_name, file_name="tmp/audit_report.
     page_width, _ = LETTER
     elements = []
 
-    # Header and audit metadata
-    elements.append(Paragraph(f"{tool_name} Audit Report", styles["Title"]))
-    elements.append(Spacer(1, 12))
-
-    elements.append(Paragraph("Audit Summary", styles["Heading1"]))
-    elements.append(Spacer(1, 12))
-
-    audit_metadata = [
-        [Paragraph("Prepared By", LABEL_STYLE), Paragraph("AJ Dehn", VALUE_STYLE)], 
-        [Paragraph("Date", LABEL_STYLE), Paragraph(str(datetime.now(timezone.utc).strftime('%Y-%m-%d')), VALUE_STYLE)],
-        [Paragraph("AWS Account ID", LABEL_STYLE), Paragraph(str(audit.aws_account_id), VALUE_STYLE)]
-    ]
-
-    audit_metadata_table = Table(audit_metadata, colWidths=[150, 100], hAlign="LEFT")
-    audit_metadata_table.setStyle(TABLE_STYLE_HIGHLIGHT_COLUMN)
-    elements.append(audit_metadata_table)
-    elements.append(Spacer(1, 24))
+    elements.extend(render_audit_cover_page(audit, tool_name, styles, controls))
 
     # Summary Page
     elements.extend(render_summary_page(controls, styles))
