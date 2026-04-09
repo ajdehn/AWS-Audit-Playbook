@@ -4,6 +4,7 @@ from utils import is_control_excluded, process_sample_exclusion, evaluate_tags
 import boto3
 import botocore
 from datetime import datetime, timezone, timedelta
+import traceback
 
 # NOTE: Sample results are set to "False" until logic determines sample passes the testing criteria.
 @dataclass
@@ -105,6 +106,11 @@ def run_control_safely(audit, control_fn, control_id):
     try:
         return control_fn(audit, control_id)
     except Exception as e:
+
+        print(f"\nERROR running control: {control_id}")
+        print(f"Exception: {e}\n")
+        traceback.print_exc()
+
         # Create a failed control object
         control = Control(
             control_id=control_id,

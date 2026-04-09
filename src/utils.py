@@ -94,31 +94,44 @@ def load_config(file_path):
 Returns True if the control is excluded.
 """
 def is_control_excluded(control_id, config):
-    for e in config.get("control_exclusions", {}).get(control_id, []):
-        if e and is_exclusion_active(e):
-            return True
-    return False
+    exclusion = config.get("control_exclusions", {}).get(control_id, {})
+    if not exclusion:
+        return False     
+    return is_exclusion_active(exclusion)
 
 """
-Returns True if exclusion is active.
+Returns True if exclusion is active and valid.
 """
 def is_exclusion_active(exclusion):
+    if not isinstance(exclusion, dict):
+        return False  # Invalid exclusion configurations.
+
     today = datetime.now(timezone.utc).date()
     if exclusion.get("permanent"):
         return True
     exp_date = exclusion.get("expiration_date")
     if exp_date:
-        exp_date = datetime.strptime(exp_date, "%Y-%m-%d").date()
-        return exp_date >= today
+        try:
+            exp_date = datetime.strptime(exp_date, "%Y-%m-%d").date()
+            return exp_date >= today
+        except ValueError:
+            print(f"Invalid Exclusion Date Format: {exclusion}")
+            return False
 
     return False
 
 def process_sample_exclusion(control, sample, audit):
-    for e in audit.config.get("sample_exclusions", {}).get(control.control_id, []):
+    exclusions = audit.config.get("sample_exclusions", {}).get(control.control_id, [])
+    if not isinstance(exclusions, list):
+        return False  # Invalid sample exclusion structure
+
+    for e in exclusions:
+        if not is_exclusion_active(e):
+            continue
+
         config_sample_id = e.get("sample_id", {})
 
         if all(sample.sample_id.get(k) == v for k, v in config_sample_id.items()):
-            if is_exclusion_active(e):
                 sample.is_excluded = True
                 sample.comments = "Sample is excluded. See config.json"
                 control.samples.append(sample)

@@ -42,36 +42,63 @@ This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) foun
     "base_required_tags": ["owner", "description", "classification"]
   },
   "control_exclusions": {
-    "RDS Tags": [
-      {
-         "rationale": "Only one RDS instance. We've decided tags aren't required.",
-         "permanent": true,
-         "expiration_date": null,
-         "approvers": ["john.doe@acme.com"]  
-      }
-    ],
-    "EBS Tags": [
-      {
-         "rationale": "We've decided to only tag EC2 instance. Please check the associated instances",
-         "permanent": false,
-         "expiration_date": "2026-12-31",
-         "approvers": ["john.doe@acme.com"]  
-      }
-    ]
+    "RDS Tags": {
+      "rationale": "Only one RDS instance. We've decided tags aren't required.",
+      "permanent": true,
+      "expiration_date": null,
+      "approvers": [
+        "john.doe@acme.com"
+      ]
+    },
+    "EBS Tags": {
+      "rationale": "We've decided to only tag EC2 instances. Please check the associated instances",
+      "permanent": false,
+      "expiration_date": "2026-12-31",
+      "approvers": [
+        "john.doe@acme.com"
+      ]
+    }
   },
   "sample_exclusions": {
-        "IAM User Key Age": [
-          {
-            "sample_id": {
-              "user": "itauditguy",
-              "access_key_id": "AKIA3TURCXF5GCAELVHX"
-            },
-            "rationale": "This is a very old access key for demo purposes.",
-            "permanent": true,
-            "expiration_date": null,
-            "approvers": ["john.doe@acme.com"]            
-          }
+    "IAM User Key Age": [
+      {
+        "sample_id": {
+          "user": "itauditguy",
+          "access_key_id": "AKIA3TURCXF5GCAELVHX"
+        },
+        "rationale": "This is a very old access key for demo purposes.",
+        "permanent": true,
+        "expiration_date": null,
+        "approvers": [
+          "john.doe@acme.com"
         ]
-    }   
+      },
+      {
+        "sample_id": {
+          "user": "anotheruser",
+          "access_key_id": "AKIAEXAMPLE123"
+        },
+        "rationale": "Another test key to ignore",
+        "permanent": false,
+        "expiration_date": "2026-12-31",
+        "approvers": [
+          "john.doe@acme.com"
+        ]
+      }
+    ],
+    "S3 Public Access": [
+      {
+        "sample_id": {
+          "bucket_name": "demo-bucket"
+        },
+        "rationale": "This bucket is intentionally public for testing",
+        "permanent": false,
+        "expiration_date": "2099-12-31",
+        "approvers": [
+          "john.doe@acme.com"
+        ]
+      }
+    ]
+  }
 }
 ```
