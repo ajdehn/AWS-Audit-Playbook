@@ -1,3 +1,15 @@
 {
-    "Functions": []
+    "Functions": [],
+    "ResponseMetadata": {
+        "RequestId": "5f95afad-8c73-4afa-843e-cf887c496fe8",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 09 Apr 2026 18:25:04 GMT",
+            "content-type": "application/json",
+            "content-length": "34",
+            "connection": "keep-alive",
+            "x-amzn-requestid": "5f95afad-8c73-4afa-843e-cf887c496fe8"
+        },
+        "RetryAttempts": 0
+    }
 }

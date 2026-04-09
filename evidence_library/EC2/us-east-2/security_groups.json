@@ -35,5 +35,19 @@
                 }
             ]
         }
-    ]
+    ],
+    "ResponseMetadata": {
+        "RequestId": "8f278baa-235d-4cc1-bb09-1c69d41f031e",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amzn-requestid": "8f278baa-235d-4cc1-bb09-1c69d41f031e",
+            "cache-control": "no-cache, no-store",
+            "strict-transport-security": "max-age=31536000; includeSubDomains",
+            "content-type": "text/xml;charset=UTF-8",
+            "content-length": "960",
+            "date": "Thu, 09 Apr 2026 18:25:04 GMT",
+            "server": "AmazonEC2"
+        },
+        "RetryAttempts": 0
+    }
 }

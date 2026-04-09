@@ -1,3 +1,15 @@
 {
-    "DBClusters": []
+    "DBClusters": [],
+    "ResponseMetadata": {
+        "RequestId": "cd312014-846a-4f01-8a2f-a8afe0b113c4",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amzn-requestid": "cd312014-846a-4f01-8a2f-a8afe0b113c4",
+            "strict-transport-security": "max-age=31536000",
+            "content-type": "text/xml",
+            "content-length": "292",
+            "date": "Thu, 09 Apr 2026 18:25:01 GMT"
+        },
+        "RetryAttempts": 0
+    }
 }

@@ -1,10 +1,11 @@
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Any
-from utils import is_control_excluded, process_sample_exclusion, evaluate_tags
+from utils import is_control_excluded, process_sample_exclusion, evaluate_tags, save_json
 import boto3
 import botocore
 from datetime import datetime, timezone, timedelta
 import traceback
+import json
 
 # NOTE: Sample results are set to "False" until logic determines sample passes the testing criteria.
 @dataclass
@@ -63,6 +64,18 @@ class Control:
             f"result: {'Pass' if self.result else 'Fail'}\n"
             f"result_description: {self.result_description}\n"
         )
+
+    def to_dict(self):
+        return {
+            "control_id": self.control_id,
+            "control_description": self.control_description,
+            "risk_rating": self.risk_rating,
+            "is_excluded": self.is_excluded,
+            "result": "Pass" if self.result else "Fail",
+            "result_description": self.result_description,
+            "test_procedures": self.test_procedures,
+            "test_attributes": self.test_attributes
+        }
 
     def create_risk_str(self):
         if self.risk_rating == 0: return "Informational"
@@ -159,6 +172,10 @@ def run_all_tests(audit):
     controls = []
     for control_id, control_fn in control_definitions:
         controls.append(run_control_safely(audit, control_fn, control_id))
+    
+    # Save controls JSON file.
+    with open(f"tmp/controls.json", "w") as f:
+        json.dump([c.to_dict() for c in controls], f, indent=4)
 
     # TODO: Add IAM tests (IAM User Stale Access Keys)
     # TODO: Add S3 secure transport test
