@@ -1,0 +1,22 @@
+{
+    "AccessKeyMetadata": [
+        {
+            "UserName": "itauditguy",
+            "AccessKeyId": "AKIA3TURCXF5GCAELVHX",
+            "Status": "Active",
+            "CreateDate": "2023-01-22 20:57:11+00:00"
+        }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "97d28ea5-021b-45a1-8a76-49b553606e82",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 09 Apr 2026 14:45:00 GMT",
+            "x-amzn-requestid": "97d28ea5-021b-45a1-8a76-49b553606e82",
+            "content-type": "text/xml",
+            "content-length": "558"
+        },
+        "RetryAttempts": 0
+    }
+}

@@ -1,0 +1,33 @@
+{
+    "ResponseMetadata": {
+        "RequestId": "7BG6G6QSHK1GQJA1",
+        "HostId": "Bd42Zw9XXYSlhl7++/tInewKkF5fD+BZknT23Jp8lpnP/hLf0mRUNSuJF1F/bXQQXYSuuBOHdm8=",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amz-id-2": "Bd42Zw9XXYSlhl7++/tInewKkF5fD+BZknT23Jp8lpnP/hLf0mRUNSuJF1F/bXQQXYSuuBOHdm8=",
+            "x-amz-request-id": "7BG6G6QSHK1GQJA1",
+            "date": "Thu, 09 Apr 2026 14:45:03 GMT",
+            "transfer-encoding": "chunked",
+            "server": "AmazonS3"
+        },
+        "RetryAttempts": 0
+    },
+    "TagSet": [
+        {
+            "Key": "Environment",
+            "Value": "Production"
+        },
+        {
+            "Key": "Owner",
+            "Value": "IT Audit Guy"
+        },
+        {
+            "Key": "Description",
+            "Value": "Stores pictures of fake drivers licenses for AWS for IT Auditors demo."
+        },
+        {
+            "Key": "Classification",
+            "Value": "Confidential"
+        }
+    ]
+}

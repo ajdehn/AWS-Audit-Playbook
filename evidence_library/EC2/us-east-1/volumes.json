@@ -1,0 +1,32 @@
+{
+    "Volumes": [
+        {
+            "AvailabilityZoneId": "use1-az5",
+            "Iops": 3000,
+            "VolumeType": "gp3",
+            "MultiAttachEnabled": false,
+            "Throughput": 125,
+            "Operator": {
+                "Managed": false
+            },
+            "VolumeId": "vol-0fad5b6c1c9198060",
+            "Size": 8,
+            "SnapshotId": "snap-09c6080e76e2ee4fc",
+            "AvailabilityZone": "us-east-1f",
+            "State": "in-use",
+            "CreateTime": "2026-02-06 16:22:35.188000+00:00",
+            "Attachments": [
+                {
+                    "DeleteOnTermination": true,
+                    "EbsCardIndex": 0,
+                    "VolumeId": "vol-0fad5b6c1c9198060",
+                    "InstanceId": "i-00ad64923065104d8",
+                    "Device": "/dev/xvda",
+                    "State": "attached",
+                    "AttachTime": "2026-02-06 16:22:35+00:00"
+                }
+            ],
+            "Encrypted": false
+        }
+    ]
+}

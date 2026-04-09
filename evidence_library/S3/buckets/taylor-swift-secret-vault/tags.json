@@ -1,0 +1,29 @@
+{
+    "ResponseMetadata": {
+        "RequestId": "XHSNTXKQTRED7X9F",
+        "HostId": "xiAeqvk/KtXlsoa062ySTKVG9KDgg4h1RTJBf6K2nGCUVCuuXTi3dFS8sG04imesAGqNMZOF7ekaCRIi2TSitcznGw8hSuCq",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amz-id-2": "xiAeqvk/KtXlsoa062ySTKVG9KDgg4h1RTJBf6K2nGCUVCuuXTi3dFS8sG04imesAGqNMZOF7ekaCRIi2TSitcznGw8hSuCq",
+            "x-amz-request-id": "XHSNTXKQTRED7X9F",
+            "date": "Thu, 09 Apr 2026 14:45:04 GMT",
+            "transfer-encoding": "chunked",
+            "server": "AmazonS3"
+        },
+        "RetryAttempts": 0
+    },
+    "TagSet": [
+        {
+            "Key": "Owner",
+            "Value": "Taylor Swift"
+        },
+        {
+            "Key": "Description",
+            "Value": "Song lyrics for 13th album."
+        },
+        {
+            "Key": "Classification",
+            "Value": "Top Secret"
+        }
+    ]
+}
