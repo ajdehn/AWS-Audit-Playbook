@@ -457,11 +457,9 @@ def test_root_no_access_keys(audit, control_id, risk_rating=3):
         test_procedures=[
             "Obtained the AWS account summary by calling the get_account_summary() boto3 command.",
             "Saved the account summary in the audit evidence folder (IAM/account_summary.json)",
-            "Inspected the account summary to determine if it complies with the test attribute(s) below."
+            "Inspected the account summary to determine if 'AccountAccessKeysPresent' was set to 0."
         ],
-        test_attributes=[
-            "AccountAccessKeysPresent must be 0."
-        ],
+        test_attributes=[],
         audit=audit,
         risk_rating = risk_rating
     )
@@ -493,11 +491,9 @@ def test_root_mfa_enabled(audit, control_id, risk_rating=3):
         test_procedures=[
             "Obtained the AWS account summary by calling the get_account_summary() boto3 command.",
             "Saved the account summary in the audit evidence folder (IAM/account_summary.json)",
-            "Inspected the account summary to determine if it complies with the test attribute(s) below."
+            "Inspected the account summary to determine if it 'AccountMFAEnabled' was set to 1."
         ],
-        test_attributes=[
-            "AccountMFAEnabled must be 1."
-        ],
+        test_attributes=[],
         audit=audit,
         risk_rating=risk_rating
     )
@@ -535,9 +531,7 @@ def test_iam_users_mfa(audit, control_id, risk_rating=3):
             "Saved the MFA devices for each user in the audit evidence folder (IAM/users/[user_name]/mfa_devices.json).",
             "Inspected each user's MFA devices to determine if at least one MFA device is enabled."
         ],
-        test_attributes=[
-            "Each IAM user with console access must have at least one MFA device enabled."
-        ],
+        test_attributes=[],
         audit=audit,
         table_headers=["User Name", "Result", "Comments"],
         risk_rating=risk_rating
@@ -738,9 +732,9 @@ def test_rds_encryption(audit, control_id, risk_rating=2):
         test_procedures=[
             "For each in-scope region, obtained the list of DB instances by calling the describe_db_instances() boto3 command.",
             "Saved the list of DB instances (RDS/[region_name]/db_instances.json).",
-            "Inspected the database configuration for each instance(s) to determine if they comply with the test attribute(s) below."
+            "Inspected the database configuration for each instance(s) to determine if 'StorageEncrypted' was set to True."
         ],
-        test_attributes=["StorageEncrypted = True."],
+        test_attributes=[],
         audit=audit,
         table_headers=["Region", "DB Instance", "Result", "Comments"],
         risk_rating=risk_rating        
@@ -790,9 +784,9 @@ def test_rds_public_access(audit, control_id, risk_rating=3):
         test_procedures=[
             "For each in-scope region, obtained the list of DB instances by calling the describe_db_instances() boto3 command.",
             "Saved the list of DB instances (RDS/[region_name]/db_instances.json).",
-            "Inspected the database configuration for each instance(s) to determine if they comply with the test attribute(s) below."
+            "Inspected the database configuration for each instance(s) to determine if 'PubliclyAccessible' was set to False."
         ],
-        test_attributes=["PubliclyAccessible must be False."],
+        test_attributes=[],
         audit=audit,
         table_headers=["Region", "DB Instance", "Result", "Comments"],
         risk_rating=risk_rating        
@@ -912,9 +906,9 @@ def test_rds_backup_retention(audit, control_id, risk_rating=1):
         test_procedures=[
             "For each in-scope region, obtained the list of DB instances by calling the describe_db_instances() boto3 command.",
             "Saved the list of DB instances (RDS/[region_name]/db_instances.json).",
-            "Inspected the database configuration for each instance(s) to determine if they comply with the test attribute(s) below."
+            f"Inspected the database configuration for each instance(s) to determine if BackupRetentionPeriod was >= {required_rds_retention_days} days."
         ],
-        test_attributes=[f"BackupRetentionPeriod must be >= {required_rds_retention_days} days."],
+        test_attributes=[],
         audit=audit,
         table_headers=["Region", "DB Instance", "Result", "Comments"],
         risk_rating=risk_rating        
@@ -962,9 +956,9 @@ def test_rds_auto_minor_version_upgrade(audit, control_id, risk_rating=1):
         test_procedures=[
             "For each in-scope region, obtained the list of DB instances by calling the describe_db_instances() boto3 command.",
             "Saved the list of DB instances (RDS/[region_name]/db_instances.json).",
-            "Inspected the database configuration for each instance to determine if automatic minor version upgrades are enabled."
+            "Inspected the database configuration for each instance to determine if 'AutoMinorVersionUpgrade' was set to True."
         ],
-        test_attributes=["AutoMinorVersionUpgrade = True."],
+        test_attributes=[],
         audit=audit,
         table_headers=["Region", "DB Instance", "Result", "Comments"],
         risk_rating=risk_rating        
@@ -1020,9 +1014,9 @@ def test_rds_deletion_protection(audit, control_id, risk_rating=2):
         test_procedures=[
             "For each in-scope region, obtained the list of DB instances and DB clusters using describe_db_instances() and describe_db_clusters() boto3 commands.",
             "Saved the list of DB instances (RDS/[region_name]/db_instances.json) and DB clusters (RDS/[region_name]/db_clusters.json).",
-            "Inspected each DB instance and associated cluster (if applicable) to determine if deletion protection is enabled."
+            "Inspected each DB instance to determine if DeletionProtection was set to True at the instance or cluster level."
         ],
-        test_attributes=["DeletionProtection = True (cluster OR instance)."],
+        test_attributes=[],
         audit=audit,
         table_headers=["Region", "DB Instance", "Result", "Comments"],
         risk_rating=risk_rating        
@@ -1245,9 +1239,9 @@ def test_ebs_volume_encryption(audit, control_id, risk_rating=2):
         test_procedures=[
             "For each in-scope region, obtained the list of EBS volumes by calling describe_volumes() boto3 command.",
             "Saved the list of volumes in the audit evidence folder (EC2/[region_name]/volumes.json).",
-            "Inspected the configuration for each volume to determine if they comply with the test attribute(s) below."
+            "Inspected the configuration for each volume to determine if 'Encrypted' attribute was set to true."
         ],
-        test_attributes=["Encrypted = True."],
+        test_attributes=[],
         audit=audit,
         table_headers=["Region", "Volume ID", "Result", "Comments"],
         risk_rating=risk_rating
@@ -1370,9 +1364,9 @@ def test_ebs_default_encryption(audit, control_id, risk_rating=0):
         test_procedures=[
             "For each in-scope region, checked if EBS default encryption is enabled using get_ebs_encryption_by_default() boto3 command.",
             "Saved the results in the audit evidence folder (EC2/[region_name]/default_ebs_encryption.json).",
-            "Inspected the configuration for each region to determine compliance with the default encryption setting."
+            "Inspected the configuration for each region to determine if 'EbsEncryptionByDefault' was set to True."
         ],
-        test_attributes=["EbsEncryptionByDefault = True."],
+        test_attributes=[],
         audit=audit,
         table_headers=["Region", "Result", "Comments"],
         risk_rating=risk_rating
@@ -1494,7 +1488,7 @@ def test_cloudtrail_global_logging(audit, control_id, risk_rating=3):
             "Saved the trail configuration in the audit evidence folder (CloudTrail/trails.json).",
             "Obtained the status of each multi-region trail using the get_trail_status() boto3 command.",
             "Saved the trail status in the audit evidence folder (CloudTrail/[trail_name]/status.json).",
-            "Inspected the trail configuration and status to determine if at least one multi-region trail has logging enabled."
+            "Inspected the trail configuration and status to determine if at least one trail complies with the test attribute(s) defined below."
         ],
         test_attributes=[
             "At least one trail must have IsMultiRegionTrail = True and IsLogging = True."
@@ -1546,11 +1540,9 @@ def test_cloudtrail_log_file_validation(audit, control_id, risk_rating=2):
         test_procedures=[
             "Obtained CloudTrail trails using the describe_trails() boto3 command.",
             "Saved the trail configuration in the audit evidence folder (CloudTrail/trails.json).",
-            "Inspected each trail's configuration to determine if log file validation is enabled."
+            "Inspected each trail's configuration to determine if 'LogFileValidationEnabled' was set to True for all trails."
         ],
-        test_attributes=[
-            "LogFileValidationEnabled must be True for all trails."
-        ],
+        test_attributes=[],
         audit=audit,
         table_headers=["Trail Name", "Result", "Comments"],
         risk_rating=risk_rating
@@ -1773,7 +1765,7 @@ def test_waf_enabled(audit, control_id, risk_rating=2):
             "Saved the WAF association results (APIGateway/[region_name]/[api_id]/waf.json).",
             "Inspected each resource to determine if a WAF Web ACL is associated."
         ],
-        test_attributes=["WAF Web ACL associated = True."],
+        test_attributes=[],
         audit=audit,
         table_headers=["Region", "Resource Type", "Resource ID", "Result", "Comments"],
         risk_rating=risk_rating
