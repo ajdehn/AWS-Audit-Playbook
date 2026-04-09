@@ -19,9 +19,11 @@ class Audit:
 if __name__ == "__main__":
     print("\nRunning the AWS Audit Playbook (maintained by AJ Dehn - AuditOps.io)\n")
 
-    audit = Audit()
+    evidence_folder = "tmp/audit_evidence"
     # Confirm if you want to use cached evidence.
-    confirm_delete_folder(audit.evidence_folder)
+    confirm_delete_folder(evidence_folder)
+
+    audit = Audit(evidence_folder=evidence_folder)
     controls = controlTesting.run_all_tests(audit)
     generate_pdf_report(audit, controls, "AWS", file_name="tmp/aws_audit_report.pdf")
 

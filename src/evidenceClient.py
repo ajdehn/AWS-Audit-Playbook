@@ -32,31 +32,44 @@ class EvidenceClient:
         save_json(data, file_path)
         return data
 
-    def get_aws(self, relative_path, fetch_fn, not_found_codes=None, paginator_params=None):
-        """
+    """
         AWS-safe fetch wrapper with optional pagination support.
-        
+        Returns flattened ResponseMetadata (from last page).
+
         paginator_params: dict with keys:
-            - method_name: str (e.g., 'list_users')
-            - pagination_key: str (key in each page to combine, e.g., 'Users')
-            - params: dict (parameters to pass to the AWS method)
-        """
+        - method_name: str (e.g., 'list_users')
+        - pagination_key: str (key in each page to combine, e.g., 'Users')
+        - params: dict (parameters to pass to the AWS method)
+    """
+    def get_aws(self, relative_path, fetch_fn, not_found_codes=None, paginator_params=None):
         def wrapped():
             try:
                 if paginator_params:
-                    client = paginator_params.get("client")  # boto3 client
+                    client = paginator_params.get("client") # boto3 client
                     method_name = paginator_params["method_name"]
                     pagination_key = paginator_params["pagination_key"]
                     params = paginator_params.get("params", {})
 
-                    # Use boto3 paginator
                     paginator = client.get_paginator(method_name)
                     items = []
-                    for page in paginator.paginate(**params):
-                        items.extend(page.get(pagination_key, []))
-                    return {pagination_key: items}
+                    last_metadata = {}
 
-                return fetch_fn()
+                    for page in paginator.paginate(**params):
+                        # Collect items
+                        items.extend(page.get(pagination_key, []))
+
+                        # Keep overwriting → ends up with last page metadata
+                        last_metadata = page.get("ResponseMetadata", {})
+
+                    return {
+                        pagination_key: items,
+                        "ResponseMetadata":  last_metadata
+                    }
+
+                # Non-paginated call
+                response = fetch_fn()
+                return response
+
             except botocore.exceptions.ClientError as e:
                 code = e.response["Error"]["Code"]
                 if not_found_codes and code in not_found_codes:
