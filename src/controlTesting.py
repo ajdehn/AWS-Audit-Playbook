@@ -343,6 +343,10 @@ def test_s3_tags(audit, control_id, risk_rating=1):
             lambda: s3.get_bucket_tagging(Bucket=bucket["Name"]),
             not_found_codes=["NoSuchTagSet"]
         )
+        if not tags_response:
+            sample.comments = "Tags not found on this bucket."
+            control.samples.append(sample)
+            continue
 
         actual_bucket_tags = {t["Key"]: t.get("Value", "") for t in tags_response.get("TagSet", [])}
         evaluate_tags(sample, required_tags, actual_bucket_tags)

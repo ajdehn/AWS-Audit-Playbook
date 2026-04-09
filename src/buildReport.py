@@ -52,9 +52,9 @@ def render_audit_cover_page(audit, tool_name, styles, controls):
 
     date_str = datetime.now(timezone.utc).strftime('%Y-%m-%d')
     total = len(controls)
-    passed = sum(1 for c in controls if c.result)
+    failed = sum(1 for c in controls if not c.result)
     excluded = sum(1 for c in controls if c.is_excluded)
-    failed = total - passed - excluded
+    passed = total - failed - excluded
 
     audit_metadata = [
         [Paragraph("Prepared By", LABEL_STYLE), Paragraph("AJ Dehn", VALUE_STYLE)], 
