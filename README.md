@@ -26,7 +26,12 @@ This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) foun
     * NOTE: Configure the access key on your local machine using the 'aws configure' command [Video Tutorial](https://youtu.be/RLx5qVZSTyE?si=7fqyxFzThDaB-mGQ).
     * NOTE: Access keys can only be viewed once, at the time of creation.  They must be stored securely elsewhere for future use.
 6. Run the command 'python src/runAudit.py'
-7. Optional: Create and populate the config file (example below). Use this to define control requirements (control_config) and exclude controls and samples that aren't in-scope.
+7. Optional: Configure the env file. Populate this if you want to run the playbook by assuming an IAM role.
+```
+role_arn = "arn:aws:iam::111222333444:role/aws_audit_playbook"  # Update with your actual role arn.
+external_id = "a1b2c3d4e5f6g7h8i9"  # Update with your actual external id.
+```
+9. Optional: Create and populate the config file (example below). Use this to define control requirements (control_config) and exclude controls and samples that aren't in-scope.
 
 ```
 {
