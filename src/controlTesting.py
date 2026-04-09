@@ -219,7 +219,7 @@ def test_s3_encryption(audit, control_id, risk_rating=2):
     control.evaluate_samples()
     if not control.result:
         # Document exception language.
-        control.result_description = f"Exceptions Noted. {control.num_findings} S3 buckets were not encrypted."
+        control.result_description = f"Exceptions Noted. {control.num_findings} S3 bucket(s) are not encrypted."
     return control
 
 def test_s3_public_access(audit, control_id, risk_rating=3):
@@ -285,7 +285,7 @@ def test_s3_public_access(audit, control_id, risk_rating=3):
     control.evaluate_samples()
     if not control.result:
         # Document exception language.
-        control.result_description = f"Exceptions Noted. {control.num_findings} S3 buckets were not blocking public access."
+        control.result_description = f"Exceptions Noted. {control.num_findings} S3 buckets are not blocking public access."
     return control
 
 """
@@ -392,7 +392,7 @@ def test_iam_password_policy(audit, control_id, risk_rating=2):
     )
     if not policy:
         control.result = False
-        control.result_description = "No password policy configured."
+        control.result_description = "Exceptions Noted. No password policy configured."
         return control
 
     password_policy = policy.get("PasswordPolicy", {})
@@ -457,7 +457,7 @@ def test_root_no_access_keys(audit, control_id, risk_rating=3):
         test_procedures=[
             "Obtained the AWS account summary by calling the get_account_summary() boto3 command.",
             "Saved the account summary in the audit evidence folder (IAM/account_summary.json)",
-            "Inspected the account summary to determine if 'AccountAccessKeysPresent' was set to 0."
+            "Inspected the account summary to determine if 'AccountAccessKeysPresent' is set to 0."
         ],
         test_attributes=[],
         audit=audit,
@@ -491,7 +491,7 @@ def test_root_mfa_enabled(audit, control_id, risk_rating=3):
         test_procedures=[
             "Obtained the AWS account summary by calling the get_account_summary() boto3 command.",
             "Saved the account summary in the audit evidence folder (IAM/account_summary.json)",
-            "Inspected the account summary to determine if it 'AccountMFAEnabled' was set to 1."
+            "Inspected the account summary to determine if it 'AccountMFAEnabled' is set to 1."
         ],
         test_attributes=[],
         audit=audit,
@@ -514,7 +514,7 @@ def test_root_mfa_enabled(audit, control_id, risk_rating=3):
         control.result = True
     else:
         control.result = False
-        control.result_description = "Exceptions Noted. Root account does not have MFA enabled"
+        control.result_description = "Exceptions Noted. Root account does not have MFA enabled."
         
     return control
 
@@ -598,7 +598,7 @@ def test_iam_users_mfa(audit, control_id, risk_rating=3):
 
     if not control.result:
         control.result_description = (
-            f"Exceptions Noted. {control.num_findings} IAM user(s) with console access do not have MFA enabled."
+            f"Exceptions Noted. {control.num_findings} IAM user(s) do not have MFA enabled."
         )
 
     return control
@@ -679,7 +679,7 @@ def test_iam_access_key_age(audit, control_id, risk_rating=3):
     control.evaluate_samples()
     if not control.result:
         # Document exception language.
-        control.result_description = f"Exceptions Noted. {control.num_findings} active IAM keys are older than {max_age_days} days old."
+        control.result_description = f"Exceptions Noted. {control.num_findings} IAM key(s) are over {max_age_days} days old."
     return control
 
 """
@@ -774,7 +774,7 @@ def test_rds_encryption(audit, control_id, risk_rating=2):
     control.evaluate_samples()
     if not control.result:
         # Document exception language.
-        control.result_description = f"Exceptions Noted. {control.num_findings} RDS instances are not encrypted."
+        control.result_description = f"Exceptions Noted. {control.num_findings} RDS instance(s) are not encrypted."
     return control
 
 def test_rds_public_access(audit, control_id, risk_rating=3):
@@ -822,7 +822,7 @@ def test_rds_public_access(audit, control_id, risk_rating=3):
     control.evaluate_samples()
     if not control.result:
         # Document exception language.
-        control.result_description = f"Exceptions Noted. {control.num_findings} RDS instances are publicly accessible."
+        control.result_description = f"Exceptions Noted. {control.num_findings} RDS instance(s) are publicly accessible."
     return control
 
 """
@@ -892,7 +892,7 @@ def test_rds_tags(audit, control_id, risk_rating=1):
     control.evaluate_samples()
     if not control.result:
         control.result_description = (
-            f"Exceptions Noted. {control.num_findings} RDS instance(s) missing required tags or have empty values."
+            f"Exceptions Noted. {control.num_findings} RDS instance(s) are missing required tags or have empty values."
         )
 
     return control
@@ -946,7 +946,7 @@ def test_rds_backup_retention(audit, control_id, risk_rating=1):
     control.evaluate_samples()
     if not control.result:
         # Document exception language.
-        control.result_description = f"Exceptions Noted. {control.num_findings} RDS instances do not have sufficient backup retention (at least {required_rds_retention_days} days)."    
+        control.result_description = f"Exceptions Noted. {control.num_findings} RDS instance(s) do not retain backups for at least {required_rds_retention_days} days."
     return control
 
 def test_rds_auto_minor_version_upgrade(audit, control_id, risk_rating=1):
@@ -1156,7 +1156,7 @@ def test_ec2_security_group_tags(audit, control_id, risk_rating=1):
     control.evaluate_samples()
     if not control.result:
         control.result_description = (
-            f"Exceptions Noted. {control.num_findings} security group(s) missing required tags or have empty values."
+            f"Exceptions Noted. {control.num_findings} security group(s) are missing required tags or have empty values."
         )
 
     return control
@@ -1227,7 +1227,7 @@ def test_ec2_tags(audit, control_id, risk_rating=1):
     control.evaluate_samples()
     if not control.result:
         control.result_description = (
-            f"Exceptions Noted. {control.num_findings} EC2 instance(s) missing required tags or have empty values."
+            f"Exceptions Noted. {control.num_findings} EC2 instance(s) are missing required tags or have empty values."
         )
 
     return control
@@ -1351,7 +1351,7 @@ def test_ebs_tags(audit, control_id, risk_rating=1):
     control.evaluate_samples()
     if not control.result:
         control.result_description = (
-            f"Exceptions Noted. {control.num_findings} EBS volume(s) missing required tags or have empty values."
+            f"Exceptions Noted. {control.num_findings} EBS volume(s) are missing required tags or have empty values."
         )
 
     return control
@@ -1362,7 +1362,7 @@ def test_ebs_default_encryption(audit, control_id, risk_rating=0):
         control_id=control_id,
         control_description="EBS volumes must have default encryption enabled in each region.",
         test_procedures=[
-            "For each in-scope region, checked if EBS default encryption is enabled using get_ebs_encryption_by_default() boto3 command.",
+            "For each in-scope region, obtained the EBS default encryption settings by calling get_ebs_encryption_by_default() boto3 command.",
             "Saved the results in the audit evidence folder (EC2/[region_name]/default_ebs_encryption.json).",
             "Inspected the configuration for each region to determine if 'EbsEncryptionByDefault' was set to True."
         ],
@@ -1474,7 +1474,7 @@ def test_lambda_tags(audit, control_id, risk_rating=1):
     control.evaluate_samples()
     if not control.result:
         control.result_description = (
-            f"Exceptions Noted. {control.num_findings} Lambda function(s) missing required tags or have empty values."
+            f"Exceptions Noted. {control.num_findings} Lambda function(s) are missing required tags or have empty values."
         )
 
     return control
@@ -1487,7 +1487,7 @@ def test_cloudtrail_global_logging(audit, control_id, risk_rating=3):
             "Obtained CloudTrail trails using the describe_trails() boto3 command.",
             "Saved the trail configuration in the audit evidence folder (CloudTrail/trails.json).",
             "Obtained the status of each multi-region trail using the get_trail_status() boto3 command.",
-            "Saved the trail status in the audit evidence folder (CloudTrail/[trail_name]/status.json).",
+            "Saved the trail status in the audit evidence folder (CloudTrail/trails/[trail_name]/trail_status.json).",
             "Inspected the trail configuration and status to determine if at least one trail complies with the test attribute(s) defined below."
         ],
         test_attributes=[
@@ -1508,7 +1508,7 @@ def test_cloudtrail_global_logging(audit, control_id, risk_rating=3):
 
     if not trails:
         control.result = False
-        control.result_description = "No CloudTrails founds."
+        control.result_description = "Exceptions Noted. No CloudTrail trail was found."
         return control
 
     found_valid_trail = False
@@ -1516,7 +1516,7 @@ def test_cloudtrail_global_logging(audit, control_id, risk_rating=3):
         if not trail.get("IsMultiRegionTrail", False):
             continue
         status = audit.evidence_client.get_aws(
-            f"CloudTrail/{trail['Name']}/status.json",
+            f"CloudTrail/trails/{trail['Name']}/trail_status.json",
             lambda: ct.get_trail_status(Name=trail["TrailARN"])
         )
         if status.get("IsLogging", False):
@@ -1559,7 +1559,7 @@ def test_cloudtrail_log_file_validation(audit, control_id, risk_rating=2):
 
     if not trails:
         control.result = False
-        control.result_description = "No CloudTrails configured."
+        control.result_description = "Exceptions Noted. No CloudTrail trails are configured."
         return control
 
     for trail in trails:
@@ -1592,10 +1592,10 @@ def test_cloudtrail_s3_bucket_protection(audit, control_id, risk_rating=3):
         control_id=control_id,
         control_description="CloudTrail S3 buckets are configured to block public access.",
         test_procedures=[
-            "Obtained a list of CloudTrails by calling the list_trails() boto3 command.",
+            "Obtained a list of CloudTrails by calling the describe_trails() boto3 command.",
             "Saved the list of trails in the audit evidence folder (CloudTrail/trails.json).",
             "For each trail, obtained the S3 bucket name and checked the bucket's public access block settings using get_public_access_block() boto3 command.",
-            "Saved the public access block settings for each bucket in the audit evidence folder (CloudTrail/buckets/[bucket_name]/public_access_block.json).",
+            "Saved the public access block settings for each bucket in the audit evidence folder (S3/buckets/[bucket_name]/public_access_block.json).",
             "Inspected the public access block settings for each S3 bucket containing CloudTrail logs to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=[
@@ -1612,8 +1612,8 @@ def test_cloudtrail_s3_bucket_protection(audit, control_id, risk_rating=3):
     ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
         "CloudTrail/trails.json",
-        lambda: ct.list_trails()
-    ).get("Trails", [])
+        lambda: ct.describe_trails()
+    ).get("trailList", [])
 
     for trail in trails:
         trail_name = trail.get("Name")
@@ -1634,7 +1634,7 @@ def test_cloudtrail_s3_bucket_protection(audit, control_id, risk_rating=3):
 
         # Fetch public access block
         public_access_block = audit.evidence_client.get_aws(
-            f"CloudTrail/buckets/{bucket_name}/public_access_block.json",
+            f"S3/buckets/{bucket_name}/public_access_block.json",
             lambda: audit.session.client("s3").get_public_access_block(Bucket=bucket_name),
             not_found_codes=["NoSuchPublicAccessBlockConfiguration"]
         )
@@ -1662,7 +1662,7 @@ def test_cloudtrail_s3_bucket_protection(audit, control_id, risk_rating=3):
 
     if not control.result:
         control.result_description = (
-            f"Exceptions Noted. {control.num_findings} CloudTrail bucket(s) are not fully protected."
+            f"Exceptions Noted. {control.num_findings} CloudTrail bucket(s) are not blocking public access."
         )
 
     return control
@@ -1680,10 +1680,10 @@ def test_cloudtrail_logging_recent_stops(audit, control_id, risk_rating=3):
             f"CloudTrail logging has not been stopped in the last {lookback_days} days."
         ),
         test_procedures=[
-            "Obtained a list of CloudTrails by calling the list_trails() boto3 command.",
+            "Obtained a list of CloudTrails by calling the describe_trails() boto3 command.",
             "Saved the list of trails in the audit evidence folder (CloudTrail/trails.json).",
             "For each trail, called get_trail_status() to check IsLogging and StopLoggingTime.",
-            f"Saved each trail's status in the audit evidence folder (CloudTrail/trails_status/[trail_name].json).",
+            f"Saved each trail's status in the audit evidence folder (CloudTrail/trails/[trail_name]/trail_status.json).",
             f"Inspected the 'TimeLoggingStopped' variable to determine if logging has been stopped in the last {lookback_days} days."
         ],
         test_attributes=[
@@ -1700,8 +1700,8 @@ def test_cloudtrail_logging_recent_stops(audit, control_id, risk_rating=3):
     ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
         "CloudTrail/trails.json",
-        lambda: ct.list_trails()
-    ).get("Trails", [])
+        lambda: ct.describe_trails()
+    ).get("trailList", [])
 
     now = datetime.now(timezone.utc)
     lookback_threshold = now - timedelta(days=lookback_days)
@@ -1717,7 +1717,7 @@ def test_cloudtrail_logging_recent_stops(audit, control_id, risk_rating=3):
             continue
 
         status = audit.evidence_client.get_aws(
-            f"CloudTrail/trails_status/{trail_name}.json",
+            f"CloudTrail/trails/{trail_name}/trail_status.json",
             lambda: ct.get_trail_status(Name=trail_name)
         )
 
@@ -1745,8 +1745,8 @@ def test_cloudtrail_logging_recent_stops(audit, control_id, risk_rating=3):
 
     if not control.result:
         control.result_description = (
-            f"Exceptions Noted. {control.num_findings} trail(s) have logging stopped "
-            f"currently or within the last {lookback_days} days."
+            f"Exceptions Noted. {control.num_findings} trail(s) are not currently logging or have been stopped "
+            f"within the last {lookback_days} days."
         )
 
     return control
