@@ -1,0 +1,18 @@
+{
+    "LoginProfile": {
+        "UserName": "goose",
+        "CreateDate": "2025-11-03 00:38:01+00:00",
+        "PasswordResetRequired": false
+    },
+    "ResponseMetadata": {
+        "RequestId": "eec07810-6142-4a79-8c0c-410df1fe8f1b",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 09 Apr 2026 14:44:59 GMT",
+            "x-amzn-requestid": "eec07810-6142-4a79-8c0c-410df1fe8f1b",
+            "content-type": "text/xml",
+            "content-length": "446"
+        },
+        "RetryAttempts": 0
+    }
+}

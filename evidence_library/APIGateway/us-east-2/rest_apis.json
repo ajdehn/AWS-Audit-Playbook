@@ -1,0 +1,16 @@
+{
+    "ResponseMetadata": {
+        "RequestId": "8611fb1d-4c91-440a-a0ee-9df189164e97",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 09 Apr 2026 14:45:09 GMT",
+            "content-type": "application/json",
+            "content-length": "12",
+            "connection": "keep-alive",
+            "x-amzn-requestid": "8611fb1d-4c91-440a-a0ee-9df189164e97",
+            "x-amz-apigw-id": "bjo6XID0CYcEcVg="
+        },
+        "RetryAttempts": 0
+    },
+    "items": []
+}

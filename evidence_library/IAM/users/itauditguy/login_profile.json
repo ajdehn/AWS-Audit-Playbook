@@ -1,0 +1,18 @@
+{
+    "LoginProfile": {
+        "UserName": "itauditguy",
+        "CreateDate": "2022-11-11 23:41:42+00:00",
+        "PasswordResetRequired": false
+    },
+    "ResponseMetadata": {
+        "RequestId": "81643e57-8806-40b7-a610-b32c79f5f38a",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 09 Apr 2026 14:44:59 GMT",
+            "x-amzn-requestid": "81643e57-8806-40b7-a610-b32c79f5f38a",
+            "content-type": "text/xml",
+            "content-length": "451"
+        },
+        "RetryAttempts": 0
+    }
+}

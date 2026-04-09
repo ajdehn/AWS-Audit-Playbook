@@ -1,0 +1,18 @@
+{
+    "LoginProfile": {
+        "UserName": "iceman",
+        "CreateDate": "2025-11-03 00:38:24+00:00",
+        "PasswordResetRequired": true
+    },
+    "ResponseMetadata": {
+        "RequestId": "9af48921-bda6-4df0-9b27-e95e6d685050",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 09 Apr 2026 14:44:59 GMT",
+            "x-amzn-requestid": "9af48921-bda6-4df0-9b27-e95e6d685050",
+            "content-type": "text/xml",
+            "content-length": "446"
+        },
+        "RetryAttempts": 0
+    }
+}

@@ -1,0 +1,59 @@
+{
+    "Users": [
+        {
+            "Path": "/",
+            "UserName": "audit-user",
+            "UserId": "AIDA3TURCXF5E5SNJH4AA",
+            "Arn": "arn:aws:iam::798094440826:user/audit-user",
+            "CreateDate": "2025-11-20 02:17:38+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "goose",
+            "UserId": "AIDA3TURCXF5KWFDYXPDC",
+            "Arn": "arn:aws:iam::798094440826:user/goose",
+            "CreateDate": "2025-11-03 00:38:00+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "iceman",
+            "UserId": "AIDA3TURCXF5NGTHI54WF",
+            "Arn": "arn:aws:iam::798094440826:user/iceman",
+            "CreateDate": "2025-11-03 00:38:24+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "itauditguy",
+            "UserId": "AIDA3TURCXF5MUI5NKMTI",
+            "Arn": "arn:aws:iam::798094440826:user/itauditguy",
+            "CreateDate": "2022-11-11 23:41:41+00:00",
+            "PasswordLastUsed": "2026-04-05 22:59:13+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "maverick",
+            "UserId": "AIDA3TURCXF5LJC66ABNT",
+            "Arn": "arn:aws:iam::798094440826:user/maverick",
+            "CreateDate": "2025-11-03 00:36:06+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "slider",
+            "UserId": "AIDA3TURCXF5LJGCKJSJ2",
+            "Arn": "arn:aws:iam::798094440826:user/slider",
+            "CreateDate": "2025-11-03 00:54:42+00:00"
+        }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "5c4ddffd-745b-4e16-a039-77af5cec2468",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 09 Apr 2026 14:44:58 GMT",
+            "x-amzn-requestid": "5c4ddffd-745b-4e16-a039-77af5cec2468",
+            "content-type": "text/xml",
+            "content-length": "1873"
+        },
+        "RetryAttempts": 0
+    }
+}

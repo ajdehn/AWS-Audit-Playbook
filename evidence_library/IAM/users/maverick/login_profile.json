@@ -1,0 +1,18 @@
+{
+    "LoginProfile": {
+        "UserName": "maverick",
+        "CreateDate": "2025-11-03 00:36:06+00:00",
+        "PasswordResetRequired": false
+    },
+    "ResponseMetadata": {
+        "RequestId": "836cc83c-edd4-4a63-9fe7-a3edeccd9a89",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 09 Apr 2026 14:44:59 GMT",
+            "x-amzn-requestid": "836cc83c-edd4-4a63-9fe7-a3edeccd9a89",
+            "content-type": "text/xml",
+            "content-length": "449"
+        },
+        "RetryAttempts": 0
+    }
+}

@@ -1,0 +1,30 @@
+{
+    "ResponseMetadata": {
+        "RequestId": "ERSQGHPZ8SXVDVXJ",
+        "HostId": "ghhV1PmhHntdmpUz/rlgN1ShRNtTLJbgIexAIFEW8LX4Iviqp/7AcPnegxUV3OIPwLJMN6Mdm2U=",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amz-id-2": "ghhV1PmhHntdmpUz/rlgN1ShRNtTLJbgIexAIFEW8LX4Iviqp/7AcPnegxUV3OIPwLJMN6Mdm2U=",
+            "x-amz-request-id": "ERSQGHPZ8SXVDVXJ",
+            "date": "Thu, 09 Apr 2026 14:45:02 GMT",
+            "transfer-encoding": "chunked",
+            "server": "AmazonS3"
+        },
+        "RetryAttempts": 0
+    },
+    "ServerSideEncryptionConfiguration": {
+        "Rules": [
+            {
+                "ApplyServerSideEncryptionByDefault": {
+                    "SSEAlgorithm": "AES256"
+                },
+                "BucketKeyEnabled": false,
+                "BlockedEncryptionTypes": {
+                    "EncryptionType": [
+                        "NONE"
+                    ]
+                }
+            }
+        ]
+    }
+}
