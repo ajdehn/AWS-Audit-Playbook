@@ -2,17 +2,18 @@
 This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) founder of [AuditOps.io](https://www.auditops.io/). The goal of this project is to help auditors conduct **AWS audits, without screenshots**.
 
 # Why use this project
-- Auditors deserve high-quality evidence directly from AWS. Using this project, you can share JSON files directly from the SDK (boto3).
-- Taking screenshots is a waste of time for everyone, auditors included. This script takes **minutes** to gather the necessary evidence and generate the report.
-- Cloud configurations change daily, and a screenshot once per year doesn't mitigate risk.
+- Auditors deserve high-quality evidence directly from AWS. Using this project, you can share JSON files directly from boto3.
+- Taking screenshots is a waste of time for everyone, auditors included. This script takes **minutes** to gather the required evidence and generate the report.
+- Screenshots don't cut it when cloud configurations change daily. I highly encourage you run this script daily (or weekly) to begin having high quality conversations with your DevOps team.
 
 # Project Overview
 - A read-only [script](./src/controlTesting.py) to generate and evaluate audit evidence (no screenshots required).
    - The script creates a new folder (tmp/audit_evidence) that you can zip and share with your auditor.
-- A [report builder](./src/buildReport.py) to create a PDF documenting audit findings.
+- A [report builder](./src/buildReport.py) to create the AWS audit report. This report is extremely transparent and shows when samples and controls are excluded.
    - Check out the [Sample Audit Report](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?usp=sharing).
 - A [library](./evidence_library/) of example audit evidence created from the script with the supporting JSON files.
 - List of [controls](./controls/) with detailed guidance of how to test each control.
+- A [JSON audit report](./evidence_library/controls.json) which cleanly displays the test procedures and control findings.
 
 # Setup Instructions
 1. Pre-requisites: Install Git, Python, and the AWS CLI.
