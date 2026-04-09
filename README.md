@@ -3,7 +3,7 @@ This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) foun
 
 ## Why use this project
 - Auditors deserve high-quality evidence directly from AWS. Using this project, you can share JSON files directly from boto3.
-- Taking screenshots is a waste of time for everyone, auditors included. This script takes **minutes** to gather the required evidence and generate the report.
+- Screenshots are a waste of time for everyone, auditors included. This script takes **minutes** to gather the required evidence and generate the report.
 - Screenshots don't cut it when cloud configurations change daily. I highly encourage you run this script daily (or weekly) to begin having high quality conversations with your DevOps team.
 
 ## Project Overview
