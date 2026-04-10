@@ -4,7 +4,7 @@ This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) foun
 ## Why use this project
 - Auditors deserve high-quality evidence directly from AWS. Using this project, you will be able to share JSON files directly from boto3.
 - Screenshots are a waste of time for everyone, auditors included. This script takes **minutes** to gather the required evidence and generate the report.
-- Screenshots don't cut it when cloud configurations change daily. Auditors should be running this script daily (or weekly) and start having risk-driven conversations with your Engineering teams.
+- Screenshots don't cut it when cloud configurations change daily. Auditors should be running this script daily (or at least weekly) and use it to start having risk-driven conversations with your Engineering teams.
 
 ## Project Overview
 - A read-only [script](./src/controlTesting.py) to generate and evaluate audit evidence (no screenshots required).
