@@ -17,26 +17,26 @@ This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) foun
 
 ## Setup Instructions
 1. Install pre-requisites:
-  * VS Code
-    * [Windows Tutorial](https://www.youtube.com/watch?v=cu_ykIfBprI)
-    * [Mac Tutorial](https://www.youtube.com/watch?v=DA03DODTP5w)
-  * Git [Tutorial](https://www.youtube.com/watch?v=3Tsaxxv9sls)
-  * Python [Tutorial](https://www.youtube.com/watch?v=D2cwvpJSBX4)
-  * AWS CLI
-    * [Windows Tutorial](https://www.youtube.com/watch?v=jCHOsMPbcV0)
-    * [Mac Tutorial](https://www.youtube.com/watch?v=U0AmeqL4DfE)
+      * VS Code
+         * [Windows Tutorial](https://www.youtube.com/watch?v=cu_ykIfBprI)
+         * [Mac Tutorial](https://www.youtube.com/watch?v=DA03DODTP5w)
+      * Git [Tutorial](https://www.youtube.com/watch?v=3Tsaxxv9sls)
+      * Python [Tutorial](https://www.youtube.com/watch?v=D2cwvpJSBX4)
+      * AWS CLI
+         * [Windows Tutorial](https://www.youtube.com/watch?v=jCHOsMPbcV0)
+         * [Mac Tutorial](https://www.youtube.com/watch?v=U0AmeqL4DfE)
 2. Open your development folder.
 3. Clone the AWS Audit Playbook Github Repo
-  * git clone https://github.com/ajdehn/AWS-Audit-Playbook.git
+      * git clone https://github.com/ajdehn/AWS-Audit-Playbook.git
 4. Switch to the AWS Audit Playbook folder
-  * cd AWS-Audit-Playook
+      * cd AWS-Audit-Playook
 5. Create a virtual environment
-  * python -m venv venv
-  * source venv/bin/activate
+      * python -m venv venv
+      * * source venv/bin/activate
 6. Install the dependencies via `pip install -r requirements.txt`
-    * The playbook requires the boto3 library, v1.39 or newer.  This command will install boto3 and its dependencies.
+      * The playbook requires the boto3 library, v1.39 or newer.  This command will install boto3 and its dependencies.
 7. Create an IAM user in the AWS account you want to audit.
-   * User needs [Security Audit](https://docs.aws.amazon.com/aws-managed-policy/latest/reference/SecurityAudit.html) permissions.
+      * User needs [Security Audit](https://docs.aws.amazon.com/aws-managed-policy/latest/reference/SecurityAudit.html) permissions.
 8. Create an access key for the IAM user created in Step 4: [AWS Docs](https://docs.aws.amazon.com/keyspaces/latest/devguide/create.keypair.html)
     * NOTE: Configure the access key on your local machine using the 'aws configure' command [Video Tutorial](https://youtu.be/RLx5qVZSTyE?si=7fqyxFzThDaB-mGQ).
     * NOTE: Access keys can only be viewed once, at the time of creation.  They must be stored securely elsewhere for future use.
