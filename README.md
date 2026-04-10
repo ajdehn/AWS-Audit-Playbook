@@ -60,7 +60,7 @@ external_id = "a1b2c3d4e5f6g7h8i9"  # Update with your actual external id.
 ```
 {
   "control_config": {
-    "in_scope_regions": ["us-east-1", "us-east-2"],
+    "in_scope_regions": [],
     "iam_password_min_length": 14,
     "iam_password_min_complexity_types": 4,
     "iam_password_require_expiration": false,
@@ -72,16 +72,16 @@ external_id = "a1b2c3d4e5f6g7h8i9"  # Update with your actual external id.
     "base_required_tags": ["owner", "description", "classification"]
   },
   "control_exclusions": {
-    "RDS Tags": {
-      "rationale": "Only one RDS instance. We've decided tags aren't required.",
+    "EXAMPLE CONTROL NAME": {
+      "rationale": "Based on discussion with DevOps, we agreed this control is not needed to mitigate risk.",
       "permanent": true,
       "expiration_date": null,
       "approvers": [
         "john.doe@acme.com"
       ]
     },
-    "EBS Tags": {
-      "rationale": "We've decided to only tag EC2 instances. Please check the associated instances",
+    "EXAMPLE CONTROL NAME 2": {
+      "rationale": "Engineering is currently implementing this control. Pausing monitoring until December 31st, 2026.",
       "permanent": false,
       "expiration_date": "2026-12-31",
       "approvers": [
@@ -123,7 +123,7 @@ external_id = "a1b2c3d4e5f6g7h8i9"  # Update with your actual external id.
         },
         "rationale": "This bucket is intentionally public for testing",
         "permanent": false,
-        "expiration_date": "2099-12-31",
+        "expiration_date": "2026-12-31",
         "approvers": [
           "john.doe@acme.com"
         ]
