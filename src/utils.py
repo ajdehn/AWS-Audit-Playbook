@@ -86,7 +86,9 @@ def load_config(file_path):
         with open(file_path, "r") as f:
             return json.load(f)
     except FileNotFoundError:
-        raise ValueError(f"Config file not found: {file_path}")
+        # Handle empty config file.
+        print(f"Warning: Config file not found: {file_path}")
+        return {}
     except json.JSONDecodeError:
         raise ValueError(f"Invalid JSON in config: {file_path}")
 
