@@ -16,23 +16,39 @@ This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) foun
 - A [JSON audit report](./evidence_library/controls.json) which cleanly displays the test procedures and control findings.
 
 ## Setup Instructions
-1. Pre-requisites: Install Git, Python, and the AWS CLI.
-2. Clone the Github repository.
-3. Install the dependencies via `pip install -r requirements.txt`
+1. Install pre-requisites:
+  * VS Code
+    * [Windows Tutorial](https://www.youtube.com/watch?v=cu_ykIfBprI)
+    * [Mac Tutorial](https://www.youtube.com/watch?v=DA03DODTP5w)
+  * Git [Tutorial](https://www.youtube.com/watch?v=3Tsaxxv9sls)
+  * Python [Tutorial](https://www.youtube.com/watch?v=D2cwvpJSBX4)
+  * AWS CLI
+    * [Windows Tutorial](https://www.youtube.com/watch?v=jCHOsMPbcV0)
+    * [Mac Tutorial](https://www.youtube.com/watch?v=U0AmeqL4DfE)
+2. Open your development folder.
+3. Clone the AWS Audit Playbook Github Repo
+  * git clone https://github.com/ajdehn/AWS-Audit-Playbook.git
+4. Switch to the AWS Audit Playbook folder
+  * cd AWS-Audit-Playook
+5. Create a virtual environment
+  * python -m venv venv
+  * source venv/bin/activate
+6. Install the dependencies via `pip install -r requirements.txt`
     * The playbook requires the boto3 library, v1.39 or newer.  This command will install boto3 and its dependencies.
-4. Create an IAM user in the AWS account you want to audit.
+7. Create an IAM user in the AWS account you want to audit.
    * User needs [Security Audit](https://docs.aws.amazon.com/aws-managed-policy/latest/reference/SecurityAudit.html) permissions.
-5. Create an access key for the IAM user created in Step 4: [AWS Docs](https://docs.aws.amazon.com/keyspaces/latest/devguide/create.keypair.html)
+8. Create an access key for the IAM user created in Step 4: [AWS Docs](https://docs.aws.amazon.com/keyspaces/latest/devguide/create.keypair.html)
     * NOTE: Configure the access key on your local machine using the 'aws configure' command [Video Tutorial](https://youtu.be/RLx5qVZSTyE?si=7fqyxFzThDaB-mGQ).
     * NOTE: Access keys can only be viewed once, at the time of creation.  They must be stored securely elsewhere for future use.
-6. Run the command 'python src/runAudit.py'
-7. Optional: Configure the env file. Populate this if you want to run the playbook by assuming an IAM role.
+9. Run the command 'python src/runAudit.py'. Running this scan will perform the following:
+  * Create a tmp folder for the audit evidence and report.
+  * Run all of the control tests (see [src/controlTesting.py](./src/controlTesting.py))
+10. Optional: Configure the env file to run the script through an IAM role.
 ```
 role_arn = "arn:aws:iam::111222333444:role/aws_audit_playbook"  # Update with your actual role arn.
 external_id = "a1b2c3d4e5f6g7h8i9"  # Update with your actual external id.
 ```
-9. Optional: Create and populate the config file (example below). Use this to define control requirements (control_config) and exclude controls and samples that aren't in-scope.
-
+11. Optional: Create and populate the config file (example below). Use this to define control requirements (control_config) and exclude controls and samples that aren't in-scope.
 ```
 {
   "control_config": {
