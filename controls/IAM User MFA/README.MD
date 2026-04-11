@@ -8,7 +8,7 @@ A DevOps engineering falls prey to a phishing email and the malicous actor obtai
 * [users.json](/evidence_library/IAM/users.json) list of all IAM users in AWS account.
   * This evidence is gathered by calling the [list_users()](https://docs.aws.amazon.com/boto3/latest/reference/services/iam/client/list_users.html) command in Boto3.
 * For each user, you will need the following:
-  * [login_profile.json](/evidence_library/IAM/itauditguy/login_profile.json) obtained by calling the [get_login_profile()]https://docs.aws.amazon.com/boto3/latest/reference/services/iam/client/get_login_profile.html) command in Boto3.
+  * [login_profile.json](/evidence_library/IAM/itauditguy/login_profile.json) obtained by calling the [get_login_profile()](https://docs.aws.amazon.com/boto3/latest/reference/services/iam/client/get_login_profile.html) command in Boto3.
   * [mfa_devices.json](/evidence_library/IAM/itauditguy/mfa_devices.json) obtained by calling the [list_mfa_devices()](https://docs.aws.amazon.com/boto3/latest/reference/services/iam/client/list_mfa_devices.html) command in Boto3.
 
 ## Testing Details
