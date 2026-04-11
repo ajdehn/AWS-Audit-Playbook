@@ -1,15 +1,21 @@
 ## Control Description
-All users with an active password must have MFA enabled.
+IAM users with an active password must have MFA enabled.
 
 ## Example Risk
-An engineer reuses their password across multiple applications. Their Facebook password is compromised and a malicious actor logs into their AWS IAM user account using the compromised password.
+A DevOps engineering falls prey to a phishing email and the malicous actor obtains the engineer's Facebook password in plaintext. After realizing the engineer is a System Admin at a major bank, the attacker does extensive intelligence gathering and is able to login to the bank's AWS account because the engineer re-used their password. After gaining access, the malicious actor steals sensitive data, and is demanding a $10,000,000 ransom in exchange for not releasing it to the dark web.
 
 ## Required Evidence
-* [credentials_report.csv](/evidence_library/IAM/credentials_report.csv) lists all users in your account and the status of their various credentials, including passwords and MFA devices.
-  * This evidence is gathered by calling the [generate_credentials_report()](https://boto3.amazonaws.com/v1/documentation/api/1.26.89/reference/services/iam/client/generate_credential_report.html) & [get_credentials_report()](https://boto3.amazonaws.com/v1/documentation/api/1.26.89/reference/services/iam/client/get_credential_report.html) commands in Boto3.
+* [users.json](/evidence_library/IAM/users.json) list of all IAM users in AWS account.
+  * This evidence is gathered by calling the [list_users()](https://docs.aws.amazon.com/boto3/latest/reference/services/iam/client/list_users.html) command in Boto3.
+* For each user, you will need the following:
+  * [login_profile.json](/evidence_library/IAM/itauditguy/login_profile.json) obtained by calling the [get_login_profile()]https://docs.aws.amazon.com/boto3/latest/reference/services/iam/client/get_login_profile.html) command in Boto3.
+  * [mfa_devices.json](/evidence_library/IAM/itauditguy/mfa_devices.json) obtained by calling the [list_mfa_devices()](https://docs.aws.amazon.com/boto3/latest/reference/services/iam/client/list_mfa_devices.html) command in Boto3.
 
 ## Testing Details
-1. Open the [credentials_report.csv](/evidence_library/IAM/credentials_report.csv) and confirm that all users with an active password also have MFA enabled.
+1. For each IAM user in the [users.json](/evidence_library/IAM/users.json), check if user has a login profile. If the [login_profile](/evidence_library/IAM/audit-user/login_profile.json) is null, the user doesn't have a console login and no further testing is required for this control. NOTE: You should still consider IAM access keys to check if they have programmatic access outside of the AWS console.
+2. For each IAM user with a [login_profile](/evidence_library/IAM/itauditguy/login_profile.json), check if they have at least one item in MFADevices in the mfa_devices.json.
+  * [Example: Passing IAM User](/evidence_library/IAM/itauditguy/mfa_devices.json)
+  * [Example: Failing IAM User](/evidence_library/IAM/maverick/mfa_devices.json)
 
 ## Other Resources
-- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=1190435560)
+- [Example Workpaper](/evidence_library/aws_audit_report.pdf)
