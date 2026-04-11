@@ -14,8 +14,8 @@ A DevOps engineering falls prey to a phishing email and the malicous actor obtai
 ## Test Procedures
 1. For each IAM user in [users.json](/evidence_library/IAM/users.json), check if user has a login profile. If the [login_profile](/evidence_library/IAM/users/audit-user/login_profile.json) is null, the user doesn't have a console login and no further testing is required for this control. NOTE: You should still check IAM access keys to evaluate programmatic access outside of the AWS console.
 2. For each IAM user with a [login_profile](/evidence_library/IAM/users/itauditguy/login_profile.json), check if they have at least one item in MFADevices in the mfa_devices.json.
-  * [Example: Passing IAM User](/evidence_library/IAM/users/itauditguy/mfa_devices.json)
-  * [Example: Failing IAM User](/evidence_library/IAM/users/maverick/mfa_devices.json)
+  1. [Example: Passing IAM User](/evidence_library/IAM/users/itauditguy/mfa_devices.json)
+  2. [Example: Failing IAM User](/evidence_library/IAM/users/maverick/mfa_devices.json)
 
 ## Other Resources
 - [Example Workpaper](/evidence_library/aws_audit_report.pdf)
