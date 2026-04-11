@@ -8,14 +8,14 @@ A DevOps engineering falls prey to a phishing email and the malicous actor obtai
 * [users.json](/evidence_library/IAM/users.json) list of all IAM users in AWS account.
   * This evidence is gathered by calling the [list_users()](https://docs.aws.amazon.com/boto3/latest/reference/services/iam/client/list_users.html) command in Boto3.
 * For each user, you will need the following:
-  * [login_profile.json](/evidence_library/IAM/users/itauditguy/login_profile.json) obtained by calling the [get_login_profile()](https://docs.aws.amazon.com/boto3/latest/reference/services/iam/client/get_login_profile.html) command in Boto3.
-  * [mfa_devices.json](/evidence_library/IAM/users/itauditguy/mfa_devices.json) obtained by calling the [list_mfa_devices()](https://docs.aws.amazon.com/boto3/latest/reference/services/iam/client/list_mfa_devices.html) command in Boto3.
+    * [login_profile.json](/evidence_library/IAM/users/itauditguy/login_profile.json) obtained by calling the [get_login_profile()](https://docs.aws.amazon.com/boto3/latest/reference/services/iam/client/get_login_profile.html) command in Boto3.
+    * [mfa_devices.json](/evidence_library/IAM/users/itauditguy/mfa_devices.json) obtained by calling the [list_mfa_devices()](https://docs.aws.amazon.com/boto3/latest/reference/services/iam/client/list_mfa_devices.html) command in Boto3.
 
 ## Test Procedures
 1. For each IAM user in [users.json](/evidence_library/IAM/users.json), check if user has a login profile. If the [login_profile](/evidence_library/IAM/users/audit-user/login_profile.json) is null, the user doesn't have a console login and no further testing is required for this control. NOTE: You should still check IAM access keys to evaluate programmatic access outside of the AWS console.
 2. For each IAM user with a [login_profile](/evidence_library/IAM/users/itauditguy/login_profile.json), check if they have at least one item in MFADevices in the mfa_devices.json.
-  1. [Example: Passing IAM User](/evidence_library/IAM/users/itauditguy/mfa_devices.json)
-  2. [Example: Failing IAM User](/evidence_library/IAM/users/maverick/mfa_devices.json)
+    1. [Example: Passing IAM User](/evidence_library/IAM/users/itauditguy/mfa_devices.json)
+    2. [Example: Failing IAM User](/evidence_library/IAM/users/maverick/mfa_devices.json)
 
 ## Other Resources
 - [Example Workpaper](/evidence_library/aws_audit_report.pdf)
