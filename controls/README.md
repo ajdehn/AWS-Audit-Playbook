@@ -1,7 +1,7 @@
 # Control Library
 | Priority | Control Description | Evidence Type | Control Documentation |
 | ------------- | ------------- | ------------- |------------- |
-| 1 | Multi-factor authentication is configured for all users of critical systems. | Automated | [IAM MFA](/controls/IAM USER MFA)<br> |
+| 1 | Multi-factor authentication is configured for all users of critical systems. | Automated | [IAM MFA](/controls/IAM_USER_MFA)<br> |
 | 2 | Infrastructure service account credentials are rotated at least once per year. | Automated | [IAM Key Age](/controls/IAM_Key_Age) |
 | 3 | Audit logs are enabled to capture activity within the cloud infrastructure.| Automated | [Cloud Trail Multi Region](/controls/Cloud_Trail_Multi_Region) |
 | 4 | Cloud resources are configured to block public access. | Automated | [S3_Public](/controls/S3_Public)<br>[RDS_Public](/controls/RDS_Public) |
