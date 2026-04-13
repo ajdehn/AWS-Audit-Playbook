@@ -149,6 +149,7 @@ def run_all_tests(audit):
         ("IAM Password", test_iam_password_policy),
         ("S3 Encryption", test_s3_encryption),
         ("S3 Public Access", test_s3_public_access),
+        ("S3 Secure Transport", test_s3_secure_transport),
         ("S3 Tags", test_s3_tags),
         ("RDS Backup Retention", test_rds_backup_retention),
         ("RDS Encryption", test_rds_encryption),
@@ -179,7 +180,6 @@ def run_all_tests(audit):
         json.dump([c.to_dict() for c in controls], f, indent=4)
 
     # TODO: Add IAM tests (IAM User Stale Access Keys)
-    # TODO: Add S3 secure transport test
     # TODO: Add S3 object owner check
     # TODO: Add EC2 Public Ports (22, RDS, all ports, etc)
     # TODO: Add WAF Tags
@@ -373,6 +373,95 @@ def test_s3_tags(audit, control_id, risk_rating=1):
     if not control.result:
         control.result_description = (
             f"Exceptions Noted. {control.num_findings} bucket(s) missing required tags or have empty values."
+        )
+
+    return control
+
+def test_s3_secure_transport(audit, control_id, risk_rating=0):
+    control = Control(
+        control_id=control_id,
+        control_description= "S3 buckets are configured to encrypt data in-transit.",
+        test_procedures=[
+            "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
+            "Saved the list of S3 buckets in the audit evidence folder (S3/buckets.json).",
+            "Obtained the bucket policy for each bucket by calling the get_bucket_policy() boto3 command.",
+            "Saved the bucket policy for each S3 bucket (S3/buckets/[bucket_name]/bucket_policy.json).",
+            "Inspected each bucket policy to confirm a statement exists that denies requests when aws:SecureTransport is false."
+        ],
+        test_attributes=[],
+        audit=audit,
+        table_headers=["Bucket Name", "Result", "Comments"],
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    s3 = audit.session.client("s3")
+
+    # Obtain and save list of buckets
+    buckets = audit.evidence_client.get(
+        "S3/buckets.json",
+        lambda: s3.list_buckets()
+    )
+
+    for bucket in buckets.get("Buckets", []):
+        bucket_name = bucket["Name"]
+        sample = Sample(
+            sample_id={"bucket_name": bucket_name},
+            control_id=control_id
+        )
+
+        if process_sample_exclusion(control, sample, audit):
+            continue
+
+        # Fetch bucket policy
+        policy = audit.evidence_client.get_aws(
+            f"S3/buckets/{bucket_name}/bucket_policy.json",
+            lambda: s3.get_bucket_policy(Bucket=bucket_name),
+            not_found_codes=["NoSuchBucketPolicy"]
+        )
+
+        if not policy:
+            sample.comments = "No bucket policy found."
+            control.samples.append(sample)
+            continue
+
+        try:
+            policy_doc = json.loads(policy.get("Policy", "{}"))
+        except Exception:
+            sample.comments = "Unable to parse bucket policy."
+            control.samples.append(sample)
+            continue
+
+        statements = policy_doc.get("Statement", [])
+
+        # Normalize to list
+        if isinstance(statements, dict):
+            statements = [statements]
+
+        secure_transport_enforced = False
+        for stmt in statements:
+            if stmt.get("Effect") != "Deny":
+                continue
+            condition = stmt.get("Condition", {})
+            bool_condition = condition.get("Bool", {})
+            if bool_condition.get("aws:SecureTransport") == "false":
+                secure_transport_enforced = True
+                break
+
+        if secure_transport_enforced:
+            sample.result = True
+        else:
+            sample.comments = "No bucket policy statement enforcing SecureTransport."
+
+        control.samples.append(sample)
+
+    control.evaluate_samples()
+
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. {control.num_findings} S3 bucket(s) do not enforce secure transport (HTTPS)."
         )
 
     return control
@@ -1948,7 +2037,7 @@ def test_guardduty_enabled(audit, control_id, risk_rating=3):
 
     if not control.result:
         control.result_description = (
-            f"Exceptions Noted. GuardDuty is not enabled in {control.num_findings} of {len(audit.in_scope_regions)} in-scope region(s)."
+            f"Exceptions Noted. GuardDuty is not enabled for {control.num_findings} in-scope region(s)."
         )
 
     return control
