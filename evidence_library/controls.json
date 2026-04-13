@@ -50,8 +50,8 @@
         "control_description": "IAM access keys are rotated at least every 90 days.",
         "risk_rating": 3,
         "is_excluded": false,
-        "result": "Fail",
-        "result_description": "Exceptions Noted. 1 IAM key(s) are over 90 days old.",
+        "result": "Pass",
+        "result_description": "",
         "test_procedures": [
             "Obtained a list of IAM users by calling the list_users() boto3 command.",
             "Saved the list of IAM users in the audit evidence folder (IAM/users.json).",
@@ -68,15 +68,15 @@
         "control_description": "IAM passwords must comply with the organizations password complexity requirements.",
         "risk_rating": 2,
         "is_excluded": false,
-        "result": "Pass",
-        "result_description": "",
+        "result": "Fail",
+        "result_description": "Exceptions Noted. Minimum password length too short (current=14, required>=20)",
         "test_procedures": [
             "Obtained IAM password configuration by using the account_password_policy() boto3 command.",
             "Saved the password configuration in the audit evidence folder (IAM/password_policy.json).",
             "Inspected the password configuration to determine if they comply with the test attribute(s) defined below."
         ],
         "test_attributes": [
-            "MinimumPasswordLength must be >= 14.",
+            "MinimumPasswordLength must be >= 20.",
             "At least 4 complexity types (RequireSymbols, RequireNumbers, RequireUppercaseCharacters, and RequireLowercaseCharacters) are set to True.",
             "PasswordReusePrevention must be >= 24."
         ]
@@ -116,6 +116,22 @@
         "test_attributes": [
             "BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets are set to true."
         ]
+    },
+    {
+        "control_id": "S3 Secure Transport",
+        "control_description": "S3 buckets are configured to encrypt data in-transit.",
+        "risk_rating": 3,
+        "is_excluded": false,
+        "result": "Fail",
+        "result_description": "Exceptions Noted. 3 S3 bucket(s) do not enforce secure transport (HTTPS).",
+        "test_procedures": [
+            "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
+            "Saved the list of S3 buckets in the audit evidence folder (S3/buckets.json).",
+            "Obtained the bucket policy for each bucket by calling the get_bucket_policy() boto3 command.",
+            "Saved the bucket policy for each S3 bucket (S3/buckets/[bucket_name]/bucket_policy.json).",
+            "Inspected each bucket policy to confirm a statement exists that denies requests when aws:SecureTransport is false."
+        ],
+        "test_attributes": []
     },
     {
         "control_id": "S3 Tags",
@@ -238,7 +254,7 @@
         "risk_rating": 0,
         "is_excluded": false,
         "result": "Fail",
-        "result_description": "Exceptions Noted. 2 region(s) do not have EBS default encryption enabled.",
+        "result_description": "Exceptions Noted. 4 region(s) do not have EBS default encryption enabled.",
         "test_procedures": [
             "For each in-scope region, obtained the EBS default encryption settings by calling get_ebs_encryption_by_default() boto3 command.",
             "Saved the results in the audit evidence folder (EC2/[region_name]/default_ebs_encryption.json).",
@@ -282,7 +298,7 @@
         "risk_rating": 1,
         "is_excluded": false,
         "result": "Fail",
-        "result_description": "Exceptions Noted. 4 security group(s) are missing required tags or have empty values.",
+        "result_description": "Exceptions Noted. 6 security group(s) are missing required tags or have empty values.",
         "test_procedures": [
             "For each in-scope region, obtained the list of EC2 security groups by calling describe_security_groups() boto3 command.",
             "Saved the list of security groups in the audit evidence folder (EC2/[region_name]/security_groups.json).",
@@ -391,6 +407,22 @@
             "Checked each API Gateway for WAF association.",
             "Saved the WAF association results (APIGateway/[region_name]/[api_id]/waf.json).",
             "Inspected each resource to determine if a WAF Web ACL is associated."
+        ],
+        "test_attributes": []
+    },
+    {
+        "control_id": "GuardDuty Enabled",
+        "control_description": "GuardDuty is enabled for all in-scope regions.",
+        "risk_rating": 3,
+        "is_excluded": false,
+        "result": "Fail",
+        "result_description": "Exceptions Noted. GuardDuty is not enabled for 3 in-scope region(s).",
+        "test_procedures": [
+            "For each in-scope region, obtained a list of GuardDuty detectors by calling the list_detectors() boto3 command.",
+            "Saved detector IDs in the audit evidence folder (GuardDuty/[region]/detectors.json).",
+            "Obtained detector configuration for each detector by calling the get_detector() boto3 command.",
+            "Saved each detector's configuration in the audit evidence folder (GuardDuty/[region]/[detector_id]/config.json).",
+            "Inspected each region to determine if at least one detector's 'Status' is set to ENABLED."
         ],
         "test_attributes": []
     }
