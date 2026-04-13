@@ -11,5 +11,5 @@
 | 7 | The production environment is monitored for suspicious or anomalous activity. Alerts are sent to the Security team for investigation, when necessary. | Partially Automated | [GuardDuty Enabled](GD_Enabled)<br>[GuardDuty_Alerts](/controls/GD_Alerts) |A.8.7|
 | 8 | Management conducts an infrastructure vulnerability scan on at least a quarterly basis. | Manual | Coming Soon |A.8.8|
 | 9.1 | Cloud resources are configured to encrypt data in-transit. | Automated | [S3_Secure_Transport](S3_Secure_Transport)|A.8.24|
-| 9.2 | Cloud resources are encrypted at rest. | Automated | [RDS_Encryption](/controls/RDS_Encryptiong)<br>[S3_Encryption](S3_Encryption) |A.8.9, A.8.24|
+| 9.2 | Cloud resources are encrypted at rest. | Automated | [RDS_Encryption](/controls/RDS_Encryption)<br>[S3_Encryption](S3_Encryption) |A.8.9, A.8.24|
 | 10 | Cloud resources are tagged based on the requirements set in the asset management policy. | Automated | [EC2 Tags](EC2_Tags)<br>[RDS Tags](/controls/RDS_Tags)<br>[S3 Tags](S3_Tags) |A.5.9, A.5.12|
