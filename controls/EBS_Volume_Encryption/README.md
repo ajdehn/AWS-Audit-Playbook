@@ -2,12 +2,12 @@
 EBS volumes are encrypted.
 
 ## Required Evidence
-* [ebsVolumes.json](/evidence_library/EBS/regions/us-east-1/ebsVolumes.json) provides a list of all EBS volumes within each in-scope region.
+* [ebsVolumes.json](/evidence_library/EC2/us-east-1/volumes.json) provides a list of all EBS volumes within each in-scope region.
   * This evidence is gathered by calling the [describe_volumes()](https://boto3.amazonaws.com/v1/documentation/api/1.35.9/reference/services/ec2/client/describe_volumes.html) command in Boto 3. 
 
 ## Testing Details
-1. For each in-scope region, review the [ebsVolumes.json](/evidence_library/EBS/regions/us-east-1/ebsVolumes.json) file and confirm the "Encryption" is enabled for each volume.
+1. For each in-scope region, review the [ebsVolumes.json](/evidence_library/EC2/us-east-1/volumes.json) file and confirm the "Encryption" is enabled for each volume.
 
 
 ## Other Resources
-- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=1449904500)
+- [Example Workpaper](/evidence_library/aws_audit_report.pdf)

@@ -13,4 +13,4 @@ S3 buckets are encrypted at rest.
 3. Confirm the "SSEAlgorithm" is "AES256" or "AWS:KMS" to confirm that encryption is enabled. If the bucket does not meet the requirement, check if there is a valid reason (ex. S3 Bucket contains only public-facing data and thus does not require encryption).
 
 ## Other Resources
-- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=1801900379)
+- [Example Workpaper](/evidence_library/aws_audit_report.pdf)

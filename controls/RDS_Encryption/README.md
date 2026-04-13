@@ -12,4 +12,4 @@ A rogue AWS employee steals hardware from the data center hosting your company's
 1. Confirm the "StorageEncrypted" field is **true** for each database within each region.
 
 ## Other Resources
-- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=164074275)
+- [Example Workpaper](/evidence_library/aws_audit_report.pdf)

@@ -10,4 +10,4 @@ EC2 instances have appropriate tags applied.
 2. For each EC2 instance, review the 'Tags' settings. Confirm all required tags are applied on each bucket as described in the organization's Data Classification Policy. Usually this policy requires assets to have an "Owner", "Description", and "Classification".
 
 ## Other Resources
-- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=1896997060)
+- [Example Workpaper](/evidence_library/aws_audit_report.pdf)

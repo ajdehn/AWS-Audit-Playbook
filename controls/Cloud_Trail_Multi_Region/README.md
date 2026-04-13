@@ -10,4 +10,4 @@ At least one multi-region CloudTrail is enabled with log-file validation.
 2. The multi-region & log file validation settings were reviewed for appropriateness as shown in Column C below.
 
 ## Other Resources
-- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=1065714791)
+- [Example Workpaper](/evidence_library/aws_audit_report.pdf)

@@ -14,4 +14,4 @@ A database administrator (DBA) accidentally deletes 10,000 records from your pro
 2. Confirm the "BackupRetentionPeriod" is **greater than or equal to** the number of days required by the organization's backup retention policy. If the database does not meet the requirement, check if there is a valid reason (ex. RDS instance does not host production data).
 
 ## Other Resources
-- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=1525441158)
+- [Example Workpaper](/evidence_library/aws_audit_report.pdf)

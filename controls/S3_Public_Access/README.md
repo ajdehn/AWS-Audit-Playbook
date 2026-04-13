@@ -13,4 +13,4 @@ S3 buckets are configured to block public access.
 3. Confirm the "BlockPublicAcls", "IgnorePublicAcls", "BlockPublicPolicy", and "RestrictPublicBuckets" are all set to true. If the bucket does not meet the requirements, check if there is a valid reason (ex. S3 Bucket is intended for public consumption and thus does not require block public access to be true).
 
 ## Other Resources
-- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=427799283)
+- [Example Workpaper](/evidence_library/aws_audit_report.pdf)

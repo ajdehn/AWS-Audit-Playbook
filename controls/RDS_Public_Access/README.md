@@ -12,4 +12,4 @@ Foreign adversaries discover that your RDS database is accessible to the interne
 1. Confirm the "PubliclyAccessible" setting for each in-scope database is set to false.
 
 ## Other Resources
-- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=1178605592)
+- [Example Workpaper](/evidence_library/aws_audit_report.pdf)

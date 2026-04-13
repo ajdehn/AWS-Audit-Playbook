@@ -13,4 +13,4 @@ Your AWS account has overly permissive firewall rules that are exposed to the in
 2. IA reviewed the 'Tags' settings for each security group to determine if it has the required tags as shown below.
 
 ## Other Resources
-- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=323546867#gid=323546867)
+- [Example Workpaper](/evidence_library/aws_audit_report.pdf)

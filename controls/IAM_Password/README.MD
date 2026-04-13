@@ -17,4 +17,4 @@ An engineer sets their IAM user's password as "Fall2025!". Their account is comp
 
 ## Other Resources
 - [Video: How to update IAM password settings](https://www.youtube.com/watch?v=Ma5jxRO1nUQ)
-- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=290595007)
+- [Example Workpaper](/evidence_library/aws_audit_report.pdf)

@@ -12,4 +12,4 @@ Your organization shares an IAM access key for a legacy data & analytics tool. T
 1. Open the [credentials_report.csv](/evidence_library/IAM/credentials_report.csv) and confirm that no users have an access key over 90 days old.
 
 ## Other Resources
-- [Example Workpaper](https://docs.google.com/spreadsheets/d/1bGfbXUTSzVCSGCWn7UtG6QN4wWeEKdrubygcCuDDjbI/edit?gid=1228234859)
+- [Example Workpaper](/evidence_library/aws_audit_report.pdf)
