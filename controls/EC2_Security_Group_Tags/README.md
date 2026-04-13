@@ -5,7 +5,7 @@ EC2 security groups have the proper tags applied, and have been reviewed in the 
 Your AWS account has overly permissive firewall rules that are exposed to the internet. This is exploited by a malicious actor who extracts sensitive data from your AWS resources.
 
 ## Required Evidence
-* [securityGroups.json](/evidence_library/EC2/regions/us-east-1/allSecurityGroups.json) provides a list of all EC2 security groups along with tags attached to each security group.
+* [security_groups](/evidence_library/EC2/us-east-1/security_groups.json) provides a list of all EC2 security groups along with tags attached to each security group.
   * This evidence is gathered by calling the [describe_security_groups()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/client/describe_security_groups.html) command in Boto 3. 
 
 ## Testing Details

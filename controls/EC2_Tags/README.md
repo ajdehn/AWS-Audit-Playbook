@@ -6,7 +6,7 @@ EC2 instances have appropriate tags applied.
   * This evidence is gathered by calling the [describe_instances()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/client/describe_instances.html) command in Boto 3. 
 
 ## Testing Details
-1. Review the listing of all EC2 instances in each region in the [instances.json](/evidence_library/EC2/regions/us-east-1/instances.json) file.
+1. Review the listing of all EC2 instances in each region in the [instances.json](/evidence_library/EC2/us-east-1/instances.json) file.
 2. For each EC2 instance, review the 'Tags' settings. Confirm all required tags are applied on each bucket as described in the organization's Data Classification Policy. Usually this policy requires assets to have an "Owner", "Description", and "Classification".
 
 ## Other Resources
