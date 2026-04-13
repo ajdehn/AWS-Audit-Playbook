@@ -167,6 +167,7 @@ def run_all_tests(audit):
         ("CloudTrail S3 Bucket Protection", test_cloudtrail_s3_bucket_protection),
         ("CloudTrail Logging Recent Stops", test_cloudtrail_logging_recent_stops),
         ("Web Application Firewall Enabled", test_waf_enabled),
+        ("GuardDuty Enabled", test_guardduty_enabled)
     ]
 
     controls = []
@@ -182,7 +183,6 @@ def run_all_tests(audit):
     # TODO: Add S3 object owner check
     # TODO: Add EC2 Public Ports (22, RDS, all ports, etc)
     # TODO: Add WAF Tags
-    # TODO: Add GuardDuty Enabled for regions with resources.
     # TODO: Add GuardDuty findings resolved within a set time period.
     # TODO: Add GuardDuty findings sent to EventBridge every 15 minutes (default is 6 hours).
 
@@ -1878,6 +1878,77 @@ def test_waf_enabled(audit, control_id, risk_rating=2):
     if not control.result:
         control.result_description = (
             f"Exceptions Noted. {control.num_findings} resource(s) do not have WAF enabled."
+        )
+
+    return control
+
+def test_guardduty_enabled(audit, control_id, risk_rating=3):
+    control = Control(
+        control_id=control_id,
+        control_description="GuardDuty is enabled for all in-scope regions.",
+        test_procedures=[
+            "For each in-scope region, obtained a list of GuardDuty detectors by calling the list_detectors() boto3 command.",
+            "Saved detector IDs in the audit evidence folder (GuardDuty/[region]/detectors.json).",
+            "Obtained detector configuration for each detector by calling the get_detector() boto3 command.",
+            "Saved each detector's configuration in the audit evidence folder (GuardDuty/[region]/[detector_id]/config.json).",
+            "Inspected each region to determine if at least one detector's 'Status' is set to ENABLED."
+        ],
+        test_attributes=[],
+        audit=audit,
+        table_headers=["Region", "Result", "Comments"],
+        risk_rating=risk_rating
+    )
+
+    if control.is_excluded:
+        return control
+
+    for region in audit.in_scope_regions:
+        gd = audit.session.client("guardduty", region_name=region)
+
+        sample = Sample(
+            sample_id={"region": region},
+            control_id=control_id
+        )
+
+        if process_sample_exclusion(control, sample, audit):
+            continue
+
+        detectors = audit.evidence_client.get_aws(
+            f"GuardDuty/{region}/detectors.json",
+            lambda: gd.list_detectors()
+        ).get("DetectorIds", [])
+
+        if not detectors:
+            sample.result = False
+            sample.comments = "No GuardDuty detectors in region."
+            control.samples.append(sample)
+            continue
+
+        enabled_detector_found = False
+
+        for detector_id in detectors:
+            config = audit.evidence_client.get_aws(
+                f"GuardDuty/{region}/{detector_id}/config.json",
+                lambda: gd.get_detector(DetectorId=detector_id)
+            )
+
+            if config.get("Status") == "ENABLED":
+                enabled_detector_found = True
+                break
+
+        if enabled_detector_found:
+            sample.result = True
+        else:
+            sample.result = False
+            sample.comments = "Detector(s) found but none are enabled."
+
+        control.samples.append(sample)
+
+    control.evaluate_samples()
+
+    if not control.result:
+        control.result_description = (
+            f"Exceptions Noted. GuardDuty is not enabled in {control.num_findings} of {len(audit.in_scope_regions)} in-scope region(s)."
         )
 
     return control
