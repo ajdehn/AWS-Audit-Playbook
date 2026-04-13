@@ -1,7 +1,7 @@
 # Control Library
 | Priority | Control Description | Evidence Type | Control Documentation | ISO 27001 Mapping|
 | ------------- | ------------- | ------------- | ------------- | ------------- |
-| 1 | Multi-factor authentication is configured for all users of critical systems. | Automated | [IAM MFA](/IAM_User_MFA)<br> |A.5.18, A.8.5|
+| 1 | Multi-factor authentication is configured for all users of critical systems. | Automated | [IAM MFA](IAM_User_MFA)<br> |A.5.18, A.8.5|
 | 2 | Infrastructure service account credentials are rotated at least once per year. | Automated | [IAM User Key Age](IAM_User_Key_Age) |A.5.18, A.8.5|
 | 3 | Audit logs are enabled to capture activity within the cloud infrastructure.| Automated | [CloudTrail Multi Region](Cloud_Trail_Multi_Region) |A.8.15|
 | 4 | Cloud resources are configured to block public access. | Automated | [S3_Public](/controls/S3_Public_Access)<br>[RDS_Public](RDS_Public_Access) |A.8.9|
