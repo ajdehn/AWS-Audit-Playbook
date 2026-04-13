@@ -1,0 +1,17 @@
+{
+    "ResponseMetadata": {
+        "RequestId": "7VVHKQ1B8NEGGNV1",
+        "HostId": "D46Adb3S96V3CsYbeoKeG8i8YExYrmCYpxuYVgQj5gdfBtaweJao6GZ0ihz0u6n+gsXQrMZo3L8=",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amz-id-2": "D46Adb3S96V3CsYbeoKeG8i8YExYrmCYpxuYVgQj5gdfBtaweJao6GZ0ihz0u6n+gsXQrMZo3L8=",
+            "x-amz-request-id": "7VVHKQ1B8NEGGNV1",
+            "date": "Mon, 13 Apr 2026 18:45:43 GMT",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "server": "AmazonS3"
+        },
+        "RetryAttempts": 0
+    },
+    "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::taylor-swift-secret-vault/*\"}]}"
+}
