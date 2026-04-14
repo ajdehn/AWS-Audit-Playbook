@@ -78,10 +78,10 @@ def render_audit_cover_page(audit, tool_name, styles, controls):
 
     disclaimers_list = ListFlowable(
         [
+            ListItem(Paragraph("This report was generated using the AWS Audit Playbook (https://github.com/ajdehn/AWS-Audit-Playbook).", LARGE_VALUE_STYLE)),
             ListItem(Paragraph("This project is maintained by AJ Dehn (founder of AuditOps.io).", LARGE_VALUE_STYLE)),
-            ListItem(Paragraph("Evidence supporting this audit was gathered directly from boto3 (AWS software development kit 'SDK' for Python).", LARGE_VALUE_STYLE)),
-            ListItem(Paragraph("Please review controlTesting.py for additional information on how evidence was gathered and testing was performed.", LARGE_VALUE_STYLE)),
-            ListItem(Paragraph("Conclusions in this report can be supported by a JSON file in the audit evidence folder.", LARGE_VALUE_STYLE)),
+            ListItem(Paragraph("Evidence used to conduct the audit was gathered directly from boto3 (AWS software development kit 'SDK' for Python).", LARGE_VALUE_STYLE)),
+            ListItem(Paragraph("Please review src/controlTesting.py for additional information on how evidence was gathered and testing was performed.", LARGE_VALUE_STYLE)),
             ListItem(Paragraph(f"Evidence used to produce this audit was gathered on {date_str}. Configurations may have changed since this report was generated.", LARGE_VALUE_STYLE))
         ],
         bulletType='bullet', bulletFontSize=11

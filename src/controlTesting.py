@@ -1866,14 +1866,18 @@ def test_waf_enabled(audit, control_id, risk_rating=2):
         control_id=control_id,
         control_description="WAF is enabled on Application Load Balancers and API Gateways.",
         test_procedures=[
-            "For each in-scope region, obtained the list of Application Load Balancers using describe_load_balancers() boto3 command.",
+            "For each in-scope region, obtained a list of Web ACLs by calling list_web_acls() boto3 command.",
+            "Saved the list of Web ACLs (WAF/[region]/web_acls.json).",
+            "For each Web ACL, obtained a list of associated resources by calling the list_resources_for_web_acl() boto3 command.",
+            "By default the list_resources_for_web_acl() only provide a list of Application Load Balancers.",
+            "Saved the Application Load Balancers associated with the ACL (WAF/[region]/[web_acl_name]/resources.json).",
+            "Re-ran the list_resources_for_web_acl() boto3 command to get the associated API Gateways.",     
+            "For each in-scope region, obtained a list of Application Load Balancers using describe_load_balancers() boto3 command.",
             "Saved the list of load balancers in the audit evidence folder (ELBv2/[region_name]/load_balancers.json).",
-            "For each load balancer, checked for WAF association using get_web_acl_for_resource() boto3 command.",
-            "Saved the WAF association results (ELBv2/[region_name]/load_balancers/[load_balancer_name]/waf.json).",
-            "For each in-scope region, obtained the list of API Gateways.",
-            "Checked each API Gateway for WAF association.",
-            "Saved the WAF association results (APIGateway/[region_name]/[api_id]/waf.json).",
-            "Inspected each resource to determine if a WAF Web ACL is associated."
+            "For each load balancer, checked if Load Balancer ARN was associated with a Web ACL.",
+            "For each in-scope region, obtained a list of API Gateways using get_rest_apis() boto3 command.",
+            "Saved the list of API Gateways in the audit evidence folder (APIGateway/[region_name]/rest_apis.json).",
+            "For each API gateway to check if it was associated with a Web ACL."
         ],
         test_attributes=[],
         audit=audit,
@@ -1888,6 +1892,38 @@ def test_waf_enabled(audit, control_id, risk_rating=2):
         waf = audit.session.client("wafv2", region_name=region)
         elbv2 = audit.session.client("elbv2", region_name=region)
         apigw = audit.session.client("apigateway", region_name=region)
+
+        # Get list of Web ACLs (REGIONAL scope for ALB + API Gateway)
+        web_acls = audit.evidence_client.get_aws(
+            f"WAF/{region}/web_acls.json",
+            lambda: waf.list_web_acls(Scope="REGIONAL")
+        )
+
+        # Preload WAF information
+        acl_to_alb_resources = {}
+        acl_to_api_resources = {}
+
+        for acl in web_acls.get("WebACLs", []):
+            web_acl_arn = acl["ARN"]
+            # ALBs
+            alb_resources = audit.evidence_client.get_aws(
+                f"WAF/{region}/{acl['Name']}/resources_alb.json",
+                lambda: waf.list_resources_for_web_acl(
+                    WebACLArn=web_acl_arn,
+                    ResourceType="APPLICATION_LOAD_BALANCER"
+                )
+            )
+            acl_to_alb_resources[web_acl_arn] = set(alb_resources.get("ResourceArns", []))
+
+            # API Gateway
+            api_resources = audit.evidence_client.get_aws(
+                f"WAF/{region}/{acl['Name']}/resources_apigw.json",
+                lambda: waf.list_resources_for_web_acl(
+                    WebACLArn=web_acl_arn,
+                    ResourceType="API_GATEWAY"
+                )
+            )
+            acl_to_api_resources[web_acl_arn] = set(api_resources.get("ResourceArns", []))        
 
         # ALBs
         lbs = audit.evidence_client.get_aws(
@@ -1916,14 +1952,17 @@ def test_waf_enabled(audit, control_id, risk_rating=2):
             if process_sample_exclusion(control, sample, audit):
                 continue
 
-            arn = lb.get("LoadBalancerArn")
+            lb_arn = lb.get("LoadBalancerArn")
+            if not lb_arn:
+                continue
+            alb_attached = False
 
-            waf_assoc = audit.evidence_client.get_aws(
-                f"ELBv2/{region}/load_balancers/{lb['LoadBalancerName']}/waf.json",
-                lambda: waf.get_web_acl_for_resource(ResourceArn=arn)
+            alb_attached = any(
+                lb_arn in resource_set
+                for resource_set in acl_to_alb_resources.values()
             )
 
-            if waf_assoc.get("WebACL"):
+            if alb_attached:
                 sample.result = True
             else:
                 sample.comments = "No WAF Web ACL associated."
@@ -1948,15 +1987,14 @@ def test_waf_enabled(audit, control_id, risk_rating=2):
 
             if process_sample_exclusion(control, sample, audit):
                 continue
-
-            resource_arn = f"arn:aws:apigateway:{region}::/restapis/{api['id']}/stages"
-
-            waf_assoc = audit.evidence_client.get_aws(
-                f"APIGateway/{region}/{api['id']}/waf.json",
-                lambda: waf.get_web_acl_for_resource(ResourceArn=resource_arn)
+            
+            api_gw_arn = f"arn:aws:apigateway:{region}::/restapis/{api['id']}"
+            api_gw_attached = any(
+                any(r.startswith(api_gw_arn) for r in resource_set)
+                for resource_set in acl_to_api_resources.values()
             )
 
-            if waf_assoc.get("WebACL"):
+            if api_gw_attached:
                 sample.result = True
             else:
                 sample.comments = "No WAF Web ACL associated."
