@@ -840,9 +840,9 @@ def test_rds_encryption(audit, control_id, risk_rating=2):
         control_id=control_id,
         control_description="RDS instances are encrypted at rest.",
         test_procedures=[
-            "For each in-scope region, obtained the list of DB instances by calling the describe_db_instances() boto3 command.",
-            "Saved the list of DB instances (RDS/[region_name]/db_instances.json).",
-            "Inspected the database configuration for each instance(s) to determine if 'StorageEncrypted' was set to True."
+            "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
+            "For each in-scope region, saved the list of RDS instances: RDS/region_name/db_instances.json.",
+            "For each RDS instance, inspected the `StorageEncrypted` setting to determine if it was set to `true`."
         ],
         test_attributes=[],
         audit=audit,
@@ -892,9 +892,9 @@ def test_rds_public_access(audit, control_id, risk_rating=3):
         control_id=control_id,
         control_description="RDS instances are not publicly accessible.",
         test_procedures=[
-            "For each in-scope region, obtained the list of DB instances by calling the describe_db_instances() boto3 command.",
-            "Saved the list of DB instances (RDS/[region_name]/db_instances.json).",
-            "Inspected the database configuration for each instance(s) to determine if 'PubliclyAccessible' was set to False."
+            "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
+            "For each in-scope region, saved the list of RDS instances: RDS/[region_name]/db_instances.json)",
+            "For each RDS instance, inspected the 'PubliclyAccessible' setting to determine if it was set to 'false'."
         ],
         test_attributes=[],
         audit=audit,
@@ -952,10 +952,9 @@ def test_rds_tags(audit, control_id, risk_rating=1):
             "RDS instances must have required tags applied and tag values must not be empty."
         ),
         test_procedures=[
-            "For each in-scope region, obtained the list of DB instances by calling describe_db_instances() boto3 command.",
-            "Saved the list of DB instances in the audit evidence folder (RDS/[region_name]/db_instances.json).",
-            "For each DB instance, obtained its tags using list_tags_for_resource() boto3 command.",
-            f"Inspected each DB instance to determine if the following tag keys exist and have non-empty values: {required_tags}"
+            "For each in-scope region, obtained a list of RDS instances by calling describe_db_instances() boto3 command.",
+            "For each in-scope region, saved the list of RDS instances: RDS/[region_name]/db_instances.json).",
+            f"For each RDS instance, reviewed the `TagList` to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
         test_attributes=[],
         audit=audit,
@@ -988,14 +987,7 @@ def test_rds_tags(audit, control_id, risk_rating=1):
             if process_sample_exclusion(control, sample, audit):
                 continue
 
-            arn = db.get("DBInstanceArn")
-            tags_response = audit.evidence_client.get_aws(
-                f"RDS/{region}/db_instances/{db['DBInstanceIdentifier']}/tags.json",
-                lambda: rds.list_tags_for_resource(ResourceName=arn)
-            )
-
-            actual_db_tags = {t["Key"]: t.get("Value", "") for t in tags_response.get("TagList", [])}
-
+            actual_db_tags = {t["Key"]: t.get("Value", "") for t in db.get("TagList", [])}
             evaluate_tags(sample, required_tags, actual_db_tags)
             control.samples.append(sample)
 
@@ -1014,9 +1006,9 @@ def test_rds_backup_retention(audit, control_id, risk_rating=1):
         control_id=control_id,
         control_description=f"RDS backups are retained for at least {required_rds_retention_days} days.",
         test_procedures=[
-            "For each in-scope region, obtained the list of DB instances by calling the describe_db_instances() boto3 command.",
-            "Saved the list of DB instances (RDS/[region_name]/db_instances.json).",
-            f"Inspected the database configuration for each instance(s) to determine if BackupRetentionPeriod was >= {required_rds_retention_days} days."
+            "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
+            "For each in-scope region, saved the list of RDS instances: RDS/[region_name]/db_instances.json.",
+            f"For each RDS instance, inspected the `BackupRetentionPeriod` to determine if it is greater than or equal to {required_rds_retention_days} days."
         ],
         test_attributes=[],
         audit=audit,
@@ -1064,9 +1056,9 @@ def test_rds_auto_minor_version_upgrade(audit, control_id, risk_rating=1):
         control_id=control_id,
         control_description="RDS instances have automatic minor version upgrades enabled.",
         test_procedures=[
-            "For each in-scope region, obtained the list of DB instances by calling the describe_db_instances() boto3 command.",
-            "Saved the list of DB instances (RDS/[region_name]/db_instances.json).",
-            "Inspected the database configuration for each instance to determine if 'AutoMinorVersionUpgrade' was set to True."
+            "For each in-scope region, obtained a list of DB instances by calling the describe_db_instances() boto3 command.",
+            "For each in-scope region, saved the list of RDS instances: RDS/[region_name]/db_instances.json.",
+            "For each RDS instance, inspected the 'AutoMinorVersionUpgrade' setting to determine if it was set to 'true'."
         ],
         test_attributes=[],
         audit=audit,
@@ -1122,9 +1114,9 @@ def test_rds_deletion_protection(audit, control_id, risk_rating=2):
         control_id=control_id,
         control_description="RDS instances have deletion protection enabled at the cluster or instance level.",
         test_procedures=[
-            "For each in-scope region, obtained the list of DB instances and DB clusters using describe_db_instances() and describe_db_clusters() boto3 commands.",
-            "Saved the list of DB instances (RDS/[region_name]/db_instances.json) and DB clusters (RDS/[region_name]/db_clusters.json).",
-            "Inspected each DB instance to determine if DeletionProtection was set to True at the instance or cluster level."
+            "For each in-scope region, obtained a list of RDS instances and RDS clusters using describe_db_instances() and describe_db_clusters() boto3 commands.",
+            "Saved the list of RDS instances: RDS/[region_name]/db_instances.json and DB clusters: RDS/[region_name]/db_clusters.json.",
+            "Inspected each RDS instance to determine if 'DeletionProtection' was set to 'true' at the instance or cluster level."
         ],
         test_attributes=[],
         audit=audit,
