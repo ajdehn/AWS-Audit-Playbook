@@ -479,8 +479,8 @@ def test_iam_password_policy(audit, control_id, risk_rating=2):
             f"IAM passwords must comply with the organizations password complexity requirements."
         ),      
         test_procedures=[
-            "Obtained IAM password configuration by using the account_password_policy() boto3 command.",
-            "Saved the password configuration in the audit evidence folder (IAM/password_policy.json).",
+            "Obtained the IAM password configuration by calling the get_account_password_policy() boto3 command.",
+            "Saved the AWS password policy: IAM/password_policy.json.",
             "Inspected the password configuration to determine if they comply with the test attribute(s) defined below."
         ],
         test_attributes=[
@@ -600,8 +600,8 @@ def test_root_mfa_enabled(audit, control_id, risk_rating=3):
         control_description="Root account has MFA enabled.",
         test_procedures=[
             "Obtained the AWS account summary by calling the get_account_summary() boto3 command.",
-            "Saved the account summary in the audit evidence folder (IAM/account_summary.json)",
-            "Inspected the account summary to determine if it 'AccountMFAEnabled' is set to 1."
+            "Saved the account summary: IAM/account_summary.json",
+            "Inspected the account summary to determine if 'AccountMFAEnabled' is set to 1."
         ],
         test_attributes=[],
         audit=audit,
@@ -634,16 +634,17 @@ def test_iam_users_mfa(audit, control_id, risk_rating=3):
         control_description="IAM users with an active console password have MFA enabled.",
         test_procedures=[
             "Obtained a list of IAM users by calling the list_users() boto3 command.",
-            "Saved the list of users in the audit evidence folder (IAM/users.json).",
-            "For each user, checked if they have a console login profile using get_login_profile() boto3 command.",
+            "Saved the list of IAM users: IAM/users.json.",
+            "For each IAM user, obtained the login profile information by calling the get_login_profile() boto3 command.",
+            "For each IAM user, saved the login profile: IAM/users/[user_name]/login_profile.json.",
             "Saved the login profile for each user in the audit evidence folder (IAM/users/[user_name]/login_profile.json).",
-            "For users with a login profile, obtained MFA devices using list_mfa_devices() boto3 command.",
-            "Saved the MFA devices for each user in the audit evidence folder (IAM/users/[user_name]/mfa_devices.json).",
-            "Inspected each user's MFA devices to determine if at least one MFA device is enabled."
+            "For each IAM user with a login profile, obtained the MFA device information by calling the list_mfa_devices() boto3 command.",
+            "For each IAM user with a login profile, saved the MFA device information: IAM/users/[user_name]/mfa_devices.json]",
+            "For each IAM user with a login profile, inspected mfa_devices.json to determine if at least one MFA device is registered."
         ],
         test_attributes=[],
         audit=audit,
-        table_headers=["User Name", "Result", "Comments"],
+        table_headers=["IAM User Name", "Result", "Comments"],
         risk_rating=risk_rating
     )
 
@@ -715,16 +716,16 @@ def test_iam_users_mfa(audit, control_id, risk_rating=3):
 
 def test_iam_access_key_age(audit, control_id, risk_rating=3):
     control_config = audit.config.get("control_config") or {}
-    max_age_days = control_config.get("iam_key_max_age", 365)
+    max_age_days = control_config.get("iam_key_max_age", 90)
 
     control = Control(
         control_id=control_id,
         control_description=f"IAM access keys are rotated at least every {max_age_days} days.",
         test_procedures=[
             "Obtained a list of IAM users by calling the list_users() boto3 command.",
-            "Saved the list of IAM users in the audit evidence folder (IAM/users.json).",
-            "Obtained the access keys attached to each IAM user by calling the list_access_keys() boto3 command.",
-            "Saved the access keys for each user IAM/users/[user_name]/access_keys.json",
+            "Saved the list of IAM users: IAM/users.json.",
+            "For each IAM user, obtained access key metadata by calling the list_access_keys() boto3 command.",
+            "For each IAM user, saved access key metadata: IAM/users/[user_name]/access_keys.json",
             "Inspected the 'AccessKeyMetadata' for each user to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=[
