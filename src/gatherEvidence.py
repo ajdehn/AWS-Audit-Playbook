@@ -35,12 +35,9 @@ def main():
 
     config = checkConfigFile(config)
     saveIAMEvidence(config)
-    saveS3Evidence(config)
     saveGuardDutyEvidence(config)
     saveEC2Evidence(config) # NOTE: This saves evidence for both EC2 & EBS
-    saveRDSEvidence(config)
     saveEventBridgeEvidence(config)
-    saveCloudTrailEvidence(config)
 
 """
     Check if config file is valid. Raises an error if the config file is misconfigured.
@@ -166,16 +163,6 @@ def saveIAMEvidence(config):
             groupMembership = fetchData(iam_client.list_groups_for_user, UserName=user['UserName'])
             saveJson(groupMembership, f"audit_evidence/IAM/users/{user['UserName']}/group_membership.json")
 
-    if config['IAM_PWD']:
-        try:
-            passwordPolicy = iam_client.get_account_password_policy()
-            saveJson(passwordPolicy, 'audit_evidence/IAM/password_policy.json')
-        except ClientError as e:
-            if e.response["Error"]["Code"] == "NoSuchEntity":
-                print("WARNING: IAM Password Policy has not been set.")
-            else:
-                raise
-
 
 def saveEC2Evidence(config):
     if not any ([config['EBS_Encryption'], config['EC2_Tags'], config['EC2_Public_Security_Groups']]):
@@ -186,12 +173,6 @@ def saveEC2Evidence(config):
     for region in config['inScopeRegions']:
         try:
             ec2_client = boto3.client('ec2', region_name=region)
-            if config['EBS_Encryption']:
-                allVolumes = fetchData(ec2_client.describe_volumes)
-                saveJson(allVolumes, f'audit_evidence/EC2/regions/{region}/allVolumes.json')
-            if config['EC2_Tags']:
-                allInstances = fetchData(ec2_client.describe_instances)
-                saveJson(allInstances, f'audit_evidence/EC2/regions/{region}/allInstances.json')
             if config['EC2_Public_Security_Groups']:
                 allSecurityGroups = fetchData(ec2_client.describe_security_groups)
                 saveJson(allSecurityGroups, f'audit_evidence/EC2/regions/{region}/allSecurityGroups.json')
@@ -204,77 +185,6 @@ def saveEC2Evidence(config):
             else:
                 raise   
 
-
-def saveS3Evidence(config):
-    if not any ([config['S3_Encrypt'], config['S3_Public'], config['S3_Tags']]):
-        # No S3 tests are in-scope.
-        print('All S3 options set to false.  Skipping.')
-        return
-    print('Gathering S3 evidence')
-    s3_client = boto3.client('s3')
-    # Get all S3 buckets
-    allBuckets = s3_client.list_buckets()
-    saveJson(allBuckets, 'audit_evidence/S3/all_s3_buckets.json')
-    # Save necessary evidence for each bucket.
-    for bucket in allBuckets['Buckets']:
-        bucketName = bucket['Name']
-        # TODO: Improve error handling
-        if config['S3_Encrypt']:
-            # Collect & save encryption evidence
-            try:
-                bucketEncryption = s3_client.get_bucket_encryption(Bucket=bucketName)
-                saveJson(bucketEncryption, f"audit_evidence/S3/buckets/{bucketName}/encryption_settings.json")
-            except ClientError as e:
-                print(f"Warning: unable to collect S3 encryption settings for {bucket['Name']}.")
-                pass
-        if config['S3_Public']:
-            # Collect & save public access settings        
-            try:
-                publicBucketSettings = s3_client.get_public_access_block(Bucket=bucketName)
-                saveJson(publicBucketSettings, f"audit_evidence/S3/buckets/{bucketName}/public_access_settings.json")
-            except ClientError as e:
-                print(f"Warning: unable to collect S3 public access settings for {bucket['Name']}.")
-                pass
-        if config['S3_Secure_Transport']:
-            # Collect & save bucket policy       
-            try:
-                bucketPolicy = s3_client.get_bucket_policy(Bucket=bucketName)
-                saveJson(bucketPolicy, f"audit_evidence/S3/buckets/{bucketName}/bucket_policy.json")
-            except ClientError as e:
-                print(f"Warning: unable to obtain S3 bucket policy for {bucket['Name']}.")
-                pass        
-        if config['S3_Tags']:   
-            # Collect & save bucket tags
-            try:
-                bucketTags = s3_client.get_bucket_tagging(Bucket=bucketName) 
-                saveJson(bucketTags, f"audit_evidence/S3/buckets/{bucket['Name']}/bucket_tags.json")
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'NoSuchTagSet':
-                    print(f"Info: {bucket['Name']} does not have any tags set.")
-                    pass
-                else:
-                    print(f"Warning: script was unable to check for or collect S3 tags for {bucket['Name']}.")
-                    pass
-
-def saveRDSEvidence(config):
-    if not any ([config['RDS_Encrypt'], config['RDS_Public'], config['RDS_Tags']]):
-        # No RDS tests are in-scope.
-        print('All RDS options set to false.  Skipping.')
-        return    
-    print('Gathering RDS evidence')
-    for region in config['inScopeRegions']:
-        try:
-            rds_client = boto3.client('rds', region_name=region)
-            allDatabases = fetchData(rds_client.describe_db_instances)
-            saveJson(allDatabases, f'audit_evidence/RDS/regions/{region}.json')
-        except Exception as e:
-            print("Exception in region: ", region)
-            if 'InvalidClientTokenId' in e.response['Error']['Code']:
-                # NOTE: Error handling for opt-in only regions (ex. af-south-1).
-                # If this error occurs, this region is not utilized.
-                pass
-            else:
-                raise
 
 def saveGuardDutyEvidence(config):
     if not any ([config['GD_Alerts'], config['GD_Enabled'], config['GD_Findings']]):
@@ -351,15 +261,6 @@ def saveEventBridgeEvidence(config):
                                 saveJson(topicSubscriptions, f"audit_evidence/SNS/{region}/{topicName}.json")
     else:
         print('Skipping EventBridge becuase GuardDuty Alerts were not selected for evidence gathering.')    
-
-def saveCloudTrailEvidence(config):
-    if config['Cloud_Trail_Multi_Region']:
-        print('Gathering CloudTrail evidence')
-        cld_trail_client = boto3.client('cloudtrail')
-        allTrails = cld_trail_client.describe_trails(includeShadowTrails=True)
-        saveJson(allTrails, 'audit_evidence/CloudTrail/all_trails.json')
-    else:
-        print('Skipping CloudTrail because Multi Region was not selected for evidence gathering.')
 
 """
     Saves a json file to a specified path
