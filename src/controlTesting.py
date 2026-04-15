@@ -194,10 +194,10 @@ def test_s3_encryption(audit, control_id, risk_rating=2):
         control_description="S3 buckets are encrypted at rest.",
         test_procedures=[
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
-            "Saved the list of S3 buckets in the audit evidence folder (S3/buckets.json).",
-            "Obtained the encryption settings for each bucket by calling the get_bucket_encryption() boto3 command.",
-            "Saved the encryption settings for each S3 bucket (S3/[bucket_name]/encryption.json).",
-            "Inspected the encryption settings for each bucket to determine if they comply with the test attribute(s) below."
+            "Saved the list of buckets: S3/buckets.json.",
+            "For each S3 bucket, obtained the encryption settings by calling the get_bucket_encryption() boto3 command.",
+            "For each S3 bucket, saved the encryption settings: S3/[bucket_name]/encryption.json.",
+            "For each S3 bucket, inspected the encryption settings to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=["ServerSideEncryptionConfiguration is present in encryption.json."],
         audit=audit,
@@ -245,10 +245,10 @@ def test_s3_public_access(audit, control_id, risk_rating=3):
         control_description="S3 buckets are configured to block public access.",
         test_procedures=[
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
-            "Saved the list of S3 buckets in the audit evidence folder (S3/buckets.json).",
-            "Obtained the public access block settings for each bucket by calling the get_public_access_block() boto3 command.",
-            "Saved the public access block settings for each S3 bucket (S3/[bucket_name]/public_access_block.json).",
-            "Inspected the public access block settings for each bucket to determine if they comply with the test attribute(s) below."
+            "Saved the list of buckets: S3/buckets.json.",
+            "For each bucket, obtained the public access block settings by calling the get_public_access_block() boto3 command.",
+            "For each bucket, saved the public access block settings: S3/[bucket_name]/public_access_block.json.",
+            "For each bucket, inspected the public access block settings to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=["BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets are set to true."],
         audit=audit,
@@ -329,10 +329,10 @@ def test_s3_tags(audit, control_id, risk_rating=1):
         ),
         test_procedures=[
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
-            "Saved the list of S3 buckets in the audit evidence folder (S3/buckets.json).",
-            "For each bucket, obtained its tags by calling get_bucket_tagging() boto3 command.",
-            "Saved the tags for each bucket in the audit evidence folder (S3/[bucket_name]/tags.json).",
-            f"Inspected each bucket to determine if the following tag keys exist and have non-empty values: {required_tags}"
+            "Saved the list of buckets: S3/buckets.json.",
+            "For each bucket, obtained its tags by calling the get_bucket_tagging() boto3 command.",
+            "For each bucket, saved the tags: S3/[bucket_name]/tags.json.",
+            f"For each bucket, inspected the tags to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
         test_attributes=[],
         audit=audit,
@@ -383,10 +383,10 @@ def test_s3_secure_transport(audit, control_id, risk_rating=0):
         control_description= "S3 buckets are configured to encrypt data in-transit.",
         test_procedures=[
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
-            "Saved the list of S3 buckets in the audit evidence folder (S3/buckets.json).",
-            "Obtained the bucket policy for each bucket by calling the get_bucket_policy() boto3 command.",
-            "Saved the bucket policy for each S3 bucket (S3/buckets/[bucket_name]/bucket_policy.json).",
-            "Inspected each bucket policy to confirm a statement exists that denies requests when aws:SecureTransport is false."
+            "Saved the list of buckets: S3/buckets.json.",
+            "For each bucket, obtained the bucket policy by calling the get_bucket_policy() boto3 command.",
+            "For each bucket, saved the bucket policy: S3/buckets/[bucket_name]/bucket_policy.json.",
+            "For each bucket, inspected the bucket policy to determine if a statement exists that denies requests when aws:SecureTransport is false."
         ],
         test_attributes=[],
         audit=audit,
@@ -479,8 +479,8 @@ def test_iam_password_policy(audit, control_id, risk_rating=2):
             f"IAM passwords must comply with the organizations password complexity requirements."
         ),      
         test_procedures=[
-            "Obtained IAM password configuration by using the account_password_policy() boto3 command.",
-            "Saved the password configuration in the audit evidence folder (IAM/password_policy.json).",
+            "Obtained the IAM password configuration by calling the get_account_password_policy() boto3 command.",
+            "Saved the AWS password policy: IAM/password_policy.json.",
             "Inspected the password configuration to determine if they comply with the test attribute(s) defined below."
         ],
         test_attributes=[
@@ -600,8 +600,8 @@ def test_root_mfa_enabled(audit, control_id, risk_rating=3):
         control_description="Root account has MFA enabled.",
         test_procedures=[
             "Obtained the AWS account summary by calling the get_account_summary() boto3 command.",
-            "Saved the account summary in the audit evidence folder (IAM/account_summary.json)",
-            "Inspected the account summary to determine if it 'AccountMFAEnabled' is set to 1."
+            "Saved the account summary: IAM/account_summary.json",
+            "Inspected the account summary to determine if 'AccountMFAEnabled' is set to 1."
         ],
         test_attributes=[],
         audit=audit,
@@ -634,16 +634,17 @@ def test_iam_users_mfa(audit, control_id, risk_rating=3):
         control_description="IAM users with an active console password have MFA enabled.",
         test_procedures=[
             "Obtained a list of IAM users by calling the list_users() boto3 command.",
-            "Saved the list of users in the audit evidence folder (IAM/users.json).",
-            "For each user, checked if they have a console login profile using get_login_profile() boto3 command.",
+            "Saved the list of IAM users: IAM/users.json.",
+            "For each IAM user, obtained the login profile information by calling the get_login_profile() boto3 command.",
+            "For each IAM user, saved the login profile: IAM/users/[user_name]/login_profile.json.",
             "Saved the login profile for each user in the audit evidence folder (IAM/users/[user_name]/login_profile.json).",
-            "For users with a login profile, obtained MFA devices using list_mfa_devices() boto3 command.",
-            "Saved the MFA devices for each user in the audit evidence folder (IAM/users/[user_name]/mfa_devices.json).",
-            "Inspected each user's MFA devices to determine if at least one MFA device is enabled."
+            "For each IAM user with a login profile, obtained the MFA device information by calling the list_mfa_devices() boto3 command.",
+            "For each IAM user with a login profile, saved the MFA device information: IAM/users/[user_name]/mfa_devices.json]",
+            "For each IAM user with a login profile, inspected mfa_devices.json to determine if at least one MFA device is registered."
         ],
         test_attributes=[],
         audit=audit,
-        table_headers=["User Name", "Result", "Comments"],
+        table_headers=["IAM User Name", "Result", "Comments"],
         risk_rating=risk_rating
     )
 
@@ -715,16 +716,16 @@ def test_iam_users_mfa(audit, control_id, risk_rating=3):
 
 def test_iam_access_key_age(audit, control_id, risk_rating=3):
     control_config = audit.config.get("control_config") or {}
-    max_age_days = control_config.get("iam_key_max_age", 365)
+    max_age_days = control_config.get("iam_key_max_age", 90)
 
     control = Control(
         control_id=control_id,
         control_description=f"IAM access keys are rotated at least every {max_age_days} days.",
         test_procedures=[
             "Obtained a list of IAM users by calling the list_users() boto3 command.",
-            "Saved the list of IAM users in the audit evidence folder (IAM/users.json).",
-            "Obtained the access keys attached to each IAM user by calling the list_access_keys() boto3 command.",
-            "Saved the access keys for each user IAM/users/[user_name]/access_keys.json",
+            "Saved the list of IAM users: IAM/users.json.",
+            "For each IAM user, obtained access key metadata by calling the list_access_keys() boto3 command.",
+            "For each IAM user, saved access key metadata: IAM/users/[user_name]/access_keys.json",
             "Inspected the 'AccessKeyMetadata' for each user to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=[
@@ -840,9 +841,9 @@ def test_rds_encryption(audit, control_id, risk_rating=2):
         control_id=control_id,
         control_description="RDS instances are encrypted at rest.",
         test_procedures=[
-            "For each in-scope region, obtained the list of DB instances by calling the describe_db_instances() boto3 command.",
-            "Saved the list of DB instances (RDS/[region_name]/db_instances.json).",
-            "Inspected the database configuration for each instance(s) to determine if 'StorageEncrypted' was set to True."
+            "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
+            "For each in-scope region, saved the list of RDS instances: RDS/region_name/db_instances.json.",
+            "For each RDS instance, inspected the `StorageEncrypted` setting to determine if it was set to `true`."
         ],
         test_attributes=[],
         audit=audit,
@@ -892,9 +893,9 @@ def test_rds_public_access(audit, control_id, risk_rating=3):
         control_id=control_id,
         control_description="RDS instances are not publicly accessible.",
         test_procedures=[
-            "For each in-scope region, obtained the list of DB instances by calling the describe_db_instances() boto3 command.",
-            "Saved the list of DB instances (RDS/[region_name]/db_instances.json).",
-            "Inspected the database configuration for each instance(s) to determine if 'PubliclyAccessible' was set to False."
+            "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
+            "For each in-scope region, saved the list of RDS instances: RDS/[region_name]/db_instances.json)",
+            "For each RDS instance, inspected the 'PubliclyAccessible' setting to determine if it was set to 'false'."
         ],
         test_attributes=[],
         audit=audit,
@@ -952,10 +953,9 @@ def test_rds_tags(audit, control_id, risk_rating=1):
             "RDS instances must have required tags applied and tag values must not be empty."
         ),
         test_procedures=[
-            "For each in-scope region, obtained the list of DB instances by calling describe_db_instances() boto3 command.",
-            "Saved the list of DB instances in the audit evidence folder (RDS/[region_name]/db_instances.json).",
-            "For each DB instance, obtained its tags using list_tags_for_resource() boto3 command.",
-            f"Inspected each DB instance to determine if the following tag keys exist and have non-empty values: {required_tags}"
+            "For each in-scope region, obtained a list of RDS instances by calling describe_db_instances() boto3 command.",
+            "For each in-scope region, saved the list of RDS instances: RDS/[region_name]/db_instances.json).",
+            f"For each RDS instance, reviewed the `TagList` to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
         test_attributes=[],
         audit=audit,
@@ -988,14 +988,7 @@ def test_rds_tags(audit, control_id, risk_rating=1):
             if process_sample_exclusion(control, sample, audit):
                 continue
 
-            arn = db.get("DBInstanceArn")
-            tags_response = audit.evidence_client.get_aws(
-                f"RDS/{region}/db_instances/{db['DBInstanceIdentifier']}/tags.json",
-                lambda: rds.list_tags_for_resource(ResourceName=arn)
-            )
-
-            actual_db_tags = {t["Key"]: t.get("Value", "") for t in tags_response.get("TagList", [])}
-
+            actual_db_tags = {t["Key"]: t.get("Value", "") for t in db.get("TagList", [])}
             evaluate_tags(sample, required_tags, actual_db_tags)
             control.samples.append(sample)
 
@@ -1014,9 +1007,9 @@ def test_rds_backup_retention(audit, control_id, risk_rating=1):
         control_id=control_id,
         control_description=f"RDS backups are retained for at least {required_rds_retention_days} days.",
         test_procedures=[
-            "For each in-scope region, obtained the list of DB instances by calling the describe_db_instances() boto3 command.",
-            "Saved the list of DB instances (RDS/[region_name]/db_instances.json).",
-            f"Inspected the database configuration for each instance(s) to determine if BackupRetentionPeriod was >= {required_rds_retention_days} days."
+            "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
+            "For each in-scope region, saved the list of RDS instances: RDS/[region_name]/db_instances.json.",
+            f"For each RDS instance, inspected the `BackupRetentionPeriod` to determine if it is greater than or equal to {required_rds_retention_days} days."
         ],
         test_attributes=[],
         audit=audit,
@@ -1064,9 +1057,9 @@ def test_rds_auto_minor_version_upgrade(audit, control_id, risk_rating=1):
         control_id=control_id,
         control_description="RDS instances have automatic minor version upgrades enabled.",
         test_procedures=[
-            "For each in-scope region, obtained the list of DB instances by calling the describe_db_instances() boto3 command.",
-            "Saved the list of DB instances (RDS/[region_name]/db_instances.json).",
-            "Inspected the database configuration for each instance to determine if 'AutoMinorVersionUpgrade' was set to True."
+            "For each in-scope region, obtained a list of DB instances by calling the describe_db_instances() boto3 command.",
+            "For each in-scope region, saved the list of RDS instances: RDS/[region_name]/db_instances.json.",
+            "For each RDS instance, inspected the 'AutoMinorVersionUpgrade' setting to determine if it was set to 'true'."
         ],
         test_attributes=[],
         audit=audit,
@@ -1122,9 +1115,9 @@ def test_rds_deletion_protection(audit, control_id, risk_rating=2):
         control_id=control_id,
         control_description="RDS instances have deletion protection enabled at the cluster or instance level.",
         test_procedures=[
-            "For each in-scope region, obtained the list of DB instances and DB clusters using describe_db_instances() and describe_db_clusters() boto3 commands.",
-            "Saved the list of DB instances (RDS/[region_name]/db_instances.json) and DB clusters (RDS/[region_name]/db_clusters.json).",
-            "Inspected each DB instance to determine if DeletionProtection was set to True at the instance or cluster level."
+            "For each in-scope region, obtained a list of RDS instances and RDS clusters using describe_db_instances() and describe_db_clusters() boto3 commands.",
+            "Saved the list of RDS instances: RDS/[region_name]/db_instances.json and DB clusters: RDS/[region_name]/db_clusters.json.",
+            "Inspected each RDS instance to determine if 'DeletionProtection' was set to 'true' at the instance or cluster level."
         ],
         test_attributes=[],
         audit=audit,
@@ -1212,13 +1205,12 @@ def test_ec2_security_group_tags(audit, control_id, risk_rating=1):
     control = Control(
         control_id=control_id,
         control_description=(
-            "EC2 security groups must have required tags applied and tag values must not be empty."
+            "EC2 security groups have required tags applied and tag values are not be empty."
         ),
         test_procedures=[
-            "For each in-scope region, obtained the list of EC2 security groups by calling describe_security_groups() boto3 command.",
-            "Saved the list of security groups in the audit evidence folder (EC2/[region_name]/security_groups.json).",
-            "For each security group, obtained its tags from the 'Tags' attribute.",
-            f"Inspected each security group's tags to determine if the following tag keys exist and have non-empty values: {required_tags}"
+            "For each in-scope region, obtained a list of EC2 security groups by calling describe_security_groups() boto3 command.",
+            "For each in-scope region, saved the list of security groups: EC2/[region]/security_groups.json",
+            f"Inspected each security group's 'Tags' attribute to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
         test_attributes=[],
         audit=audit,
@@ -1286,9 +1278,8 @@ def test_ec2_tags(audit, control_id, risk_rating=1):
         ),
         test_procedures=[
             "For each in-scope region, obtained the list of EC2 instances by calling describe_instances() boto3 command.",
-            "Saved the list of instances in the audit evidence folder (EC2/[region_name]/instances.json).",
-            "For each instance, obtained its tags from the 'Tags' attribute.",
-            f"Inspected each EC2 instance to determine if the following tag keys exist and have non-empty values: {required_tags}"
+            "For each in-scope AWS region, saved the list of EC2 instances: EC2/[region_name]/instances.json",
+            f"For each EC2 instance, reviewed the 'Tags' to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
         test_attributes=[],
         audit=audit,
@@ -1347,9 +1338,9 @@ def test_ebs_volume_encryption(audit, control_id, risk_rating=2):
         control_id=control_id,
         control_description="EBS volumes are encrypted at rest.",
         test_procedures=[
-            "For each in-scope region, obtained the list of EBS volumes by calling describe_volumes() boto3 command.",
-            "Saved the list of volumes in the audit evidence folder (EC2/[region_name]/volumes.json).",
-            "Inspected the configuration for each volume to determine if 'Encrypted' attribute was set to true."
+            "For each in-scope region, obtained a list of EBS volumes by calling describe_volumes() boto3 command.",
+            "For each in-scope region, saved the list of EBS volumes: EC2/[region_name]/volumes.json.",
+            "For each EBS volume, inspected the 'Encrypted' attribute to determine it is set to 'true'."
         ],
         test_attributes=[],
         audit=audit,
@@ -1473,8 +1464,8 @@ def test_ebs_default_encryption(audit, control_id, risk_rating=0):
         control_description="EBS volumes must have default encryption enabled in each region.",
         test_procedures=[
             "For each in-scope region, obtained the EBS default encryption settings by calling get_ebs_encryption_by_default() boto3 command.",
-            "Saved the results in the audit evidence folder (EC2/[region_name]/default_ebs_encryption.json).",
-            "Inspected the configuration for each region to determine if 'EbsEncryptionByDefault' was set to True."
+            "For each in-scope region, saved the EBS default encryption settings: EC2/[region_name]/default_ebs_encryption.json.",
+            "Inspected the configuration for each region to determine if 'EbsEncryptionByDefault' is set to True."
         ],
         test_attributes=[],
         audit=audit,
@@ -1594,14 +1585,15 @@ def test_cloudtrail_global_logging(audit, control_id, risk_rating=3):
         control_id=control_id,
         control_description="At least one multi-region CloudTrail trail has logging enabled.",
         test_procedures=[
-            "Obtained CloudTrail trails using the describe_trails() boto3 command.",
-            "Saved the trail configuration in the audit evidence folder (CloudTrail/trails.json).",
-            "Obtained the status of each multi-region trail using the get_trail_status() boto3 command.",
-            "Saved the trail status in the audit evidence folder (CloudTrail/trails/[trail_name]/trail_status.json).",
+            "Obtained a list of CloudTrail trails by calling the describe_trails() boto3 command.",
+            "Saved the list of CloudTrail trails: CloudTrail/trails.json.",
+            "For each CloudTrail trail, inspected the trail configuration to determine whether 'IsMultiRegionTrail' is set to 'true'.",
+            "For each multi-region trail, obtained the trail status by calling the get_trail_status() boto3 command.",
+            "For each multi-region trail, saved the trail status: CloudTrail/trails/[trail_name]/trail_status.json.",
             "Inspected the trail configuration and status to determine if at least one trail complies with the test attribute(s) defined below."
         ],
         test_attributes=[
-            "At least one trail must have IsMultiRegionTrail = True and IsLogging = True."
+            "At least one trail must have IsMultiRegionTrail = true and IsLogging = true."
         ],
         audit=audit,
         risk_rating=risk_rating
@@ -2015,10 +2007,10 @@ def test_guardduty_enabled(audit, control_id, risk_rating=3):
         control_description="GuardDuty is enabled for all in-scope regions.",
         test_procedures=[
             "For each in-scope region, obtained a list of GuardDuty detectors by calling the list_detectors() boto3 command.",
-            "Saved detector IDs in the audit evidence folder (GuardDuty/[region]/detectors.json).",
-            "Obtained detector configuration for each detector by calling the get_detector() boto3 command.",
-            "Saved each detector's configuration in the audit evidence folder (GuardDuty/[region]/[detector_id]/config.json).",
-            "Inspected each region to determine if at least one detector's 'Status' is set to ENABLED."
+            "For each in-scope region, saved the list of detector IDs: GuardDuty/[region]/detectors.json.",
+            "For each detector ID, obtained detector configuration by calling the get_detector() boto3 command.",
+            "For each detector ID, saved the detector configuration: GuardDuty/[region]/[detector_id]/config.json.",
+            "For each detector ID, inspected the detector configuration to determine whether 'Status' is set to 'ENABLED'."
         ],
         test_attributes=[],
         audit=audit,

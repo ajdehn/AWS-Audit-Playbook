@@ -4,16 +4,14 @@ S3 buckets in the AWS account have appropriate tags applied.
 ## Example Risk
 Your lead DevOps engineer wins the lottery and walks away with $100 million dollars. You never hear from them again, and your team is unable to maintain your AWS account.
 
-## Required Evidence
-* [buckets.json](/evidence_library/S3/buckets.json) provides a list of all S3 buckets.
-  * This evidence is gathered by calling the [list_buckets()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_buckets.html) command in Boto3.
-* [bucket_tags.json](/evidence_library/S3/buckets/itauditguy/bucket_tags.json) provides the tags for an individual S3 bucket.
-  * This evidence is gathered by calling the [get_bucket_tagging()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3control/client/get_bucket_tagging.html) command in Boto3.
-
-## Testing Details
-1. Review the full listing of all S3 buckets in the [buckets.json](/evidence_library/S3/buckets.json) file.
-2. For each S3 bucket, review the [bucket_tags.json](/evidence_library/S3/buckets/itauditguy/bucket_tags.json) file.
-3. Confirm all required tags are applied on each bucket as described in the organization's Data Classification Policy. Usually this policy requires assets to have an "Owner", "Description", and "Classification".
+## Test Procedures
+1. Obtained a list of S3 buckets by calling the [list_buckets()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_buckets.html) boto3 command.
+2. Saved the list of buckets: [S3/buckets.json](/evidence_library/S3/buckets.json).
+3. For each bucket, obtained its tags by calling the [get_bucket_tagging()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/get_bucket_tagging.html) boto3 command.
+4. For each bucket, saved the attached tags: [S3/[bucket_name]/tags.json)](/evidence_library/S3/buckets/itauditguy/bucket_tags.json).
+5. For each bucket, inspected the tags to determine if the required tags exist and contain non-empty values.
+  * By default, the playbook requires the following tags: "Owner", "Description", "Classification".
+  * If you want to change the default required tags, please add them under 's3_required_tags' in the 'control_config' section of the config.json file.
 
 ## Other Resources
 - [Example Workpaper](/evidence_library/aws_audit_report.pdf)
