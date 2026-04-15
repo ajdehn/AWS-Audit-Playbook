@@ -194,10 +194,10 @@ def test_s3_encryption(audit, control_id, risk_rating=2):
         control_description="S3 buckets are encrypted at rest.",
         test_procedures=[
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
-            "Saved the list of S3 buckets in the audit evidence folder (S3/buckets.json).",
-            "Obtained the encryption settings for each bucket by calling the get_bucket_encryption() boto3 command.",
-            "Saved the encryption settings for each S3 bucket (S3/[bucket_name]/encryption.json).",
-            "Inspected the encryption settings for each bucket to determine if they comply with the test attribute(s) below."
+            "Saved the list of buckets: S3/buckets.json.",
+            "For each S3 bucket, obtained the encryption settings by calling the get_bucket_encryption() boto3 command.",
+            "For each S3 bucket, saved the encryption settings: S3/[bucket_name]/encryption.json.",
+            "For each S3 bucket, inspected the encryption settings to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=["ServerSideEncryptionConfiguration is present in encryption.json."],
         audit=audit,
@@ -245,10 +245,10 @@ def test_s3_public_access(audit, control_id, risk_rating=3):
         control_description="S3 buckets are configured to block public access.",
         test_procedures=[
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
-            "Saved the list of S3 buckets in the audit evidence folder (S3/buckets.json).",
-            "Obtained the public access block settings for each bucket by calling the get_public_access_block() boto3 command.",
-            "Saved the public access block settings for each S3 bucket (S3/[bucket_name]/public_access_block.json).",
-            "Inspected the public access block settings for each bucket to determine if they comply with the test attribute(s) below."
+            "Saved the list of buckets: S3/buckets.json.",
+            "For each bucket, obtained the public access block settings by calling the get_public_access_block() boto3 command.",
+            "For each bucket, saved the public access block settings: S3/[bucket_name]/public_access_block.json.",
+            "For each bucket, inspected the public access block settings to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=["BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets are set to true."],
         audit=audit,
@@ -329,10 +329,10 @@ def test_s3_tags(audit, control_id, risk_rating=1):
         ),
         test_procedures=[
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
-            "Saved the list of S3 buckets in the audit evidence folder (S3/buckets.json).",
-            "For each bucket, obtained its tags by calling get_bucket_tagging() boto3 command.",
-            "Saved the tags for each bucket in the audit evidence folder (S3/[bucket_name]/tags.json).",
-            f"Inspected each bucket to determine if the following tag keys exist and have non-empty values: {required_tags}"
+            "Saved the list of buckets: S3/buckets.json.",
+            "For each bucket, obtained its tags by calling the get_bucket_tagging() boto3 command.",
+            "For each bucket, saved the tags: S3/[bucket_name]/tags.json.",
+            f"For each bucket, inspected the tags to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
         test_attributes=[],
         audit=audit,
@@ -383,10 +383,10 @@ def test_s3_secure_transport(audit, control_id, risk_rating=0):
         control_description= "S3 buckets are configured to encrypt data in-transit.",
         test_procedures=[
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
-            "Saved the list of S3 buckets in the audit evidence folder (S3/buckets.json).",
-            "Obtained the bucket policy for each bucket by calling the get_bucket_policy() boto3 command.",
-            "Saved the bucket policy for each S3 bucket (S3/buckets/[bucket_name]/bucket_policy.json).",
-            "Inspected each bucket policy to confirm a statement exists that denies requests when aws:SecureTransport is false."
+            "Saved the list of buckets: S3/buckets.json.",
+            "For each bucket, obtained the bucket policy by calling the get_bucket_policy() boto3 command.",
+            "For each bucket, saved the bucket policy: S3/buckets/[bucket_name]/bucket_policy.json.",
+            "For each bucket, inspected the bucket policy to determine if a statement exists that denies requests when aws:SecureTransport is false."
         ],
         test_attributes=[],
         audit=audit,
