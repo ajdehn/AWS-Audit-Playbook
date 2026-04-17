@@ -380,7 +380,7 @@ def test_s3_tags(audit, control_id, risk_rating=1):
 def test_s3_secure_transport(audit, control_id, risk_rating=0):
     control = Control(
         control_id=control_id,
-        control_description= "S3 buckets are configured to encrypt data in-transit.",
+        control_description= "S3 buckets are configured to deny unencrypted data in-transit.",
         test_procedures=[
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
             "Saved the list of buckets: S3/buckets.json.",

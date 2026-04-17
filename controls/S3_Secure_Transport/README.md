@@ -1,5 +1,5 @@
 ## Control Description
-S3 buckets are configured to encrypt data in-transit.
+S3 buckets are configured to deny unencrypted data in-transit.
 
 ## Example Risk
 An engineer accidentally uses HTTP when uploading sensitive documents to an S3 bucket. They are working from a coffee shop, and the traffic is intercepted giving the attacker a list of your customer's bank account numbers.

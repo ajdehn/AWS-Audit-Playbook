@@ -79,7 +79,6 @@ def render_audit_cover_page(audit, tool_name, styles, controls):
     disclaimers_list = ListFlowable(
         [
             ListItem(Paragraph("This report was generated using the AWS Audit Playbook (https://github.com/ajdehn/AWS-Audit-Playbook).", LARGE_VALUE_STYLE)),
-            ListItem(Paragraph("This project is maintained by AJ Dehn (founder of AuditOps.io).", LARGE_VALUE_STYLE)),
             ListItem(Paragraph("Evidence used to conduct the audit was gathered directly from boto3 (AWS software development kit 'SDK' for Python).", LARGE_VALUE_STYLE)),
             ListItem(Paragraph("Please review src/controlTesting.py for additional information on how evidence was gathered and testing was performed.", LARGE_VALUE_STYLE)),
             ListItem(Paragraph(f"Evidence used to produce this audit was gathered on {date_str}. Configurations may have changed since this report was generated.", LARGE_VALUE_STYLE))
@@ -192,13 +191,12 @@ def render_summary_page(controls, styles):
     control_summary_data = []
     # Header row
     control_summary_data.append([
-        Paragraph("Control ID", LABEL_STYLE), Paragraph("Control Description", LABEL_STYLE), 
-        Paragraph("Results", LABEL_STYLE), Paragraph("Comments", LABEL_STYLE)
+        Paragraph("Control Description", LABEL_STYLE), Paragraph("Results", LABEL_STYLE), 
+        Paragraph("Risk Level", LABEL_STYLE),  Paragraph("Comments", LABEL_STYLE)
     ])
     # Detailed Findings
     for control in controls:
         row = []
-        row.append(Paragraph(str(control.control_id), VALUE_STYLE))
         row.append(Paragraph(str(control.control_description), VALUE_STYLE))
         if control.is_excluded:
             control_result = "Out of Scope"
@@ -206,13 +204,14 @@ def render_summary_page(controls, styles):
         else:
             control_result = "Pass" if control.result else "Fail"
             result_color = PASS_COLOR if control.result else FAIL_COLOR
-            row.append(Paragraph(f"<font color='{result_color}'>{control_result}</font>", CENTER_STYLE))
+            row.append(Paragraph(f"<font color='{result_color}'>{control_result}</font>", VALUE_STYLE))
+        row.append(Paragraph(str(control.risk_rating_str), VALUE_STYLE))
         # TODO: Add control exclusion rationale to table.
         row.append(Paragraph(control.result_description, VALUE_STYLE))
         
         control_summary_data.append(row)
 
-    control_summary_table = Table(control_summary_data, colWidths=[100, 200, 75, 125])
+    control_summary_table = Table(control_summary_data, colWidths=[200, 75, 75, 125])
     control_summary_table.setStyle(TABLE_STYLE_HIGHLIGHT_ROW)
     elements.append(control_summary_table)
     return elements
