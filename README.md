@@ -11,8 +11,8 @@ This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) foun
    - The script creates a new folder (tmp/audit_evidence) that you can zip and share with your auditor.
 - A [report builder](./src/buildReport.py) to create an [AWS Audit Report](./evidence_library/aws_audit_report.pdf).
 - A [library](./evidence_library/) of example audit evidence created from the script with the supporting JSON files.
-- List of [controls](./controls/) with detailed guidance of how to test each control.
-- A [JSON audit report](./evidence_library/controls.json) is also included. This is a machine readable audit report and cleanly displays the test procedures and control findings.
+- List of [tests](./tests/) with detailed testing procedures.
+- A [JSON audit report](./evidence_library/test_results.json) is also included. This is a machine readable audit report and cleanly displays the test procedures and findings.
 
 ## Setup Instructions
 1. Install pre-requisites:
@@ -56,7 +56,7 @@ This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) foun
 role_arn = "arn:aws:iam::111222333444:role/aws_audit_playbook"  # Update with your actual role arn.
 external_id = "a1b2c3d4e5f6g7h8i9"  # Update with your actual external id.
 ```
-10. Optional: Create and populate the config file (example below). Use this to define control requirements (test_config) and exclude controls and samples that aren't in-scope.
+10. Optional: Create and populate the config file (example below). Use this to define test requirements (test_config) and exclude tests and samples that aren't in-scope.
 ```
 {
   "test_config": {
@@ -73,7 +73,7 @@ external_id = "a1b2c3d4e5f6g7h8i9"  # Update with your actual external id.
   },
   "test_exclusions": {
     "EXAMPLE TEST ID": {
-      "rationale": "Based on discussion with DevOps, we agreed this control is not needed to mitigate risk.",
+      "rationale": "Based on discussion with DevOps, we agreed this test is not needed to mitigate risk.",
       "permanent": true,
       "expiration_date": null,
       "approvers": [
@@ -81,7 +81,7 @@ external_id = "a1b2c3d4e5f6g7h8i9"  # Update with your actual external id.
       ]
     },
     "EXAMPLE TEST ID 2": {
-      "rationale": "Engineering is currently implementing this control. Pausing monitoring until December 31st, 2026.",
+      "rationale": "Engineering is currently implementing this test. Pausing monitoring until December 31st, 2026.",
       "permanent": false,
       "expiration_date": "2026-12-31",
       "approvers": [
