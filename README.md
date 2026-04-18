@@ -9,7 +9,7 @@ This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) foun
 ## Project Overview
 - A read-only [script](./src/aws_tests.py) to generate and evaluate audit evidence (no screenshots required).
    - The script creates a new folder (tmp/audit_evidence) that you can zip and share with your auditor.
-- A [report builder](./src/buildReport.py) to create an [AWS Audit Report](./evidence_library/aws_audit_report.pdf).
+- A [report builder](./src/build_report.py) to create an [AWS Audit Report](./evidence_library/aws_audit_report.pdf).
 - A [library](./evidence_library/) of example audit evidence created from the script with the supporting JSON files.
 - List of [tests](./tests/) with detailed testing procedures.
 - A [JSON audit report](./evidence_library/test_results.json) is also included. This is a machine readable audit report and cleanly displays the test procedures and findings.
