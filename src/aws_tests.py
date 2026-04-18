@@ -141,6 +141,13 @@ def run_test_safely(audit, test_fn, test_id):
         return test
 
 def run_all_tests(audit):
+    # TODO: Add IAM tests (IAM User Stale Access Keys)
+    # TODO: Add S3 object owner check
+    # TODO: Add EC2 Public Ports (22, RDS, all ports, etc)
+    # TODO: Add WAF Tags
+    # TODO: Add GuardDuty findings resolved within a set time period.
+    # TODO: Add GuardDuty findings sent to EventBridge every 15 minutes (default is 6 hours).
+
     test_definitions = [
         ("IAM Root MFA", test_root_mfa_enabled),
         ("IAM Root Access Key", test_root_no_access_keys),
@@ -170,22 +177,10 @@ def run_all_tests(audit):
         ("Web Application Firewall Enabled", test_waf_enabled),
         ("GuardDuty Enabled", test_guardduty_enabled)
     ]
-
     tests = []
     for test_id, test_fn in test_definitions:
         tests.append(run_test_safely(audit, test_fn, test_id))
     
-    # Save test results JSON file.
-    with open(f"tmp/test_results.json", "w") as f:
-        json.dump([t.to_dict() for t in tests], f, indent=4)
-
-    # TODO: Add IAM tests (IAM User Stale Access Keys)
-    # TODO: Add S3 object owner check
-    # TODO: Add EC2 Public Ports (22, RDS, all ports, etc)
-    # TODO: Add WAF Tags
-    # TODO: Add GuardDuty findings resolved within a set time period.
-    # TODO: Add GuardDuty findings sent to EventBridge every 15 minutes (default is 6 hours).
-
     return tests
 
 def test_s3_encryption(audit, test_id, risk_rating=2):
