@@ -93,10 +93,10 @@ def load_config(file_path):
         raise ValueError(f"Invalid JSON in config: {file_path}")
 
 """
-Returns True if the control is excluded.
+Returns True if the test is excluded.
 """
-def is_control_excluded(control_id, config):
-    exclusion = config.get("control_exclusions", {}).get(control_id, {})
+def is_test_excluded(test_id, config):
+    exclusion = config.get("test_exclusions", {}).get(test_id, {})
     if not exclusion:
         return False     
     return is_exclusion_active(exclusion)
@@ -122,8 +122,8 @@ def is_exclusion_active(exclusion):
 
     return False
 
-def process_sample_exclusion(control, sample, audit):
-    exclusions = audit.config.get("sample_exclusions", {}).get(control.control_id, [])
+def process_sample_exclusion(test, sample, audit):
+    exclusions = audit.config.get("sample_exclusions", {}).get(test.test_id, [])
     if not isinstance(exclusions, list):
         return False  # Invalid sample exclusion structure
 
@@ -136,12 +136,12 @@ def process_sample_exclusion(control, sample, audit):
         if all(sample.sample_id.get(k) == v for k, v in config_sample_id.items()):
                 sample.is_excluded = True
                 sample.comments = "Sample is excluded. See config.json"
-                control.samples.append(sample)
+                test.samples.append(sample)
                 return True
 
     return False
 
-def process_control_pass_fail(sample, condition, fail_msg):
+def process_test_pass_fail(sample, condition, fail_msg):
     if condition:
         sample.result = True
     else:

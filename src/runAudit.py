@@ -1,4 +1,4 @@
-import controlTesting
+import aws_tests
 from utils import confirm_delete_folder, load_config, create_session, get_aws_account_id
 from buildReport import generate_pdf_report
 from evidenceClient import EvidenceClient
@@ -13,7 +13,7 @@ class Audit:
         self.config = load_config(config_file_path)                 # Control and sample exclusions
         self.evidence_client = EvidenceClient(base_path=evidence_folder, debug=False)
         self.session = create_session()
-        self.in_scope_regions = controlTesting.get_regions(self)        
+        self.in_scope_regions = aws_tests.get_regions(self)        
         self.aws_account_id = get_aws_account_id(self)
 
 if __name__ == "__main__":
@@ -24,7 +24,7 @@ if __name__ == "__main__":
     confirm_delete_folder(evidence_folder)
 
     audit = Audit(evidence_folder=evidence_folder)
-    controls = controlTesting.run_all_tests(audit)
-    generate_pdf_report(audit, controls, "AWS", file_name="tmp/aws_audit_report.pdf")
+    tests = aws_tests.run_all_tests(audit)
+    generate_pdf_report(audit, tests, "AWS", file_name="tmp/aws_audit_report.pdf")
 
     # TODO: Support uploads to evidence repository (include PDF and supporting evidence).

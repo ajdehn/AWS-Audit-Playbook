@@ -7,8 +7,8 @@ from botocore.exceptions import ClientError
 
 def main():
     # TODO: Update the in-scope regions (Ex. "inScopeRegions":['us-east-1','us-east-2']). If left empty, all regions will be included.
-    # TODO: Mark controls as 'False' if they are not in-scope for the audit. This will ensure you only save the necessary evidence.
-    # You can find all controls here: https://github.com/ajdehn/AWS-Audit-Playbook/tree/main/controls
+    # TODO: Mark tests as 'null' if they are not in-scope for the audit. This will ensure you only save the necessary evidence.
+    # You can find all tests here: https://github.com/ajdehn/AWS-Audit-Playbook/tree/main/tests
     config = {
         "inScopeRegions": [],
         "Cloud_Trail_Multi_Region": True,
@@ -57,15 +57,15 @@ def checkConfigFile(config):
         if region not in awsRegionList:
             raise ValueError(f"{region} is not a valid region. Please update the config file.")
     
-        # Check if each control is in the config file, and confirm that the value is boolean.
-    allControls = ['Cloud_Trail_Multi_Region', 'EBS_Encryption', 'EC2_Public_Security_Groups', 'EC2_Tags',
+        # Check if each test is in the config file, and confirm that the value is boolean.
+    allTests = ['Cloud_Trail_Multi_Region', 'EBS_Encryption', 'EC2_Public_Security_Groups', 'EC2_Tags',
                    'GD_Alerts', 'GD_Enabled', 'GD_Findings', 'IAM_Admin', 'IAM_Key_Age', 'IAM_MFA', 'IAM_PWD',
                    'IAM_UAR', 'RDS_Backup', 'RDS_Encrypt', 'RDS_Public', 'RDS_Tags', 'S3_Encrypt', 'S3_Secure_Transport', 'S3_Public', 'S3_Tags']
-    for controlName in allControls:
-        if config.get(controlName) is None:
-            raise KeyError(f"Invalid configuration. {controlName} is not in the config file")
-        elif not isinstance(config[controlName], bool):
-            raise ValueError(f"Invalid configuration. {controlName} should be True or False")
+    for testName in allTests:
+        if config.get(testName) is None:
+            raise KeyError(f"Invalid configuration. {testName} is not in the config file")
+        elif not isinstance(config[testName], bool):
+            raise ValueError(f"Invalid configuration. {testName} should be True or False")
 
     # If regions list is empty, make all regions in scope.
     if len(config['inScopeRegions']) == 0:

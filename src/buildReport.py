@@ -41,7 +41,7 @@ def format_count_with_pct(count, total):
 """
     Build first page of the audit report.
 """
-def render_audit_cover_page(audit, tool_name, styles, controls):
+def render_audit_cover_page(audit, tool_name, styles, tests):
     elements = []
     # Header and audit metadata
     elements.append(Paragraph(f"{tool_name} Audit Report", styles["Title"]))
@@ -51,16 +51,16 @@ def render_audit_cover_page(audit, tool_name, styles, controls):
     elements.append(Spacer(1, 12))
 
     date_str = datetime.now(timezone.utc).strftime('%Y-%m-%d')
-    total = len(controls)
-    failed = sum(1 for c in controls if not c.result)
-    excluded = sum(1 for c in controls if c.is_excluded)
+    total = len(tests)
+    failed = sum(1 for c in tests if not c.result)
+    excluded = sum(1 for c in tests if c.is_excluded)
     passed = total - failed - excluded
 
     audit_metadata = [
         [Paragraph("Prepared By", LABEL_STYLE), Paragraph("AJ Dehn", VALUE_STYLE)], 
         [Paragraph("Date", LABEL_STYLE), Paragraph(str(date_str), VALUE_STYLE)],
         [Paragraph("AWS Account ID", LABEL_STYLE), Paragraph(str(audit.aws_account_id), VALUE_STYLE)],
-        [Paragraph("Number of controls", LABEL_STYLE), Paragraph(str(total), VALUE_STYLE)], 
+        [Paragraph("Number of tests", LABEL_STYLE), Paragraph(str(total), VALUE_STYLE)], 
         [Paragraph("Passed", LABEL_STYLE), Paragraph(format_count_with_pct(passed, total), VALUE_STYLE)],
         [Paragraph("Failed", LABEL_STYLE), Paragraph(format_count_with_pct(failed, total), VALUE_STYLE)],
         [Paragraph("Out of Scope", LABEL_STYLE), Paragraph(format_count_with_pct(excluded, total), VALUE_STYLE)]
@@ -80,7 +80,7 @@ def render_audit_cover_page(audit, tool_name, styles, controls):
         [
             ListItem(Paragraph("This report was generated using the AWS Audit Playbook (https://github.com/ajdehn/AWS-Audit-Playbook).", LARGE_VALUE_STYLE)),
             ListItem(Paragraph("Evidence used to conduct the audit was gathered directly from boto3 (AWS software development kit 'SDK' for Python).", LARGE_VALUE_STYLE)),
-            ListItem(Paragraph("Please review src/controlTesting.py for additional information on how evidence was gathered and testing was performed.", LARGE_VALUE_STYLE)),
+            ListItem(Paragraph("Please review src/aws_tests.py for additional information on how evidence was gathered and testing was performed.", LARGE_VALUE_STYLE)),
             ListItem(Paragraph(f"Evidence used to produce this audit was gathered on {date_str}. Configurations may have changed since this report was generated.", LARGE_VALUE_STYLE))
         ],
         bulletType='bullet', bulletFontSize=11
@@ -93,29 +93,29 @@ def render_audit_cover_page(audit, tool_name, styles, controls):
     return elements
 
 """
-    Render 2-column control summary table.
+    Render 2-column test summary table.
 """
-def render_control_summary(control, page_width):
+def render_test_summary(test, page_width):
     test_procedures = [
         Paragraph(f"{i+1}. {item}", LIST_STYLE)
-        for i, item in enumerate(control.test_procedures)
+        for i, item in enumerate(test.test_procedures)
     ]
     test_attributes = [
         Paragraph(f"• {item}", LIST_STYLE)
-        for item in control.test_attributes
+        for item in test.test_attributes
     ]
 
     # Conclusion
     conclusion = Paragraph(
-        f"<font color='{PASS_COLOR if control.result else FAIL_COLOR}'><b>{'Pass' if control.result else 'Fail'}</b></font>",
+        f"<font color='{PASS_COLOR if test.result else FAIL_COLOR}'><b>{'Pass' if test.result else 'Fail'}</b></font>",
         VALUE_STYLE
     )
     
     # Build summary table
     table_data = [
-        [Paragraph("Control ID", LABEL_STYLE), Paragraph(control.control_id, VALUE_STYLE)], 
-        [Paragraph("Control Description", LABEL_STYLE), Paragraph(control.control_description, VALUE_STYLE)],
-        [Paragraph("Risk Rating", LABEL_STYLE), Paragraph(control.risk_rating_str, VALUE_STYLE)],
+        [Paragraph("Test ID", LABEL_STYLE), Paragraph(test.test_id, VALUE_STYLE)], 
+        [Paragraph("Test Description", LABEL_STYLE), Paragraph(test.test_description, VALUE_STYLE)],
+        [Paragraph("Risk Rating", LABEL_STYLE), Paragraph(test.risk_rating_str, VALUE_STYLE)],
         [Paragraph("Test Procedures", LABEL_STYLE), test_procedures], 
         [Paragraph("Conclusion", LABEL_STYLE), conclusion],
     ]
@@ -124,9 +124,9 @@ def render_control_summary(control, page_width):
         # Add test attributes only when populated.
         table_data.insert(4, [Paragraph("Test Attributes", LABEL_STYLE), test_attributes])
 
-    # Add row to summary table if control failed and result_description is populated.
-    if not control.result and control.result_description:
-        table_data.append([Paragraph("Comments", LABEL_STYLE), Paragraph(control.result_description, VALUE_STYLE)])
+    # Add row to summary table if test failed and result_description is populated.
+    if not test.result and test.result_description:
+        table_data.append([Paragraph("Comments", LABEL_STYLE), Paragraph(test.result_description, VALUE_STYLE)])
 
     table_width = page_width - 2 * 72
     table = Table(table_data, colWidths=[table_width * 0.25, table_width * 0.75])
@@ -137,21 +137,21 @@ def render_control_summary(control, page_width):
 """
     Render sample results table (if present).
 """
-def render_sample_table(control, page_width):
-    if not control.table_headers:
+def render_sample_table(test, page_width):
+    if not test.table_headers:
         return None
 
     # Sort failing samples to top of the table.
-    control.samples = sorted(control.samples, key=lambda s: (s.result))
+    test.samples = sorted(test.samples, key=lambda s: (s.result))
 
     table_data = []
     # Header row
     table_data.append([
-        Paragraph(h, LABEL_STYLE) for h in control.table_headers
+        Paragraph(h, LABEL_STYLE) for h in test.table_headers
     ])
-    for i, sample in enumerate(control.samples, 1):
+    for i, sample in enumerate(test.samples, 1):
         row = []
-        if control.include_sample_number:
+        if test.include_sample_number:
             row.append(Paragraph(str(i), CENTER_STYLE))
         row.extend([
             Paragraph(str(v), VALUE_STYLE)
@@ -182,38 +182,38 @@ def render_sample_table(control, page_width):
     return table
 
 """Build summary elements with pass/fail counts."""
-def render_summary_page(controls, styles):
+def render_summary_page(tests, styles):
     elements = []
 
-    elements.append(Paragraph("Control Summary", styles["Heading1"]))
+    elements.append(Paragraph("Test Summary", styles["Heading1"]))
     elements.append(Spacer(1, 12))
 
-    control_summary_data = []
+    test_summary_data = []
     # Header row
-    control_summary_data.append([
-        Paragraph("Control Description", LABEL_STYLE), Paragraph("Results", LABEL_STYLE), 
+    test_summary_data.append([
+        Paragraph("Test Description", LABEL_STYLE), Paragraph("Results", LABEL_STYLE), 
         Paragraph("Risk Level", LABEL_STYLE),  Paragraph("Comments", LABEL_STYLE)
     ])
     # Detailed Findings
-    for control in controls:
+    for test in tests:
         row = []
-        row.append(Paragraph(str(control.control_description), VALUE_STYLE))
-        if control.is_excluded:
-            control_result = "Out of Scope"
-            row.append(Paragraph(control_result, CENTER_STYLE))
+        row.append(Paragraph(str(test.test_description), VALUE_STYLE))
+        if test.is_excluded:
+            test_result = "Out of Scope"
+            row.append(Paragraph(test_result, CENTER_STYLE))
         else:
-            control_result = "Pass" if control.result else "Fail"
-            result_color = PASS_COLOR if control.result else FAIL_COLOR
-            row.append(Paragraph(f"<font color='{result_color}'>{control_result}</font>", VALUE_STYLE))
-        row.append(Paragraph(str(control.risk_rating_str), VALUE_STYLE))
-        # TODO: Add control exclusion rationale to table.
-        row.append(Paragraph(control.result_description, VALUE_STYLE))
+            test_result = "Pass" if test.result else "Fail"
+            result_color = PASS_COLOR if test.result else FAIL_COLOR
+            row.append(Paragraph(f"<font color='{result_color}'>{test_result}</font>", VALUE_STYLE))
+        row.append(Paragraph(str(test.risk_rating_str), VALUE_STYLE))
+        # TODO: Add test exclusion rationale to table.
+        row.append(Paragraph(test.result_description, VALUE_STYLE))
         
-        control_summary_data.append(row)
+        test_summary_data.append(row)
 
-    control_summary_table = Table(control_summary_data, colWidths=[200, 75, 75, 125])
-    control_summary_table.setStyle(TABLE_STYLE_HIGHLIGHT_ROW)
-    elements.append(control_summary_table)
+    test_summary_table = Table(test_summary_data, colWidths=[200, 75, 75, 125])
+    test_summary_table.setStyle(TABLE_STYLE_HIGHLIGHT_ROW)
+    elements.append(test_summary_table)
     return elements
 
 
@@ -222,15 +222,14 @@ Build audit report summarizing findings.
 
 Structure:
     1. Cover Page
-    2. Controls Summary
-    3. Detailed Findings
-        - Control Summary
-        - Sample Findings
+    2. Test Summary Results
+    3. Detailed Test Findings
+        - Optional: Sample Table
 """
-def generate_pdf_report(audit, controls, tool_name, file_name="tmp/audit_report.pdf"):
+def generate_pdf_report(audit, tests, tool_name, file_name="tmp/audit_report.pdf"):
 
-    # Sort controls by controls that are failing, and then by risk rating.
-    controls = sorted(controls, key=lambda c: (c.result, -c.risk_rating))
+    # Sort by failing tests, and then by risk rating.
+    tests = sorted(tests, key=lambda c: (c.result, -c.risk_rating))
 
     doc = SimpleDocTemplate(file_name, pagesize=letter,
     title=f"{tool_name} Audit Report", author="AJ Dehn", subject=f"Summarizes audit findings from {tool_name}")
@@ -238,22 +237,22 @@ def generate_pdf_report(audit, controls, tool_name, file_name="tmp/audit_report.
     page_width, _ = LETTER
     elements = []
 
-    elements.extend(render_audit_cover_page(audit, tool_name, styles, controls))
+    elements.extend(render_audit_cover_page(audit, tool_name, styles, tests))
 
     # Summary Page
-    elements.extend(render_summary_page(controls, styles))
+    elements.extend(render_summary_page(tests, styles))
     elements.append(PageBreak())
 
     # Detailed Findings
-    for control in controls:
-        if not control.is_excluded:
-            summary_table = render_control_summary(control, page_width)
+    for test in tests:
+        if not test.is_excluded:
+            summary_table = render_test_summary(test, page_width)
             elements.append(KeepTogether(summary_table))
             elements.append(Spacer(1, 16))
-            sample_table = render_sample_table(control, page_width)
+            sample_table = render_sample_table(test, page_width)
             if sample_table:
                 elements.append(KeepTogether(sample_table))
-                # Create new page if control includes sample table.
+                # Create new page if test includes sample table.
                 elements.append(PageBreak())
             else:
                 elements.append(Spacer(1, 30))
