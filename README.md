@@ -7,12 +7,12 @@ This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) foun
 - Screenshots don't cut it when cloud configurations change daily. Auditors should be running this script daily (or at least weekly) and use it to start having risk-driven conversations with your Engineering teams.
 
 ## Project Overview
-- A read-only [script](./src/controlTesting.py) to generate and evaluate audit evidence (no screenshots required).
+- A read-only [script](./src/aws_tests.py) to generate and evaluate audit evidence (no screenshots required).
    - The script creates a new folder (tmp/audit_evidence) that you can zip and share with your auditor.
 - A [report builder](./src/buildReport.py) to create an [AWS Audit Report](./evidence_library/aws_audit_report.pdf).
 - A [library](./evidence_library/) of example audit evidence created from the script with the supporting JSON files.
-- List of [controls](./controls/) with detailed guidance of how to test each control.
-- A [JSON audit report](./evidence_library/controls.json) is also included. This is a machine readable audit report and cleanly displays the test procedures and control findings.
+- List of [tests](./tests/) with detailed testing procedures.
+- A [JSON audit report](./evidence_library/test_results.json) is also included. This is a machine readable audit report and cleanly displays the test procedures and findings.
 
 ## Setup Instructions
 1. Install pre-requisites:
@@ -48,18 +48,18 @@ This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) foun
 7. Create an access key for the IAM user created in the previous step: [AWS Docs](https://docs.aws.amazon.com/keyspaces/latest/devguide/create.keypair.html)
     * NOTE: Configure the access key on your local machine using the 'aws configure' command [Video Tutorial](https://youtu.be/RLx5qVZSTyE?si=7fqyxFzThDaB-mGQ).
     * NOTE: Access keys can only be viewed once, at the time of creation.  They must be stored securely elsewhere for future use.
-8. Run the command 'python src/runAudit.py'. Running this scan will perform the following:
+8. Run the command 'python src/run_audit.py'. Running this scan will perform the following:
   * Create a tmp folder for the audit evidence and report.
-  * Run all of the control tests (see [src/controlTesting.py](./src/controlTesting.py))
+  * Run all tests (see [src/aws_tests.py](./src/aws_tests.py))
 9. Optional: Configure the env file to run the script through an IAM role.
 ```
 role_arn = "arn:aws:iam::111222333444:role/aws_audit_playbook"  # Update with your actual role arn.
 external_id = "a1b2c3d4e5f6g7h8i9"  # Update with your actual external id.
 ```
-10. Optional: Create and populate the config file (example below). Use this to define control requirements (control_config) and exclude controls and samples that aren't in-scope.
+10. Optional: Create and populate the config file (example below). Use this to define test requirements (test_config) and exclude tests and samples that aren't in-scope.
 ```
 {
-  "control_config": {
+  "test_config": {
     "in_scope_regions": [],
     "iam_password_min_length": 14,
     "iam_password_min_complexity_types": 4,
@@ -71,17 +71,17 @@ external_id = "a1b2c3d4e5f6g7h8i9"  # Update with your actual external id.
     "rds_backup_retention_days": 14,
     "base_required_tags": ["owner", "description", "classification"]
   },
-  "control_exclusions": {
-    "EXAMPLE CONTROL NAME": {
-      "rationale": "Based on discussion with DevOps, we agreed this control is not needed to mitigate risk.",
+  "test_exclusions": {
+    "EXAMPLE TEST ID": {
+      "rationale": "Based on discussion with DevOps, we agreed this test is not needed to mitigate risk.",
       "permanent": true,
       "expiration_date": null,
       "approvers": [
         "john.doe@acme.com"
       ]
     },
-    "EXAMPLE CONTROL NAME 2": {
-      "rationale": "Engineering is currently implementing this control. Pausing monitoring until December 31st, 2026.",
+    "EXAMPLE TEST ID 2": {
+      "rationale": "Engineering is currently implementing this test. Pausing monitoring until December 31st, 2026.",
       "permanent": false,
       "expiration_date": "2026-12-31",
       "approvers": [

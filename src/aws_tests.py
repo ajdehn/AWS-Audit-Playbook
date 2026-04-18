@@ -1,17 +1,94 @@
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Any
-from utils import is_control_excluded, process_sample_exclusion, evaluate_tags, save_json
+from utils import is_test_excluded, process_sample_exclusion, evaluate_tags, save_json, load_json_if_exists
 import boto3
 import botocore
 from datetime import datetime, timezone, timedelta
 import traceback
 import json
+import os
+
+class EvidenceClient:
+    def __init__(self, base_path, debug=False):
+        """
+        base_path: root folder for evidence (e.g., audit.evidence_folder)
+        debug: print cache behavior
+        """
+        self.base_path = base_path
+        self.debug = debug
+
+    # ---------------------------
+    # Public API
+    # ---------------------------
+    def get(self, relative_path, fetch_fn):
+        """
+        Fetch data with simple caching (no expiration).
+        """
+        file_path = os.path.join(self.base_path, relative_path)
+
+        if os.path.exists(file_path):
+            if self.debug:
+                print(f"[CACHE HIT] {file_path}")
+            return load_json_if_exists(file_path)
+
+        if self.debug:
+            print(f"[FETCHING] {file_path}")
+
+        data = fetch_fn()
+        save_json(data, file_path)
+        return data
+
+    """
+        AWS-safe fetch wrapper with optional pagination support.
+        Returns flattened ResponseMetadata (from last page).
+
+        paginator_params: dict with keys:
+        - method_name: str (e.g., 'list_users')
+        - pagination_key: str (key in each page to combine, e.g., 'Users')
+        - params: dict (parameters to pass to the AWS method)
+    """
+    def get_aws(self, relative_path, fetch_fn, not_found_codes=None, paginator_params=None):
+        def wrapped():
+            try:
+                if paginator_params:
+                    client = paginator_params.get("client") # boto3 client
+                    method_name = paginator_params["method_name"]
+                    pagination_key = paginator_params["pagination_key"]
+                    params = paginator_params.get("params", {})
+
+                    paginator = client.get_paginator(method_name)
+                    items = []
+                    last_metadata = {}
+
+                    for page in paginator.paginate(**params):
+                        # Collect items
+                        items.extend(page.get(pagination_key, []))
+
+                        # Keep overwriting → ends up with last page metadata
+                        last_metadata = page.get("ResponseMetadata", {})
+
+                    return {
+                        pagination_key: items,
+                        "ResponseMetadata":  last_metadata
+                    }
+
+                # Non-paginated call
+                response = fetch_fn()
+                return response
+
+            except botocore.exceptions.ClientError as e:
+                code = e.response["Error"]["Code"]
+                if not_found_codes and code in not_found_codes:
+                    return None
+                raise
+
+        return self.get(relative_path, wrapped)
 
 # NOTE: Sample results are set to "False" until logic determines sample passes the testing criteria.
 @dataclass
 class Sample:
     sample_id: Dict[str, Any]
-    control_id: str
+    test_id: str
     result: bool = False
     is_excluded: bool = False
     comments: str = ""
@@ -23,11 +100,11 @@ class Sample:
             f"comments: {self.comments}\n"
         )
 
-# NOTE: Control results are set to "True" until an invalid control is identified.
+# NOTE: Test result is true by default. This set to false when a sample or other logic determines the test has failed.
 @dataclass
-class Control:
-    control_id: str
-    control_description: str
+class Test:
+    test_id: str
+    test_description: str
     test_procedures: List[str]
     test_attributes: List[str]
     audit: Audit
@@ -47,18 +124,18 @@ class Control:
     def __post_init__(self):
         self.risk_rating_str = self.create_risk_str()
         # Set exclusion status AFTER object is created
-        self.is_excluded = is_control_excluded(
-            self.control_id,
+        self.is_excluded = is_test_excluded(
+            self.test_id,
             self.audit.config
         )
 
         if self.is_excluded:
-            self.result_description = "Control is excluded. See exclusions.json"
+            self.result_description = "Test is excluded. See exclusions.json"
 
     def __str__(self):
         return (
-            f"control_id: {self.control_id}\n"
-            f"control_description: {self.control_description}\n"
+            f"test_id: {self.test_id}\n"
+            f"test_description: {self.test_description}\n"
             f"risk_rating: {self.risk_rating}\n"
             f"is_excluded: {self.is_excluded}\n"
             f"result: {'Pass' if self.result else 'Fail'}\n"
@@ -67,8 +144,8 @@ class Control:
 
     def to_dict(self):
         return {
-            "control_id": self.control_id,
-            "control_description": self.control_description,
+            "test_id": self.test_id,
+            "test_description": self.test_description,
             "risk_rating": self.risk_rating,
             "is_excluded": self.is_excluded,
             "result": "Pass" if self.result else "Fail",
@@ -103,7 +180,7 @@ class Control:
         in_scope_samples = [s for s in self.samples if not s.is_excluded]
 
         if not in_scope_samples:
-            # No valid samples. Control passes with a population of zero.
+            # No valid samples. Test passes with a population of zero.
             self.result = True
             return self
 
@@ -115,33 +192,40 @@ class Control:
         return self
 
 
-def run_control_safely(audit, control_fn, control_id):
+def run_test_safely(audit, test_fn, test_id):
     try:
-        return control_fn(audit, control_id)
+        return test_fn(audit, test_id)
     except Exception as e:
 
-        print(f"\nERROR running control: {control_id}")
+        print(f"\nERROR running test: {test_id}")
         print(f"Exception: {e}\n")
         traceback.print_exc()
 
-        # Create a failed control object
-        control = Control(
-            control_id=control_id,
-            control_description=f"{control_id} (Execution Failed)",
-            test_procedures=["Control execution failed."],
+        # Create a failed test object
+        test = Test(
+            test_id=test_id,
+            test_description=f"{test_id} (Execution Failed)",
+            test_procedures=["Test execution failed."],
             test_attributes=[],
             audit=audit,
             table_headers=["Error"],
             risk_rating=3
         )
-        control.result = False
-        control.result_description = f"Control execution failed. Please manually investigate."
-        print(f"ERROR: Running {control_id} test failed. Moving to the next test.")
+        test.result = False
+        test.result_description = f"Test execution failed. Please manually investigate."
+        print(f"ERROR: Running {test_id} test failed. Moving to the next test.")
 
-        return control
+        return test
 
 def run_all_tests(audit):
-    control_definitions = [
+    # TODO: Add IAM tests (IAM User Stale Access Keys)
+    # TODO: Add S3 object owner check
+    # TODO: Add EC2 Public Ports (22, RDS, all ports, etc)
+    # TODO: Add WAF Tags
+    # TODO: Add GuardDuty findings resolved within a set time period.
+    # TODO: Add GuardDuty findings sent to EventBridge every 15 minutes (default is 6 hours).
+
+    test_definitions = [
         ("IAM Root MFA", test_root_mfa_enabled),
         ("IAM Root Access Key", test_root_no_access_keys),
         ("IAM User MFA", test_iam_users_mfa),
@@ -170,28 +254,16 @@ def run_all_tests(audit):
         ("Web Application Firewall Enabled", test_waf_enabled),
         ("GuardDuty Enabled", test_guardduty_enabled)
     ]
-
-    controls = []
-    for control_id, control_fn in control_definitions:
-        controls.append(run_control_safely(audit, control_fn, control_id))
+    tests = []
+    for test_id, test_fn in test_definitions:
+        tests.append(run_test_safely(audit, test_fn, test_id))
     
-    # Save controls JSON file.
-    with open(f"tmp/controls.json", "w") as f:
-        json.dump([c.to_dict() for c in controls], f, indent=4)
+    return tests
 
-    # TODO: Add IAM tests (IAM User Stale Access Keys)
-    # TODO: Add S3 object owner check
-    # TODO: Add EC2 Public Ports (22, RDS, all ports, etc)
-    # TODO: Add WAF Tags
-    # TODO: Add GuardDuty findings resolved within a set time period.
-    # TODO: Add GuardDuty findings sent to EventBridge every 15 minutes (default is 6 hours).
-
-    return controls
-
-def test_s3_encryption(audit, control_id, risk_rating=2):
-    control = Control(
-        control_id=control_id,
-        control_description="S3 buckets are encrypted at rest.",
+def test_s3_encryption(audit, test_id, risk_rating=2):
+    test = Test(
+        test_id=test_id,
+        test_description="S3 buckets are encrypted at rest.",
         test_procedures=[
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
             "Saved the list of buckets: S3/buckets.json.",
@@ -204,9 +276,9 @@ def test_s3_encryption(audit, control_id, risk_rating=2):
         table_headers=["Bucket Name", "Result", "Comments"],
         risk_rating=risk_rating
     )
-    if control.is_excluded:
+    if test.is_excluded:
         # No further testing required.
-        return control
+        return test
     
     s3 = audit.session.client("s3")
     # Obtain and save list of buckets.
@@ -215,10 +287,10 @@ def test_s3_encryption(audit, control_id, risk_rating=2):
     for bucket in buckets.get("Buckets", []):
         sample = Sample(
             sample_id={"bucket_name": bucket['Name']},
-            control_id=control_id
+            test_id=test_id
         )
 
-        if process_sample_exclusion(control, sample, audit):
+        if process_sample_exclusion(test, sample, audit):
             # Move to next sample, if excluded.
             continue        
 
@@ -231,18 +303,18 @@ def test_s3_encryption(audit, control_id, risk_rating=2):
             sample.result = True
         else:
             sample.comments = "No encryption configuration found"
-        control.samples.append(sample)
+        test.samples.append(sample)
 
-    control.evaluate_samples()
-    if not control.result:
+    test.evaluate_samples()
+    if not test.result:
         # Document exception language.
-        control.result_description = f"Exceptions Noted. {control.num_findings} S3 bucket(s) are not encrypted."
-    return control
+        test.result_description = f"Exceptions Noted. {test.num_findings} S3 bucket(s) are not encrypted."
+    return test
 
-def test_s3_public_access(audit, control_id, risk_rating=3):
-    control = Control(
-        control_id=control_id,
-        control_description="S3 buckets are configured to block public access.",
+def test_s3_public_access(audit, test_id, risk_rating=3):
+    test = Test(
+        test_id=test_id,
+        test_description="S3 buckets are configured to block public access.",
         test_procedures=[
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
             "Saved the list of buckets: S3/buckets.json.",
@@ -256,8 +328,8 @@ def test_s3_public_access(audit, control_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     s3 = audit.session.client("s3")
     # Obtain and save list of buckets.
@@ -266,10 +338,10 @@ def test_s3_public_access(audit, control_id, risk_rating=3):
     for bucket in buckets.get("Buckets", []):
         sample = Sample(
             sample_id={"bucket_name": bucket["Name"]},
-            control_id=control_id
+            test_id=test_id
         )
 
-        if process_sample_exclusion(control, sample, audit):
+        if process_sample_exclusion(test, sample, audit):
             # Move to next sample, if excluded.
             continue
         
@@ -281,7 +353,7 @@ def test_s3_public_access(audit, control_id, risk_rating=3):
         )
         if not public_access_block:
             sample.comments = "No Public Access Block configuration found."
-            control.samples.append(sample)
+            test.samples.append(sample)
             continue
 
         config = public_access_block.get("PublicAccessBlockConfiguration", {})
@@ -296,35 +368,32 @@ def test_s3_public_access(audit, control_id, risk_rating=3):
             sample.result = True
         else:
             sample.comments = "One or more public access settings are disabled"
-        control.samples.append(sample)
+        test.samples.append(sample)
 
 
-    control.evaluate_samples()
-    if not control.result:
+    test.evaluate_samples()
+    if not test.result:
         # Document exception language.
-        control.result_description = f"Exceptions Noted. {control.num_findings} S3 buckets are not blocking public access."
-    return control
+        test.result_description = f"Exceptions Noted. {test.num_findings} S3 buckets are not blocking public access."
+    return test
 
-"""
-    Control: S3 buckets must have required tags applied with non-empty values.
-"""
 # TODO: Update logic for opt-in regions
-def test_s3_tags(audit, control_id, risk_rating=1):
+def test_s3_tags(audit, test_id, risk_rating=1):
     # Get base required tags.
-    control_config = audit.config.get("control_config") or {}
-    base_required_tags = control_config.get("base_required_tags", ["Owner", "Description", "Classification"])
+    test_config = audit.config.get("test_config") or {}
+    base_required_tags = test_config.get("base_required_tags", ["Owner", "Description", "Classification"])
 
     # Check if 's3_required_tags' is set. If so, override base required tags.
-    control_config = audit.config.get("control_config") or {}
-    s3_required_tags = control_config.get("s3_required_tags")
+    test_config = audit.config.get("test_config") or {}
+    s3_required_tags = test_config.get("s3_required_tags")
     if s3_required_tags:
         required_tags = s3_required_tags
     else:
         required_tags = base_required_tags
 
-    control = Control(
-        control_id=control_id,
-        control_description=(
+    test = Test(
+        test_id=test_id,
+        test_description=(
             "S3 buckets must have required tags applied and tag values must not be empty."
         ),
         test_procedures=[
@@ -340,8 +409,8 @@ def test_s3_tags(audit, control_id, risk_rating=1):
         risk_rating=risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     s3 = audit.session.client("s3")
     buckets = audit.evidence_client.get("S3/buckets.json", lambda: s3.list_buckets())
@@ -349,9 +418,9 @@ def test_s3_tags(audit, control_id, risk_rating=1):
     for bucket in buckets.get("Buckets", []):
         sample = Sample(
             sample_id={"bucket_name": bucket["Name"]},
-            control_id=control_id
+            test_id=test_id
         )
-        if process_sample_exclusion(control, sample, audit):
+        if process_sample_exclusion(test, sample, audit):
             continue
 
         # Fetch bucket tags
@@ -362,25 +431,25 @@ def test_s3_tags(audit, control_id, risk_rating=1):
         )
         if not tags_response:
             sample.comments = "Tags not found on this bucket."
-            control.samples.append(sample)
+            test.samples.append(sample)
             continue
 
         actual_bucket_tags = {t["Key"]: t.get("Value", "") for t in tags_response.get("TagSet", [])}
         evaluate_tags(sample, required_tags, actual_bucket_tags)
-        control.samples.append(sample)
+        test.samples.append(sample)
 
-    control.evaluate_samples()
-    if not control.result:
-        control.result_description = (
-            f"Exceptions Noted. {control.num_findings} bucket(s) missing required tags or have empty values."
+    test.evaluate_samples()
+    if not test.result:
+        test.result_description = (
+            f"Exceptions Noted. {test.num_findings} bucket(s) missing required tags or have empty values."
         )
 
-    return control
+    return test
 
-def test_s3_secure_transport(audit, control_id, risk_rating=0):
-    control = Control(
-        control_id=control_id,
-        control_description= "S3 buckets are configured to deny unencrypted data in-transit.",
+def test_s3_secure_transport(audit, test_id, risk_rating=0):
+    test = Test(
+        test_id=test_id,
+        test_description= "S3 buckets are configured to deny unencrypted data in-transit.",
         test_procedures=[
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
             "Saved the list of buckets: S3/buckets.json.",
@@ -394,8 +463,8 @@ def test_s3_secure_transport(audit, control_id, risk_rating=0):
         risk_rating=risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     s3 = audit.session.client("s3")
 
@@ -409,10 +478,10 @@ def test_s3_secure_transport(audit, control_id, risk_rating=0):
         bucket_name = bucket["Name"]
         sample = Sample(
             sample_id={"bucket_name": bucket_name},
-            control_id=control_id
+            test_id=test_id
         )
 
-        if process_sample_exclusion(control, sample, audit):
+        if process_sample_exclusion(test, sample, audit):
             continue
 
         # Fetch bucket policy
@@ -424,14 +493,14 @@ def test_s3_secure_transport(audit, control_id, risk_rating=0):
 
         if not policy:
             sample.comments = "No bucket policy found."
-            control.samples.append(sample)
+            test.samples.append(sample)
             continue
 
         try:
             policy_doc = json.loads(policy.get("Policy", "{}"))
         except Exception:
             sample.comments = "Unable to parse bucket policy."
-            control.samples.append(sample)
+            test.samples.append(sample)
             continue
 
         statements = policy_doc.get("Statement", [])
@@ -455,27 +524,27 @@ def test_s3_secure_transport(audit, control_id, risk_rating=0):
         else:
             sample.comments = "No bucket policy statement enforcing SecureTransport."
 
-        control.samples.append(sample)
+        test.samples.append(sample)
 
-    control.evaluate_samples()
+    test.evaluate_samples()
 
-    if not control.result:
-        control.result_description = (
-            f"Exceptions Noted. {control.num_findings} S3 bucket(s) do not enforce secure transport (HTTPS)."
+    if not test.result:
+        test.result_description = (
+            f"Exceptions Noted. {test.num_findings} S3 bucket(s) do not enforce secure transport (HTTPS)."
         )
 
-    return control
+    return test
 
-def test_iam_password_policy(audit, control_id, risk_rating=2):
+def test_iam_password_policy(audit, test_id, risk_rating=2):
     # Retrieve values from config. If not available, set safe defaults.
-    control_config = audit.config.get("control_config") or {}
-    required_min_length = control_config.get("iam_password_min_length", 14)
-    req_min_complexity_types = control_config.get("iam_password_min_complexity_types", 4)
-    required_password_history = control_config.get("iam_password_password_history", 24)
+    test_config = audit.config.get("test_config") or {}
+    required_min_length = test_config.get("iam_password_min_length", 14)
+    req_min_complexity_types = test_config.get("iam_password_min_complexity_types", 4)
+    required_password_history = test_config.get("iam_password_password_history", 24)
 
-    control = Control(
-        control_id=control_id,
-        control_description=(
+    test = Test(
+        test_id=test_id,
+        test_description=(
             f"IAM passwords must comply with the organizations password complexity requirements."
         ),      
         test_procedures=[
@@ -501,9 +570,9 @@ def test_iam_password_policy(audit, control_id, risk_rating=2):
         not_found_codes=["NoSuchEntity"]
     )
     if not policy:
-        control.result = False
-        control.result_description = "Exceptions Noted. No password policy configured."
-        return control
+        test.result = False
+        test.result_description = "Exceptions Noted. No password policy configured."
+        return test
 
     password_policy = policy.get("PasswordPolicy", {})
     failures = []
@@ -535,13 +604,13 @@ def test_iam_password_policy(audit, control_id, risk_rating=2):
         )
 
     # Test password expiration, if required by config.json
-    required_expiration = control_config.get("iam_password_require_expiration", False)
+    required_expiration = test_config.get("iam_password_require_expiration", False)
     if required_expiration:
-        required_max_password_age = control_config.get("iam_password_max_password_age", 365)        
+        required_max_password_age = test_config.get("iam_password_max_password_age", 365)        
         expire_enabled = password_policy.get("ExpirePasswords", False)
         actual_max_password_age = password_policy.get("MaxPasswordAge")
         # Add password expiration as test attribute.
-        control.test_attributes.append(
+        test.test_attributes.append(
             f"Passwords must expire within {required_max_password_age} days."
         )
         if not expire_enabled:
@@ -554,16 +623,16 @@ def test_iam_password_policy(audit, control_id, risk_rating=2):
             )
 
     # --- Final result ---
-    control.result = len(failures) == 0
-    if not control.result:
-        control.result_description = "; ".join(failures)
-        control.result_description = "Exceptions Noted. " + control.result_description
-    return control
+    test.result = len(failures) == 0
+    if not test.result:
+        test.result_description = "; ".join(failures)
+        test.result_description = "Exceptions Noted. " + test.result_description
+    return test
 
-def test_root_no_access_keys(audit, control_id, risk_rating=3):
-    control = Control(
-        control_id=control_id,
-        control_description="Root account does not have any active access keys.",      
+def test_root_no_access_keys(audit, test_id, risk_rating=3):
+    test = Test(
+        test_id=test_id,
+        test_description="Root account does not have any active access keys.",      
         test_procedures=[
             "Obtained the AWS account summary by calling the get_account_summary() boto3 command.",
             "Saved the account summary in the audit evidence folder (IAM/account_summary.json)",
@@ -574,8 +643,8 @@ def test_root_no_access_keys(audit, control_id, risk_rating=3):
         risk_rating = risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     iam = audit.session.client("iam")
     summary = audit.evidence_client.get_aws(
@@ -587,17 +656,17 @@ def test_root_no_access_keys(audit, control_id, risk_rating=3):
     root_keys = account_summary.get("AccountAccessKeysPresent", 0)
 
     if root_keys == 0:
-        control.result = True
+        test.result = True
     else:
-        control.result = False
-        control.result_description = f"Exceptions Noted. Root account has {root_keys} access key(s)"
+        test.result = False
+        test.result_description = f"Exceptions Noted. Root account has {root_keys} access key(s)"
 
-    return control
+    return test
 
-def test_root_mfa_enabled(audit, control_id, risk_rating=3):
-    control = Control(
-        control_id=control_id,
-        control_description="Root account has MFA enabled.",
+def test_root_mfa_enabled(audit, test_id, risk_rating=3):
+    test = Test(
+        test_id=test_id,
+        test_description="Root account has MFA enabled.",
         test_procedures=[
             "Obtained the AWS account summary by calling the get_account_summary() boto3 command.",
             "Saved the account summary: IAM/account_summary.json",
@@ -608,8 +677,8 @@ def test_root_mfa_enabled(audit, control_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     iam = audit.session.client("iam")
     summary = audit.evidence_client.get_aws(
@@ -621,17 +690,17 @@ def test_root_mfa_enabled(audit, control_id, risk_rating=3):
     mfa_enabled = account_summary.get("AccountMFAEnabled", 0)
 
     if mfa_enabled == 1:
-        control.result = True
+        test.result = True
     else:
-        control.result = False
-        control.result_description = "Exceptions Noted. Root account does not have MFA enabled."
+        test.result = False
+        test.result_description = "Exceptions Noted. Root account does not have MFA enabled."
         
-    return control
+    return test
 
-def test_iam_users_mfa(audit, control_id, risk_rating=3):
-    control = Control(
-        control_id=control_id,
-        control_description="IAM users with an active console password have MFA enabled.",
+def test_iam_users_mfa(audit, test_id, risk_rating=3):
+    test = Test(
+        test_id=test_id,
+        test_description="IAM users with an active console password have MFA enabled.",
         test_procedures=[
             "Obtained a list of IAM users by calling the list_users() boto3 command.",
             "Saved the list of IAM users: IAM/users.json.",
@@ -648,8 +717,8 @@ def test_iam_users_mfa(audit, control_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     iam = audit.session.client("iam")
     users = audit.evidence_client.get_aws(
@@ -661,10 +730,10 @@ def test_iam_users_mfa(audit, control_id, risk_rating=3):
         username = user["UserName"]
         sample = Sample(
             sample_id={"user": username},
-            control_id=control_id
+            test_id=test_id
         )
 
-        if process_sample_exclusion(control, sample, audit):
+        if process_sample_exclusion(test, sample, audit):
             continue
 
         # Check if user has a console password
@@ -679,7 +748,7 @@ def test_iam_users_mfa(audit, control_id, risk_rating=3):
             if code == "NoSuchEntity":
                 sample.is_excluded = True
                 sample.comments = "User has no console password (programmatic access only)."
-                control.samples.append(sample)
+                test.samples.append(sample)
                 continue
             else:
                 raise
@@ -689,7 +758,7 @@ def test_iam_users_mfa(audit, control_id, risk_rating=3):
         if not login_profile.get("LoginProfile"):
             sample.result = True
             sample.comments = "User has no console password (programmatic access only)."
-            control.samples.append(sample)
+            test.samples.append(sample)
             continue
 
         # Check MFA devices
@@ -703,24 +772,24 @@ def test_iam_users_mfa(audit, control_id, risk_rating=3):
         else:
             sample.comments = "No MFA device enabled for this user."
 
-        control.samples.append(sample)
+        test.samples.append(sample)
 
-    control.evaluate_samples()
+    test.evaluate_samples()
 
-    if not control.result:
-        control.result_description = (
-            f"Exceptions Noted. {control.num_findings} IAM user(s) do not have MFA enabled."
+    if not test.result:
+        test.result_description = (
+            f"Exceptions Noted. {test.num_findings} IAM user(s) do not have MFA enabled."
         )
 
-    return control
+    return test
 
-def test_iam_access_key_age(audit, control_id, risk_rating=3):
-    control_config = audit.config.get("control_config") or {}
-    max_age_days = control_config.get("iam_key_max_age", 90)
+def test_iam_access_key_age(audit, test_id, risk_rating=3):
+    test_config = audit.config.get("test_config") or {}
+    max_age_days = test_config.get("iam_key_max_age", 90)
 
-    control = Control(
-        control_id=control_id,
-        control_description=f"IAM access keys are rotated at least every {max_age_days} days.",
+    test = Test(
+        test_id=test_id,
+        test_description=f"IAM access keys are rotated at least every {max_age_days} days.",
         test_procedures=[
             "Obtained a list of IAM users by calling the list_users() boto3 command.",
             "Saved the list of IAM users: IAM/users.json.",
@@ -736,8 +805,8 @@ def test_iam_access_key_age(audit, control_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     iam = audit.session.client("iam")
     users = audit.evidence_client.get_aws(
@@ -761,15 +830,15 @@ def test_iam_access_key_age(audit, control_id, risk_rating=3):
                     "user": username,
                     "access_key_id": key["AccessKeyId"]
                 },
-                control_id=control_id
+                test_id=test_id
             )
             if key["Status"] != "Active":
                 sample.is_excluded = True
                 sample.comments = "N/A - key is inactive."
-                control.samples.append(sample)
+                test.samples.append(sample)
                 continue
 
-            if process_sample_exclusion(control, sample, audit):
+            if process_sample_exclusion(test, sample, audit):
                 continue
 
             create_date = key["CreateDate"]
@@ -785,13 +854,13 @@ def test_iam_access_key_age(audit, control_id, risk_rating=3):
             else:
                 sample.comments = f"Key is {actual_age_days} days old."
 
-            control.samples.append(sample)
+            test.samples.append(sample)
 
-    control.evaluate_samples()
-    if not control.result:
+    test.evaluate_samples()
+    if not test.result:
         # Document exception language.
-        control.result_description = f"Exceptions Noted. {control.num_findings} IAM key(s) are over {max_age_days} days old."
-    return control
+        test.result_description = f"Exceptions Noted. {test.num_findings} IAM key(s) are over {max_age_days} days old."
+    return test
 
 """
     NOTE: Used by region based tests (EC2, RDS, SNS, GuardDuty, etc)
@@ -815,8 +884,8 @@ def get_regions(audit):
     available_regions = {r["RegionName"] for r in regions["Regions"]}
 
     # Pull from config and lower-case region values
-    control_config = audit.config.get("control_config") or {}
-    config_regions = control_config.get("in_scope_regions", [])
+    test_config = audit.config.get("test_config") or {}
+    config_regions = test_config.get("in_scope_regions", [])
     config_regions = [r.lower() for r in config_regions]
 
     if not config_regions:
@@ -836,10 +905,10 @@ def get_regions(audit):
     return [r for r in config_regions if r in available_regions]
 
 
-def test_rds_encryption(audit, control_id, risk_rating=2):
-    control = Control(
-        control_id=control_id,
-        control_description="RDS instances are encrypted at rest.",
+def test_rds_encryption(audit, test_id, risk_rating=2):
+    test = Test(
+        test_id=test_id,
+        test_description="RDS instances are encrypted at rest.",
         test_procedures=[
             "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
             "For each in-scope region, saved the list of RDS instances: RDS/region_name/db_instances.json.",
@@ -851,8 +920,8 @@ def test_rds_encryption(audit, control_id, risk_rating=2):
         risk_rating=risk_rating        
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     for region in audit.in_scope_regions:
         rds = audit.session.client("rds", region_name=region)
@@ -870,10 +939,10 @@ def test_rds_encryption(audit, control_id, risk_rating=2):
         for db in instances.get("DBInstances", []):
             sample = Sample(
                 sample_id={"region": region, "db_instance": db["DBInstanceIdentifier"]},
-                control_id=control_id
+                test_id=test_id
             )
 
-            if process_sample_exclusion(control, sample, audit):
+            if process_sample_exclusion(test, sample, audit):
                 continue
 
             if db.get("StorageEncrypted"):
@@ -881,17 +950,17 @@ def test_rds_encryption(audit, control_id, risk_rating=2):
             else:
                 sample.comments = "RDS instance is not encrypted."
 
-            control.samples.append(sample)
-    control.evaluate_samples()
-    if not control.result:
+            test.samples.append(sample)
+    test.evaluate_samples()
+    if not test.result:
         # Document exception language.
-        control.result_description = f"Exceptions Noted. {control.num_findings} RDS instance(s) are not encrypted."
-    return control
+        test.result_description = f"Exceptions Noted. {test.num_findings} RDS instance(s) are not encrypted."
+    return test
 
-def test_rds_public_access(audit, control_id, risk_rating=3):
-    control = Control(
-        control_id=control_id,
-        control_description="RDS instances are not publicly accessible.",
+def test_rds_public_access(audit, test_id, risk_rating=3):
+    test = Test(
+        test_id=test_id,
+        test_description="RDS instances are not publicly accessible.",
         test_procedures=[
             "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
             "For each in-scope region, saved the list of RDS instances: RDS/[region_name]/db_instances.json)",
@@ -903,8 +972,8 @@ def test_rds_public_access(audit, control_id, risk_rating=3):
         risk_rating=risk_rating        
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     for region in audit.in_scope_regions:
         rds = audit.session.client("rds", region_name=region)
@@ -917,10 +986,10 @@ def test_rds_public_access(audit, control_id, risk_rating=3):
         for db in instances.get("DBInstances", []):
             sample = Sample(
                 sample_id={"region": region, "db_instance": db["DBInstanceIdentifier"]},
-                control_id=control_id
+                test_id=test_id
             )
 
-            if process_sample_exclusion(control, sample, audit):
+            if process_sample_exclusion(test, sample, audit):
                 continue
 
             if not db.get("PubliclyAccessible", False):
@@ -928,28 +997,25 @@ def test_rds_public_access(audit, control_id, risk_rating=3):
             else:
                 sample.comments = "Instance is publicly accessible."
 
-            control.samples.append(sample)
+            test.samples.append(sample)
 
-    control.evaluate_samples()
-    if not control.result:
+    test.evaluate_samples()
+    if not test.result:
         # Document exception language.
-        control.result_description = f"Exceptions Noted. {control.num_findings} RDS instance(s) are publicly accessible."
-    return control
+        test.result_description = f"Exceptions Noted. {test.num_findings} RDS instance(s) are publicly accessible."
+    return test
 
-"""
-    Control: RDS instances must have required tags applied with non-empty values.
-"""
-def test_rds_tags(audit, control_id, risk_rating=1):
+def test_rds_tags(audit, test_id, risk_rating=1):
     # Get base required tags.
-    control_config = audit.config.get("control_config") or {}
-    base_required_tags = control_config.get("base_required_tags", ["Owner", "Description", "Classification"])
+    test_config = audit.config.get("test_config") or {}
+    base_required_tags = test_config.get("base_required_tags", ["Owner", "Description", "Classification"])
 
     # Override if 'rds_required_tags' is set
-    required_tags = control_config.get("rds_required_tags", base_required_tags)
+    required_tags = test_config.get("rds_required_tags", base_required_tags)
 
-    control = Control(
-        control_id=control_id,
-        control_description=(
+    test = Test(
+        test_id=test_id,
+        test_description=(
             "RDS instances must have required tags applied and tag values must not be empty."
         ),
         test_procedures=[
@@ -963,8 +1029,8 @@ def test_rds_tags(audit, control_id, risk_rating=1):
         risk_rating=risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     for region in audit.in_scope_regions:
         rds = audit.session.client("rds", region_name=region)
@@ -982,30 +1048,30 @@ def test_rds_tags(audit, control_id, risk_rating=1):
         for db in instances.get("DBInstances", []):
             sample = Sample(
                 sample_id={"region": region, "db_instance": db["DBInstanceIdentifier"]},
-                control_id=control_id
+                test_id=test_id
             )
 
-            if process_sample_exclusion(control, sample, audit):
+            if process_sample_exclusion(test, sample, audit):
                 continue
 
             actual_db_tags = {t["Key"]: t.get("Value", "") for t in db.get("TagList", [])}
             evaluate_tags(sample, required_tags, actual_db_tags)
-            control.samples.append(sample)
+            test.samples.append(sample)
 
-    control.evaluate_samples()
-    if not control.result:
-        control.result_description = (
-            f"Exceptions Noted. {control.num_findings} RDS instance(s) are missing required tags or have empty values."
+    test.evaluate_samples()
+    if not test.result:
+        test.result_description = (
+            f"Exceptions Noted. {test.num_findings} RDS instance(s) are missing required tags or have empty values."
         )
 
-    return control
+    return test
 
-def test_rds_backup_retention(audit, control_id, risk_rating=1):
-    control_config = audit.config.get("control_config") or {}
-    required_rds_retention_days = control_config.get("rds_backup_retention_days", 14)
-    control = Control(
-        control_id=control_id,
-        control_description=f"RDS backups are retained for at least {required_rds_retention_days} days.",
+def test_rds_backup_retention(audit, test_id, risk_rating=1):
+    test_config = audit.config.get("test_config") or {}
+    required_rds_retention_days = test_config.get("rds_backup_retention_days", 14)
+    test = Test(
+        test_id=test_id,
+        test_description=f"RDS backups are retained for at least {required_rds_retention_days} days.",
         test_procedures=[
             "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
             "For each in-scope region, saved the list of RDS instances: RDS/[region_name]/db_instances.json.",
@@ -1017,8 +1083,8 @@ def test_rds_backup_retention(audit, control_id, risk_rating=1):
         risk_rating=risk_rating        
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     for region in audit.in_scope_regions:
         rds = audit.session.client("rds", region_name=region)
@@ -1031,10 +1097,10 @@ def test_rds_backup_retention(audit, control_id, risk_rating=1):
         for db in instances.get("DBInstances", []):
             sample = Sample(
                 sample_id={"region": region, "db_instance": db["DBInstanceIdentifier"]},
-                control_id=control_id
+                test_id=test_id
             )
 
-            if process_sample_exclusion(control, sample, audit):
+            if process_sample_exclusion(test, sample, audit):
                 continue
 
             actual_retention_days = db.get("BackupRetentionPeriod", 0)
@@ -1044,18 +1110,18 @@ def test_rds_backup_retention(audit, control_id, risk_rating=1):
             else:
                 sample.comments = f"Retention is {actual_retention_days} days"
 
-            control.samples.append(sample)
+            test.samples.append(sample)
 
-    control.evaluate_samples()
-    if not control.result:
+    test.evaluate_samples()
+    if not test.result:
         # Document exception language.
-        control.result_description = f"Exceptions Noted. {control.num_findings} RDS instance(s) do not retain backups for at least {required_rds_retention_days} days."
-    return control
+        test.result_description = f"Exceptions Noted. {test.num_findings} RDS instance(s) do not retain backups for at least {required_rds_retention_days} days."
+    return test
 
-def test_rds_auto_minor_version_upgrade(audit, control_id, risk_rating=1):
-    control = Control(
-        control_id=control_id,
-        control_description="RDS instances have automatic minor version upgrades enabled.",
+def test_rds_auto_minor_version_upgrade(audit, test_id, risk_rating=1):
+    test = Test(
+        test_id=test_id,
+        test_description="RDS instances have automatic minor version upgrades enabled.",
         test_procedures=[
             "For each in-scope region, obtained a list of DB instances by calling the describe_db_instances() boto3 command.",
             "For each in-scope region, saved the list of RDS instances: RDS/[region_name]/db_instances.json.",
@@ -1067,8 +1133,8 @@ def test_rds_auto_minor_version_upgrade(audit, control_id, risk_rating=1):
         risk_rating=risk_rating        
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     for region in audit.in_scope_regions:
         rds = audit.session.client("rds", region_name=region)
@@ -1089,10 +1155,10 @@ def test_rds_auto_minor_version_upgrade(audit, control_id, risk_rating=1):
                     "region": region,
                     "db_instance": db["DBInstanceIdentifier"]
                 },
-                control_id=control_id
+                test_id=test_id
             )
 
-            if process_sample_exclusion(control, sample, audit):
+            if process_sample_exclusion(test, sample, audit):
                 continue
 
             if db.get("AutoMinorVersionUpgrade"):
@@ -1100,20 +1166,20 @@ def test_rds_auto_minor_version_upgrade(audit, control_id, risk_rating=1):
             else:
                 sample.comments = "Automatic minor version upgrades are not enabled."
 
-            control.samples.append(sample)
+            test.samples.append(sample)
 
-    control.evaluate_samples()
-    if not control.result:
-        control.result_description = (
-            f"Exceptions Noted. {control.num_findings} RDS instance(s) do not have automatic minor version upgrades enabled."
+    test.evaluate_samples()
+    if not test.result:
+        test.result_description = (
+            f"Exceptions Noted. {test.num_findings} RDS instance(s) do not have automatic minor version upgrades enabled."
         )
 
-    return control
+    return test
 
-def test_rds_deletion_protection(audit, control_id, risk_rating=2):
-    control = Control(
-        control_id=control_id,
-        control_description="RDS instances have deletion protection enabled at the cluster or instance level.",
+def test_rds_deletion_protection(audit, test_id, risk_rating=2):
+    test = Test(
+        test_id=test_id,
+        test_description="RDS instances have deletion protection enabled at the cluster or instance level.",
         test_procedures=[
             "For each in-scope region, obtained a list of RDS instances and RDS clusters using describe_db_instances() and describe_db_clusters() boto3 commands.",
             "Saved the list of RDS instances: RDS/[region_name]/db_instances.json and DB clusters: RDS/[region_name]/db_clusters.json.",
@@ -1125,8 +1191,8 @@ def test_rds_deletion_protection(audit, control_id, risk_rating=2):
         risk_rating=risk_rating        
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     for region in audit.in_scope_regions:
         rds = audit.session.client("rds", region_name=region)
@@ -1165,10 +1231,10 @@ def test_rds_deletion_protection(audit, control_id, risk_rating=2):
                     "region": region,
                     "db_instance": db["DBInstanceIdentifier"]
                 },
-                control_id=control_id
+                test_id=test_id
             )
 
-            if process_sample_exclusion(control, sample, audit):
+            if process_sample_exclusion(test, sample, audit):
                 continue
 
             instance_protection = db.get("DeletionProtection", False)
@@ -1187,24 +1253,24 @@ def test_rds_deletion_protection(audit, control_id, risk_rating=2):
                     sample.comments = "Deletion protection is not enabled at either the instance or cluster level."
                 else:
                     sample.comments = "Deletion protection is not enabled at the instance level."
-            control.samples.append(sample)
+            test.samples.append(sample)
 
-    control.evaluate_samples()
-    if not control.result:
-        control.result_description = (
-            f"Exceptions Noted. {control.num_findings} RDS instance(s) do not have deletion protection enabled."
+    test.evaluate_samples()
+    if not test.result:
+        test.result_description = (
+            f"Exceptions Noted. {test.num_findings} RDS instance(s) do not have deletion protection enabled."
         )
 
-    return control
+    return test
 
-def test_ec2_security_group_tags(audit, control_id, risk_rating=1):
+def test_ec2_security_group_tags(audit, test_id, risk_rating=1):
     # Get required tags.
-    control_config = audit.config.get("control_config") or {}
-    required_tags = control_config.get("ec2_sg_required_tags", ["Owner", "Description", "ReviewedBy", "LastReviewedDate"])
+    test_config = audit.config.get("test_config") or {}
+    required_tags = test_config.get("ec2_sg_required_tags", ["Owner", "Description", "ReviewedBy", "LastReviewedDate"])
 
-    control = Control(
-        control_id=control_id,
-        control_description=(
+    test = Test(
+        test_id=test_id,
+        test_description=(
             "EC2 security groups have required tags applied and tag values are not be empty."
         ),
         test_procedures=[
@@ -1218,8 +1284,8 @@ def test_ec2_security_group_tags(audit, control_id, risk_rating=1):
         risk_rating=risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     for region in audit.in_scope_regions:
         ec2 = audit.session.client("ec2", region_name=region)
@@ -1240,10 +1306,10 @@ def test_ec2_security_group_tags(audit, control_id, risk_rating=1):
                     "region": region,
                     "security_group_id": sg["GroupId"]
                 },
-                control_id=control_id
+                test_id=test_id
             )
 
-            if process_sample_exclusion(control, sample, audit):
+            if process_sample_exclusion(test, sample, audit):
                 continue
 
             # Security group tags
@@ -1253,27 +1319,27 @@ def test_ec2_security_group_tags(audit, control_id, risk_rating=1):
             }
 
             evaluate_tags(sample, required_tags, actual_sg_tags)
-            control.samples.append(sample)
+            test.samples.append(sample)
 
-    control.evaluate_samples()
-    if not control.result:
-        control.result_description = (
-            f"Exceptions Noted. {control.num_findings} security group(s) are missing required tags or have empty values."
+    test.evaluate_samples()
+    if not test.result:
+        test.result_description = (
+            f"Exceptions Noted. {test.num_findings} security group(s) are missing required tags or have empty values."
         )
 
-    return control
+    return test
 
-def test_ec2_tags(audit, control_id, risk_rating=1):
+def test_ec2_tags(audit, test_id, risk_rating=1):
     # Get base required tags.
-    control_config = audit.config.get("control_config") or {}
-    base_required_tags = control_config.get("base_required_tags", ["Owner", "Description", "Classification"])
+    test_config = audit.config.get("test_config") or {}
+    base_required_tags = test_config.get("base_required_tags", ["Owner", "Description", "Classification"])
 
     # Override if 'ec2_required_tags' is set
-    required_tags = control_config.get("ec2_required_tags", base_required_tags)
+    required_tags = test_config.get("ec2_required_tags", base_required_tags)
 
-    control = Control(
-        control_id=control_id,
-        control_description=(
+    test = Test(
+        test_id=test_id,
+        test_description=(
             "EC2 instances must have required tags applied and tag values must not be empty."
         ),
         test_procedures=[
@@ -1287,8 +1353,8 @@ def test_ec2_tags(audit, control_id, risk_rating=1):
         risk_rating=risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     for region in audit.in_scope_regions:
         ec2 = audit.session.client("ec2", region_name=region)
@@ -1310,10 +1376,10 @@ def test_ec2_tags(audit, control_id, risk_rating=1):
                         "region": region,
                         "instance_id": instance["InstanceId"]
                     },
-                    control_id=control_id
+                    test_id=test_id
                 )
 
-                if process_sample_exclusion(control, sample, audit):
+                if process_sample_exclusion(test, sample, audit):
                     continue
 
                 # EC2 tags come in the 'Tags' attribute
@@ -1323,20 +1389,20 @@ def test_ec2_tags(audit, control_id, risk_rating=1):
                 }
 
                 evaluate_tags(sample, required_tags, instance_tags)
-                control.samples.append(sample)
+                test.samples.append(sample)
 
-    control.evaluate_samples()
-    if not control.result:
-        control.result_description = (
-            f"Exceptions Noted. {control.num_findings} EC2 instance(s) are missing required tags or have empty values."
+    test.evaluate_samples()
+    if not test.result:
+        test.result_description = (
+            f"Exceptions Noted. {test.num_findings} EC2 instance(s) are missing required tags or have empty values."
         )
 
-    return control
+    return test
 
-def test_ebs_volume_encryption(audit, control_id, risk_rating=2):
-    control = Control(
-        control_id=control_id,
-        control_description="EBS volumes are encrypted at rest.",
+def test_ebs_volume_encryption(audit, test_id, risk_rating=2):
+    test = Test(
+        test_id=test_id,
+        test_description="EBS volumes are encrypted at rest.",
         test_procedures=[
             "For each in-scope region, obtained a list of EBS volumes by calling describe_volumes() boto3 command.",
             "For each in-scope region, saved the list of EBS volumes: EC2/[region_name]/volumes.json.",
@@ -1348,8 +1414,8 @@ def test_ebs_volume_encryption(audit, control_id, risk_rating=2):
         risk_rating=risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     for region in audit.in_scope_regions:
         ec2 = audit.session.client("ec2", region_name=region)
@@ -1367,10 +1433,10 @@ def test_ebs_volume_encryption(audit, control_id, risk_rating=2):
         for volume in volumes.get("Volumes", []):
             sample = Sample(
                 sample_id={"region": region, "volume_id": volume["VolumeId"]},
-                control_id=control_id
+                test_id=test_id
             )
 
-            if process_sample_exclusion(control, sample, audit):
+            if process_sample_exclusion(test, sample, audit):
                 continue
 
             if volume.get("Encrypted"):
@@ -1378,30 +1444,27 @@ def test_ebs_volume_encryption(audit, control_id, risk_rating=2):
             else:
                 sample.comments = "EBS volume is not encrypted."
 
-            control.samples.append(sample)
+            test.samples.append(sample)
 
-    control.evaluate_samples()
-    if not control.result:
-        control.result_description = (
-            f"Exceptions Noted. {control.num_findings} EBS volume(s) are not encrypted."
+    test.evaluate_samples()
+    if not test.result:
+        test.result_description = (
+            f"Exceptions Noted. {test.num_findings} EBS volume(s) are not encrypted."
         )
 
-    return control
+    return test
 
-def test_ebs_tags(audit, control_id, risk_rating=1):
-    """
-    Control: EBS volumes must have required tags applied with non-empty values.
-    """
+def test_ebs_tags(audit, test_id, risk_rating=1):
     # Get base required tags.
-    control_config = audit.config.get("control_config") or {}
-    base_required_tags = control_config.get("base_required_tags", ["Owner", "Description", "Classification"])
+    test_config = audit.config.get("test_config") or {}
+    base_required_tags = test_config.get("base_required_tags", ["Owner", "Description", "Classification"])
 
     # Override if 'ebs_required_tags' is set
-    required_tags = control_config.get("ebs_required_tags", base_required_tags)
+    required_tags = test_config.get("ebs_required_tags", base_required_tags)
 
-    control = Control(
-        control_id=control_id,
-        control_description=(
+    test = Test(
+        test_id=test_id,
+        test_description=(
             "EBS volumes must have required tags applied and tag values must not be empty."
         ),
         test_procedures=[
@@ -1416,8 +1479,8 @@ def test_ebs_tags(audit, control_id, risk_rating=1):
         risk_rating=risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     for region in audit.in_scope_regions:
         ec2 = audit.session.client("ec2", region_name=region)
@@ -1435,10 +1498,10 @@ def test_ebs_tags(audit, control_id, risk_rating=1):
         for volume in volumes.get("Volumes", []):
             sample = Sample(
                 sample_id={"region": region, "volume_id": volume["VolumeId"]},
-                control_id=control_id
+                test_id=test_id
             )
 
-            if process_sample_exclusion(control, sample, audit):
+            if process_sample_exclusion(test, sample, audit):
                 continue
 
             # EBS tags come in the 'Tags' attribute
@@ -1447,21 +1510,21 @@ def test_ebs_tags(audit, control_id, risk_rating=1):
             # Reuse helper to evaluate tags
             evaluate_tags(sample, required_tags, volume_tags)
 
-            control.samples.append(sample)
+            test.samples.append(sample)
 
-    control.evaluate_samples()
-    if not control.result:
-        control.result_description = (
-            f"Exceptions Noted. {control.num_findings} EBS volume(s) are missing required tags or have empty values."
+    test.evaluate_samples()
+    if not test.result:
+        test.result_description = (
+            f"Exceptions Noted. {test.num_findings} EBS volume(s) are missing required tags or have empty values."
         )
 
-    return control
+    return test
 
-def test_ebs_default_encryption(audit, control_id, risk_rating=0):
+def test_ebs_default_encryption(audit, test_id, risk_rating=0):
     # NOTE: Risk rating is set to 'Informational'. Not having this set does not mean there are unencrypted EBS volumes.
-    control = Control(
-        control_id=control_id,
-        control_description="EBS volumes must have default encryption enabled in each region.",
+    test = Test(
+        test_id=test_id,
+        test_description="EBS volumes must have default encryption enabled in each region.",
         test_procedures=[
             "For each in-scope region, obtained the EBS default encryption settings by calling get_ebs_encryption_by_default() boto3 command.",
             "For each in-scope region, saved the EBS default encryption settings: EC2/[region_name]/default_ebs_encryption.json.",
@@ -1473,8 +1536,8 @@ def test_ebs_default_encryption(audit, control_id, risk_rating=0):
         risk_rating=risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     for region in audit.in_scope_regions:
         ec2 = audit.session.client("ec2", region_name=region)
@@ -1486,10 +1549,10 @@ def test_ebs_default_encryption(audit, control_id, risk_rating=0):
 
         sample = Sample(
             sample_id={"region": region},
-            control_id=control_id
+            test_id=test_id
         )
 
-        if process_sample_exclusion(control, sample, audit):
+        if process_sample_exclusion(test, sample, audit):
             continue
 
         if default_encryption.get("EbsEncryptionByDefault"):
@@ -1497,27 +1560,27 @@ def test_ebs_default_encryption(audit, control_id, risk_rating=0):
         else:
             sample.comments = "EBS default encryption is not enabled in this region."
 
-        control.samples.append(sample)
+        test.samples.append(sample)
 
-    control.evaluate_samples()
-    if not control.result:
-        control.result_description = (
-            f"Exceptions Noted. {control.num_findings} region(s) do not have EBS default encryption enabled."
+    test.evaluate_samples()
+    if not test.result:
+        test.result_description = (
+            f"Exceptions Noted. {test.num_findings} region(s) do not have EBS default encryption enabled."
         )
 
-    return control
+    return test
 
-def test_lambda_tags(audit, control_id, risk_rating=1):
+def test_lambda_tags(audit, test_id, risk_rating=1):
     # Get base required tags.
-    control_config = audit.config.get("control_config") or {}
-    base_required_tags = control_config.get("base_required_tags", ["Owner", "Description", "Classification"])
+    test_config = audit.config.get("test_config") or {}
+    base_required_tags = test_config.get("base_required_tags", ["Owner", "Description", "Classification"])
 
     # Override if 'lambda_required_tags' is set
-    required_tags = control_config.get("lambda_required_tags", base_required_tags)
+    required_tags = test_config.get("lambda_required_tags", base_required_tags)
 
-    control = Control(
-        control_id=control_id,
-        control_description=(
+    test = Test(
+        test_id=test_id,
+        test_description=(
             "Lambda functions must have required tags applied and tag values must not be empty."
         ),
         test_procedures=[
@@ -1533,8 +1596,8 @@ def test_lambda_tags(audit, control_id, risk_rating=1):
         risk_rating=risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     for region in audit.in_scope_regions:
         lambda_client = audit.session.client("lambda", region_name=region)
@@ -1555,10 +1618,10 @@ def test_lambda_tags(audit, control_id, risk_rating=1):
                     "region": region,
                     "function_name": fn["FunctionName"]
                 },
-                control_id=control_id
+                test_id=test_id
             )
 
-            if process_sample_exclusion(control, sample, audit):
+            if process_sample_exclusion(test, sample, audit):
                 continue
 
             # Fetch tags via ARN
@@ -1570,20 +1633,20 @@ def test_lambda_tags(audit, control_id, risk_rating=1):
 
             lambda_tags = tags_response.get("Tags", {})
             evaluate_tags(sample, required_tags, lambda_tags)
-            control.samples.append(sample)
+            test.samples.append(sample)
 
-    control.evaluate_samples()
-    if not control.result:
-        control.result_description = (
-            f"Exceptions Noted. {control.num_findings} Lambda function(s) are missing required tags or have empty values."
+    test.evaluate_samples()
+    if not test.result:
+        test.result_description = (
+            f"Exceptions Noted. {test.num_findings} Lambda function(s) are missing required tags or have empty values."
         )
 
-    return control
+    return test
 
-def test_cloudtrail_global_logging(audit, control_id, risk_rating=3):
-    control = Control(
-        control_id=control_id,
-        control_description="At least one multi-region CloudTrail trail has logging enabled.",
+def test_cloudtrail_global_logging(audit, test_id, risk_rating=3):
+    test = Test(
+        test_id=test_id,
+        test_description="At least one multi-region CloudTrail trail has logging enabled.",
         test_procedures=[
             "Obtained a list of CloudTrail trails by calling the describe_trails() boto3 command.",
             "Saved the list of CloudTrail trails: CloudTrail/trails.json.",
@@ -1599,8 +1662,8 @@ def test_cloudtrail_global_logging(audit, control_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
@@ -1609,9 +1672,9 @@ def test_cloudtrail_global_logging(audit, control_id, risk_rating=3):
     ).get("trailList", [])
 
     if not trails:
-        control.result = False
-        control.result_description = "Exceptions Noted. No CloudTrail trail was found."
-        return control
+        test.result = False
+        test.result_description = "Exceptions Noted. No CloudTrail trail was found."
+        return test
 
     found_valid_trail = False
     for trail in trails:
@@ -1626,19 +1689,19 @@ def test_cloudtrail_global_logging(audit, control_id, risk_rating=3):
             break
 
     if found_valid_trail:
-        control.result = True
+        test.result = True
     else:
-        control.result = False
-        control.result_description = (
+        test.result = False
+        test.result_description = (
             "Exceptions Noted. No multi-region CloudTrail trail with active logging was found."
         )
 
-    return control
+    return test
 
-def test_cloudtrail_log_file_validation(audit, control_id, risk_rating=2):
-    control = Control(
-        control_id=control_id,
-        control_description="CloudTrail trails have log file validation enabled.",
+def test_cloudtrail_log_file_validation(audit, test_id, risk_rating=2):
+    test = Test(
+        test_id=test_id,
+        test_description="CloudTrail trails have log file validation enabled.",
         test_procedures=[
             "Obtained CloudTrail trails using the describe_trails() boto3 command.",
             "Saved the trail configuration in the audit evidence folder (CloudTrail/trails.json).",
@@ -1650,8 +1713,8 @@ def test_cloudtrail_log_file_validation(audit, control_id, risk_rating=2):
         risk_rating=risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
@@ -1660,18 +1723,18 @@ def test_cloudtrail_log_file_validation(audit, control_id, risk_rating=2):
     ).get("trailList", [])
 
     if not trails:
-        control.result = False
-        control.result_description = "Exceptions Noted. No CloudTrail trails are configured."
-        return control
+        test.result = False
+        test.result_description = "Exceptions Noted. No CloudTrail trails are configured."
+        return test
 
     for trail in trails:
         trail_name = trail["Name"]
         sample = Sample(
             sample_id={"trail_name": trail_name},
-            control_id=control_id
+            test_id=test_id
         )
 
-        if process_sample_exclusion(control, sample, audit):
+        if process_sample_exclusion(test, sample, audit):
             continue
 
         log_validation = trail.get("LogFileValidationEnabled", False)
@@ -1679,20 +1742,20 @@ def test_cloudtrail_log_file_validation(audit, control_id, risk_rating=2):
             sample.result = True
         else:
             sample.comments = "Log file validation is disabled."
-        control.samples.append(sample)
+        test.samples.append(sample)
 
-    control.evaluate_samples()
-    if not control.result:
-        control.result_description = (
-            f"Exceptions Noted. {control.num_findings} trail(s) do not have log file validation enabled."
+    test.evaluate_samples()
+    if not test.result:
+        test.result_description = (
+            f"Exceptions Noted. {test.num_findings} trail(s) do not have log file validation enabled."
         )
 
-    return control
+    return test
 
-def test_cloudtrail_s3_bucket_protection(audit, control_id, risk_rating=3):
-    control = Control(
-        control_id=control_id,
-        control_description="CloudTrail S3 buckets are configured to block public access.",
+def test_cloudtrail_s3_bucket_protection(audit, test_id, risk_rating=3):
+    test = Test(
+        test_id=test_id,
+        test_description="CloudTrail S3 buckets are configured to block public access.",
         test_procedures=[
             "Obtained a list of CloudTrails by calling the describe_trails() boto3 command.",
             "Saved the list of trails in the audit evidence folder (CloudTrail/trails.json).",
@@ -1708,8 +1771,8 @@ def test_cloudtrail_s3_bucket_protection(audit, control_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
@@ -1723,15 +1786,15 @@ def test_cloudtrail_s3_bucket_protection(audit, control_id, risk_rating=3):
 
         sample = Sample(
             sample_id={"trail_name": trail_name, "bucket_name": bucket_name},
-            control_id=control_id
+            test_id=test_id
         )
 
-        if process_sample_exclusion(control, sample, audit):
+        if process_sample_exclusion(test, sample, audit):
             continue
 
         if not bucket_name:
             sample.comments = "Trail does not have an associated S3 bucket."
-            control.samples.append(sample)
+            test.samples.append(sample)
             continue
 
         # Fetch public access block
@@ -1743,7 +1806,7 @@ def test_cloudtrail_s3_bucket_protection(audit, control_id, risk_rating=3):
 
         if not public_access_block:
             sample.comments = "No Public Access Block configuration found."
-            control.samples.append(sample)
+            test.samples.append(sample)
             continue
 
         config = public_access_block.get("PublicAccessBlockConfiguration", {})
@@ -1758,27 +1821,27 @@ def test_cloudtrail_s3_bucket_protection(audit, control_id, risk_rating=3):
         else:
             sample.comments = "One or more public access settings are not enabled."
 
-        control.samples.append(sample)
+        test.samples.append(sample)
 
-    control.evaluate_samples()
+    test.evaluate_samples()
 
-    if not control.result:
-        control.result_description = (
-            f"Exceptions Noted. {control.num_findings} CloudTrail bucket(s) are not blocking public access."
+    if not test.result:
+        test.result_description = (
+            f"Exceptions Noted. {test.num_findings} CloudTrail bucket(s) are not blocking public access."
         )
 
-    return control
+    return test
 
 """
     Ensure CloudTrail logging has not been stopped within the configured lookback period.
 """
-def test_cloudtrail_logging_recent_stops(audit, control_id, risk_rating=3):
-    control_config = audit.config.get("control_config") or {}
-    lookback_days = control_config.get("cloudtrail_logging_lookback_days", 365)
+def test_cloudtrail_logging_recent_stops(audit, test_id, risk_rating=3):
+    test_config = audit.config.get("test_config") or {}
+    lookback_days = test_config.get("cloudtrail_logging_lookback_days", 365)
 
-    control = Control(
-        control_id=control_id,
-        control_description=(
+    test = Test(
+        test_id=test_id,
+        test_description=(
             f"CloudTrail logging has not been stopped in the last {lookback_days} days."
         ),
         test_procedures=[
@@ -1796,8 +1859,8 @@ def test_cloudtrail_logging_recent_stops(audit, control_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
@@ -1812,10 +1875,10 @@ def test_cloudtrail_logging_recent_stops(audit, control_id, risk_rating=3):
         trail_name = trail.get("Name")
         sample = Sample(
             sample_id={"trail_name": trail_name},
-            control_id=control_id
+            test_id=test_id
         )
 
-        if process_sample_exclusion(control, sample, audit):
+        if process_sample_exclusion(test, sample, audit):
             continue
 
         status = audit.evidence_client.get_aws(
@@ -1841,22 +1904,22 @@ def test_cloudtrail_logging_recent_stops(audit, control_id, risk_rating=3):
         else:
             sample.result = True
 
-        control.samples.append(sample)
+        test.samples.append(sample)
 
-    control.evaluate_samples()
+    test.evaluate_samples()
 
-    if not control.result:
-        control.result_description = (
-            f"Exceptions Noted. {control.num_findings} trail(s) are not currently logging or have been stopped "
+    if not test.result:
+        test.result_description = (
+            f"Exceptions Noted. {test.num_findings} trail(s) are not currently logging or have been stopped "
             f"within the last {lookback_days} days."
         )
 
-    return control
+    return test
 
-def test_waf_enabled(audit, control_id, risk_rating=2):
-    control = Control(
-        control_id=control_id,
-        control_description="WAF is enabled on Application Load Balancers and API Gateways.",
+def test_waf_enabled(audit, test_id, risk_rating=2):
+    test = Test(
+        test_id=test_id,
+        test_description="WAF is enabled on Application Load Balancers and API Gateways.",
         test_procedures=[
             "For each in-scope region, obtained a list of Web ACLs by calling list_web_acls() boto3 command.",
             "Saved the list of Web ACLs (WAF/[region]/web_acls.json).",
@@ -1877,8 +1940,8 @@ def test_waf_enabled(audit, control_id, risk_rating=2):
         risk_rating=risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     for region in audit.in_scope_regions:
         waf = audit.session.client("wafv2", region_name=region)
@@ -1938,10 +2001,10 @@ def test_waf_enabled(audit, control_id, risk_rating=2):
                     "resource_type": "ALB",
                     "resource_id": lb["LoadBalancerName"]
                 },
-                control_id=control_id
+                test_id=test_id
             )
 
-            if process_sample_exclusion(control, sample, audit):
+            if process_sample_exclusion(test, sample, audit):
                 continue
 
             lb_arn = lb.get("LoadBalancerArn")
@@ -1959,7 +2022,7 @@ def test_waf_enabled(audit, control_id, risk_rating=2):
             else:
                 sample.comments = "No WAF Web ACL associated."
 
-            control.samples.append(sample)
+            test.samples.append(sample)
 
         # API Gateway (REST APIs)
         apis = audit.evidence_client.get_aws(
@@ -1974,10 +2037,10 @@ def test_waf_enabled(audit, control_id, risk_rating=2):
                     "resource_type": "API Gateway",
                     "resource_id": api["id"]
                 },
-                control_id=control_id
+                test_id=test_id
             )
 
-            if process_sample_exclusion(control, sample, audit):
+            if process_sample_exclusion(test, sample, audit):
                 continue
             
             api_gw_arn = f"arn:aws:apigateway:{region}::/restapis/{api['id']}"
@@ -1991,20 +2054,20 @@ def test_waf_enabled(audit, control_id, risk_rating=2):
             else:
                 sample.comments = "No WAF Web ACL associated."
 
-            control.samples.append(sample)
+            test.samples.append(sample)
 
-    control.evaluate_samples()
-    if not control.result:
-        control.result_description = (
-            f"Exceptions Noted. {control.num_findings} resource(s) do not have WAF enabled."
+    test.evaluate_samples()
+    if not test.result:
+        test.result_description = (
+            f"Exceptions Noted. {test.num_findings} resource(s) do not have WAF enabled."
         )
 
-    return control
+    return test
 
-def test_guardduty_enabled(audit, control_id, risk_rating=3):
-    control = Control(
-        control_id=control_id,
-        control_description="GuardDuty is enabled for all in-scope regions.",
+def test_guardduty_enabled(audit, test_id, risk_rating=3):
+    test = Test(
+        test_id=test_id,
+        test_description="GuardDuty is enabled for all in-scope regions.",
         test_procedures=[
             "For each in-scope region, obtained a list of GuardDuty detectors by calling the list_detectors() boto3 command.",
             "For each in-scope region, saved the list of detector IDs: GuardDuty/[region]/detectors.json.",
@@ -2018,18 +2081,18 @@ def test_guardduty_enabled(audit, control_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    if control.is_excluded:
-        return control
+    if test.is_excluded:
+        return test
 
     for region in audit.in_scope_regions:
         gd = audit.session.client("guardduty", region_name=region)
 
         sample = Sample(
             sample_id={"region": region},
-            control_id=control_id
+            test_id=test_id
         )
 
-        if process_sample_exclusion(control, sample, audit):
+        if process_sample_exclusion(test, sample, audit):
             continue
 
         detectors = audit.evidence_client.get_aws(
@@ -2040,7 +2103,7 @@ def test_guardduty_enabled(audit, control_id, risk_rating=3):
         if not detectors:
             sample.result = False
             sample.comments = "No GuardDuty detectors in region."
-            control.samples.append(sample)
+            test.samples.append(sample)
             continue
 
         enabled_detector_found = False
@@ -2061,13 +2124,13 @@ def test_guardduty_enabled(audit, control_id, risk_rating=3):
             sample.result = False
             sample.comments = "Detector(s) found but none are enabled."
 
-        control.samples.append(sample)
+        test.samples.append(sample)
 
-    control.evaluate_samples()
+    test.evaluate_samples()
 
-    if not control.result:
-        control.result_description = (
-            f"Exceptions Noted. GuardDuty is not enabled for {control.num_findings} in-scope region(s)."
+    if not test.result:
+        test.result_description = (
+            f"Exceptions Noted. GuardDuty is not enabled for {test.num_findings} in-scope region(s)."
         )
 
-    return control
+    return test

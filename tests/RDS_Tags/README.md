@@ -9,7 +9,7 @@ A production RDS instance is created without proper tagging. Due to the lack of 
 2. For each in-scope region, saved the list of RDS instances: [/evidence_library/RDS/region_name/db_instances.json](/evidence_library/RDS/us-east-1/db_instances.json).
 3. For each RDS instance, reviewed the `TagList` to determine if the required tags exist and contain non-empty values.
   * By default, the playbook requires the following tags: "Owner", "Description", "Classification".
-  * If you want to change the default required tags, please add them under 'rds_required_tags' in the 'control_config' section of the config.json file.
+  * If you want to change the default required tags, please add them under 'rds_required_tags' in the 'test_config' section of the config.json file.
 
 ## Other Resources
 - [Example Workpaper](/evidence_library/aws_audit_report.pdf)

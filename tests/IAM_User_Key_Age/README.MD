@@ -14,7 +14,7 @@ Your organization created an IAM access key for a legacy data & analytics tool. 
    - If the access key is inactive, it is excluded from testing.  
    - If the access key exceeds 90 days, an it is marked as an exception.
 
-**Note:** The default maximum age for IAM access keys is 90 days. To customize this value, update the `iam_key_max_age` setting in the `control_config` section of the `config.json` file.
+**Note:** The default maximum age for IAM access keys is 90 days. To customize this value, update the `iam_key_max_age` setting in the `test_config` section of the `config.json` file.
 
 ## Other Resources
 - [Example Workpaper](/evidence_library/aws_audit_report.pdf)
