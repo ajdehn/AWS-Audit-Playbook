@@ -1,6 +1,6 @@
 import aws_tests
 from utils import confirm_delete_folder, load_config, create_session, get_aws_account_id
-from buildReport import generate_pdf_report
+from build_report import generate_pdf_report
 from evidenceClient import EvidenceClient
 import json
 
