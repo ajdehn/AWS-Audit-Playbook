@@ -9,7 +9,7 @@ Your AWS account has overly permissive firewall rules that are exposed to the in
 2. For each in-scope region, saved the list of security groups: [EC2/[region]/security_groups.json](/evidence_library/EC2/us-east-1/security_groups.json).
 3. For each security group, reviewed the `Tags` to determine if the required tags exist and contain non-empty values.
   * By default, the playbook requires the following tags: "Owner", "Description", "ReviewedBy", "LastReviewedDate".
-  * If you want to change the default required tags, please add them under 'ec2_sg_required_tags' in the 'control_config' section of the config.json file.
+  * If you want to change the default required tags, please add them under 'ec2_sg_required_tags' in the 'test_config' section of the config.json file.
 
 ## Other Resources
 - [Example Workpaper](/evidence_library/aws_audit_report.pdf)
