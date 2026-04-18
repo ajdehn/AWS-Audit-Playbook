@@ -48,7 +48,7 @@ This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) foun
 7. Create an access key for the IAM user created in the previous step: [AWS Docs](https://docs.aws.amazon.com/keyspaces/latest/devguide/create.keypair.html)
     * NOTE: Configure the access key on your local machine using the 'aws configure' command [Video Tutorial](https://youtu.be/RLx5qVZSTyE?si=7fqyxFzThDaB-mGQ).
     * NOTE: Access keys can only be viewed once, at the time of creation.  They must be stored securely elsewhere for future use.
-8. Run the command 'python src/runAudit.py'. Running this scan will perform the following:
+8. Run the command 'python src/run_audit.py'. Running this scan will perform the following:
   * Create a tmp folder for the audit evidence and report.
   * Run all tests (see [src/aws_tests.py](./src/aws_tests.py))
 9. Optional: Configure the env file to run the script through an IAM role.
