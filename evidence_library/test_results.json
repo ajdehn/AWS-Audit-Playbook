@@ -1,7 +1,7 @@
 [
     {
-        "control_id": "IAM Root MFA",
-        "control_description": "Root account has MFA enabled.",
+        "test_id": "IAM Root MFA",
+        "test_description": "Root account has MFA enabled.",
         "risk_rating": 3,
         "is_excluded": false,
         "result": "Pass",
@@ -14,8 +14,8 @@
         "test_attributes": []
     },
     {
-        "control_id": "IAM Root Access Key",
-        "control_description": "Root account does not have any active access keys.",
+        "test_id": "IAM Root Access Key",
+        "test_description": "Root account does not have any active access keys.",
         "risk_rating": 3,
         "is_excluded": false,
         "result": "Pass",
@@ -28,8 +28,8 @@
         "test_attributes": []
     },
     {
-        "control_id": "IAM User MFA",
-        "control_description": "IAM users with an active console password have MFA enabled.",
+        "test_id": "IAM User MFA",
+        "test_description": "IAM users with an active console password have MFA enabled.",
         "risk_rating": 3,
         "is_excluded": false,
         "result": "Fail",
@@ -47,8 +47,8 @@
         "test_attributes": []
     },
     {
-        "control_id": "IAM User Key Age",
-        "control_description": "IAM access keys are rotated at least every 90 days.",
+        "test_id": "IAM User Key Age",
+        "test_description": "IAM access keys are rotated at least every 90 days.",
         "risk_rating": 3,
         "is_excluded": false,
         "result": "Fail",
@@ -65,8 +65,8 @@
         ]
     },
     {
-        "control_id": "IAM Password",
-        "control_description": "IAM passwords must comply with the organizations password complexity requirements.",
+        "test_id": "IAM Password",
+        "test_description": "IAM passwords must comply with the organizations password complexity requirements.",
         "risk_rating": 2,
         "is_excluded": false,
         "result": "Fail",
@@ -83,8 +83,8 @@
         ]
     },
     {
-        "control_id": "S3 Encryption",
-        "control_description": "S3 buckets are encrypted at rest.",
+        "test_id": "S3 Encryption",
+        "test_description": "S3 buckets are encrypted at rest.",
         "risk_rating": 2,
         "is_excluded": false,
         "result": "Pass",
@@ -101,8 +101,8 @@
         ]
     },
     {
-        "control_id": "S3 Public Access",
-        "control_description": "S3 buckets are configured to block public access.",
+        "test_id": "S3 Public Access",
+        "test_description": "S3 buckets are configured to block public access.",
         "risk_rating": 3,
         "is_excluded": false,
         "result": "Fail",
@@ -119,12 +119,12 @@
         ]
     },
     {
-        "control_id": "S3 Secure Transport",
-        "control_description": "S3 buckets are configured to deny unencrypted data in-transit.",
+        "test_id": "S3 Secure Transport",
+        "test_description": "S3 buckets are configured to deny unencrypted data in-transit.",
         "risk_rating": 0,
         "is_excluded": false,
         "result": "Fail",
-        "result_description": "Exceptions Noted. 3 S3 bucket(s) do not enforce secure transport (HTTPS).",
+        "result_description": "Exceptions Noted. 4 S3 bucket(s) do not enforce secure transport (HTTPS).",
         "test_procedures": [
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
             "Saved the list of buckets: S3/buckets.json.",
@@ -135,12 +135,12 @@
         "test_attributes": []
     },
     {
-        "control_id": "S3 Tags",
-        "control_description": "S3 buckets must have required tags applied and tag values must not be empty.",
+        "test_id": "S3 Tags",
+        "test_description": "S3 buckets must have required tags applied and tag values must not be empty.",
         "risk_rating": 1,
         "is_excluded": false,
         "result": "Fail",
-        "result_description": "Exceptions Noted. 1 bucket(s) missing required tags or have empty values.",
+        "result_description": "Exceptions Noted. 2 bucket(s) missing required tags or have empty values.",
         "test_procedures": [
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
             "Saved the list of buckets: S3/buckets.json.",
@@ -151,8 +151,8 @@
         "test_attributes": []
     },
     {
-        "control_id": "RDS Backup Retention",
-        "control_description": "RDS backups are retained for at least 14 days.",
+        "test_id": "RDS Backup Retention",
+        "test_description": "RDS backups are retained for at least 14 days.",
         "risk_rating": 1,
         "is_excluded": false,
         "result": "Pass",
@@ -165,8 +165,8 @@
         "test_attributes": []
     },
     {
-        "control_id": "RDS Encryption",
-        "control_description": "RDS instances are encrypted at rest.",
+        "test_id": "RDS Encryption",
+        "test_description": "RDS instances are encrypted at rest.",
         "risk_rating": 2,
         "is_excluded": false,
         "result": "Pass",
@@ -179,8 +179,8 @@
         "test_attributes": []
     },
     {
-        "control_id": "RDS Public Access",
-        "control_description": "RDS instances are not publicly accessible.",
+        "test_id": "RDS Public Access",
+        "test_description": "RDS instances are not publicly accessible.",
         "risk_rating": 3,
         "is_excluded": false,
         "result": "Pass",
@@ -193,8 +193,8 @@
         "test_attributes": []
     },
     {
-        "control_id": "RDS Automatic Upgrades",
-        "control_description": "RDS instances have automatic minor version upgrades enabled.",
+        "test_id": "RDS Automatic Upgrades",
+        "test_description": "RDS instances have automatic minor version upgrades enabled.",
         "risk_rating": 1,
         "is_excluded": false,
         "result": "Pass",
@@ -207,8 +207,8 @@
         "test_attributes": []
     },
     {
-        "control_id": "RDS Deletion Protection",
-        "control_description": "RDS instances have deletion protection enabled at the cluster or instance level.",
+        "test_id": "RDS Deletion Protection",
+        "test_description": "RDS instances have deletion protection enabled at the cluster or instance level.",
         "risk_rating": 2,
         "is_excluded": false,
         "result": "Pass",
@@ -221,8 +221,8 @@
         "test_attributes": []
     },
     {
-        "control_id": "RDS Tags",
-        "control_description": "RDS instances must have required tags applied and tag values must not be empty.",
+        "test_id": "RDS Tags",
+        "test_description": "RDS instances must have required tags applied and tag values must not be empty.",
         "risk_rating": 1,
         "is_excluded": false,
         "result": "Pass",
@@ -235,8 +235,8 @@
         "test_attributes": []
     },
     {
-        "control_id": "EBS Volume Encryption",
-        "control_description": "EBS volumes are encrypted at rest.",
+        "test_id": "EBS Volume Encryption",
+        "test_description": "EBS volumes are encrypted at rest.",
         "risk_rating": 2,
         "is_excluded": false,
         "result": "Fail",
@@ -249,12 +249,12 @@
         "test_attributes": []
     },
     {
-        "control_id": "EBS Encryption Default",
-        "control_description": "EBS volumes must have default encryption enabled in each region.",
+        "test_id": "EBS Encryption Default",
+        "test_description": "EBS volumes must have default encryption enabled in each region.",
         "risk_rating": 0,
         "is_excluded": false,
         "result": "Fail",
-        "result_description": "Exceptions Noted. 4 region(s) do not have EBS default encryption enabled.",
+        "result_description": "Exceptions Noted. 2 region(s) do not have EBS default encryption enabled.",
         "test_procedures": [
             "For each in-scope region, obtained the EBS default encryption settings by calling get_ebs_encryption_by_default() boto3 command.",
             "For each in-scope region, saved the EBS default encryption settings: EC2/[region_name]/default_ebs_encryption.json.",
@@ -263,8 +263,8 @@
         "test_attributes": []
     },
     {
-        "control_id": "EBS Tags",
-        "control_description": "EBS volumes must have required tags applied and tag values must not be empty.",
+        "test_id": "EBS Tags",
+        "test_description": "EBS volumes must have required tags applied and tag values must not be empty.",
         "risk_rating": 1,
         "is_excluded": false,
         "result": "Fail",
@@ -278,8 +278,8 @@
         "test_attributes": []
     },
     {
-        "control_id": "EC2 Tags",
-        "control_description": "EC2 instances must have required tags applied and tag values must not be empty.",
+        "test_id": "EC2 Tags",
+        "test_description": "EC2 instances must have required tags applied and tag values must not be empty.",
         "risk_rating": 1,
         "is_excluded": false,
         "result": "Fail",
@@ -292,12 +292,12 @@
         "test_attributes": []
     },
     {
-        "control_id": "EC2 Security Group Tags",
-        "control_description": "EC2 security groups have required tags applied and tag values are not be empty.",
+        "test_id": "EC2 Security Group Tags",
+        "test_description": "EC2 security groups have required tags applied and tag values are not be empty.",
         "risk_rating": 1,
         "is_excluded": false,
         "result": "Fail",
-        "result_description": "Exceptions Noted. 6 security group(s) are missing required tags or have empty values.",
+        "result_description": "Exceptions Noted. 4 security group(s) are missing required tags or have empty values.",
         "test_procedures": [
             "For each in-scope region, obtained a list of EC2 security groups by calling describe_security_groups() boto3 command.",
             "For each in-scope region, saved the list of security groups: EC2/[region]/security_groups.json",
@@ -306,8 +306,8 @@
         "test_attributes": []
     },
     {
-        "control_id": "Lambda Tags",
-        "control_description": "Lambda functions must have required tags applied and tag values must not be empty.",
+        "test_id": "Lambda Tags",
+        "test_description": "Lambda functions must have required tags applied and tag values must not be empty.",
         "risk_rating": 1,
         "is_excluded": false,
         "result": "Pass",
@@ -322,8 +322,8 @@
         "test_attributes": []
     },
     {
-        "control_id": "CloudTrail Multi-Region",
-        "control_description": "At least one multi-region CloudTrail trail has logging enabled.",
+        "test_id": "CloudTrail Multi-Region",
+        "test_description": "At least one multi-region CloudTrail trail has logging enabled.",
         "risk_rating": 3,
         "is_excluded": false,
         "result": "Pass",
@@ -341,8 +341,8 @@
         ]
     },
     {
-        "control_id": "CloudTrail Log File Validation",
-        "control_description": "CloudTrail trails have log file validation enabled.",
+        "test_id": "CloudTrail Log File Validation",
+        "test_description": "CloudTrail trails have log file validation enabled.",
         "risk_rating": 2,
         "is_excluded": false,
         "result": "Fail",
@@ -355,8 +355,8 @@
         "test_attributes": []
     },
     {
-        "control_id": "CloudTrail S3 Bucket Protection",
-        "control_description": "CloudTrail S3 buckets are configured to block public access.",
+        "test_id": "CloudTrail S3 Bucket Protection",
+        "test_description": "CloudTrail S3 buckets are configured to block public access.",
         "risk_rating": 3,
         "is_excluded": false,
         "result": "Pass",
@@ -373,8 +373,8 @@
         ]
     },
     {
-        "control_id": "CloudTrail Logging Recent Stops",
-        "control_description": "CloudTrail logging has not been stopped in the last 365 days.",
+        "test_id": "CloudTrail Logging Recent Stops",
+        "test_description": "CloudTrail logging has not been stopped in the last 365 days.",
         "risk_rating": 3,
         "is_excluded": false,
         "result": "Pass",
@@ -391,8 +391,8 @@
         ]
     },
     {
-        "control_id": "Web Application Firewall Enabled",
-        "control_description": "WAF is enabled on Application Load Balancers and API Gateways.",
+        "test_id": "Web Application Firewall Enabled",
+        "test_description": "WAF is enabled on Application Load Balancers and API Gateways.",
         "risk_rating": 2,
         "is_excluded": false,
         "result": "Pass",
@@ -414,12 +414,12 @@
         "test_attributes": []
     },
     {
-        "control_id": "GuardDuty Enabled",
-        "control_description": "GuardDuty is enabled for all in-scope regions.",
+        "test_id": "GuardDuty Enabled",
+        "test_description": "GuardDuty is enabled for all in-scope regions.",
         "risk_rating": 3,
         "is_excluded": false,
         "result": "Fail",
-        "result_description": "Exceptions Noted. GuardDuty is not enabled for 3 in-scope region(s).",
+        "result_description": "Exceptions Noted. GuardDuty is not enabled for 1 in-scope region(s).",
         "test_procedures": [
             "For each in-scope region, obtained a list of GuardDuty detectors by calling the list_detectors() boto3 command.",
             "For each in-scope region, saved the list of detector IDs: GuardDuty/[region]/detectors.json.",
