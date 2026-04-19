@@ -9,12 +9,12 @@ import json
 import os
 
 class EvidenceClient:
-    def __init__(self, base_path, debug=False):
+    def __init__(self, evidence_folder_path, debug=False):
         """
         base_path: root folder for evidence (e.g., audit.evidence_folder)
         debug: print cache behavior
         """
-        self.base_path = base_path
+        self.base_path = evidence_folder_path
         self.debug = debug
 
     # ---------------------------
@@ -24,6 +24,7 @@ class EvidenceClient:
         """
         Fetch data with simple caching (no expiration).
         """
+        # TODO: Consider lowercasing by using .lower()
         file_path = os.path.join(self.base_path, relative_path)
 
         if os.path.exists(file_path):
