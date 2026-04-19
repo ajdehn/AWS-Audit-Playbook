@@ -75,6 +75,38 @@ def checkConfigFile(config):
 
     return config
 
+# NOTE: Experiment only collecting evidence.
+# NOTE: Consider making these calls concurrently to speed up the process.
+def save_s3_evidence(audit):
+    print("Saving S3 evidence.")
+    s3 = audit.session.client("s3")
+    # Obtain and save list of buckets.
+    buckets = audit.evidence_client.get("S3/buckets.json", lambda: s3.list_buckets())
+    for bucket in buckets.get("Buckets", []):
+
+        # Save encryption settings.
+        enc = audit.evidence_client.get_aws(f"S3/buckets/{bucket['Name']}/encryption.json",
+            lambda: s3.get_bucket_encryption(Bucket=bucket['Name']),
+            not_found_codes=["ServerSideEncryptionConfigurationNotFoundError"]
+        )
+        # Save public access block.
+        public_access_block = audit.evidence_client.get_aws(
+            f"S3/buckets/{bucket['Name']}/public_access_block.json",
+            lambda: s3.get_public_access_block(Bucket=bucket["Name"]),
+            not_found_codes=["NoSuchPublicAccessBlockConfiguration"]
+        )
+        # Save tags.
+        tags_response = audit.evidence_client.get_aws(
+            f"S3/buckets/{bucket['Name']}/tags.json",
+            lambda: s3.get_bucket_tagging(Bucket=bucket["Name"]),
+            not_found_codes=["NoSuchTagSet"]
+        )
+        # Save bucket policy
+        policy = audit.evidence_client.get_aws(
+            f"S3/buckets/{bucket_name}/bucket_policy.json",
+            lambda: s3.get_bucket_policy(Bucket=bucket_name),
+            not_found_codes=["NoSuchBucketPolicy"]
+        )        
 
 """
     Save all IAM related evidence
