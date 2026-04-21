@@ -81,29 +81,29 @@ def save_s3_evidence(audit):
     print("Saving S3 evidence.")
     s3 = audit.session.client("s3")
     # Obtain and save list of buckets.
-    buckets = audit.evidence_client.get("S3/buckets.json", lambda: s3.list_buckets())
+    buckets = audit.evidence_client.get("s3/buckets.json", lambda: s3.list_buckets())
     for bucket in buckets.get("Buckets", []):
 
         # Save encryption settings.
-        enc = audit.evidence_client.get_aws(f"S3/buckets/{bucket['Name']}/encryption.json",
+        enc = audit.evidence_client.get_aws(f"s3/buckets/{bucket['Name']}/encryption.json",
             lambda: s3.get_bucket_encryption(Bucket=bucket['Name']),
             not_found_codes=["ServerSideEncryptionConfigurationNotFoundError"]
         )
         # Save public access block.
         public_access_block = audit.evidence_client.get_aws(
-            f"S3/buckets/{bucket['Name']}/public_access_block.json",
+            f"s3/buckets/{bucket['Name']}/public_access_block.json",
             lambda: s3.get_public_access_block(Bucket=bucket["Name"]),
             not_found_codes=["NoSuchPublicAccessBlockConfiguration"]
         )
         # Save tags.
         tags_response = audit.evidence_client.get_aws(
-            f"S3/buckets/{bucket['Name']}/tags.json",
+            f"s3/buckets/{bucket['Name']}/tags.json",
             lambda: s3.get_bucket_tagging(Bucket=bucket["Name"]),
             not_found_codes=["NoSuchTagSet"]
         )
         # Save bucket policy
         policy = audit.evidence_client.get_aws(
-            f"S3/buckets/{bucket_name}/bucket_policy.json",
+            f"s3/buckets/{bucket_name}/bucket_policy.json",
             lambda: s3.get_bucket_policy(Bucket=bucket_name),
             not_found_codes=["NoSuchBucketPolicy"]
         )        
@@ -113,7 +113,7 @@ def save_s3_evidence(audit):
 """
 def saveIAMEvidence(config):
     if not any ([config['IAM_MFA'], config['IAM_Key_Age'], config['IAM_Admin'], config['IAM_PWD']]):
-        # No EC2/EBS tests are in-scope.
+        # No ec2/EBS tests are in-scope.
         print('All EC2 & EBS options set to false.  Skipping.')
         return
     print('Gathering IAM evidence')
@@ -133,72 +133,72 @@ def saveIAMEvidence(config):
         ],
         StartTime=start_time
     )
-    saveJson(response, 'audit_evidence/IAM/new_iam_users.json')
+    saveJson(response, 'audit_evidence/iam/new_iam_users.json')
 
     if config['IAM_MFA'] or config['IAM_Key_Age']:
         # Generate credentials report & save to JSON.
         iam_client.generate_credential_report()
         time.sleep(5)
         credentialReport = iam_client.get_credential_report()
-        saveJson(credentialReport, 'audit_evidence/IAM/credentials_report.json')
+        saveJson(credentialReport, 'audit_evidence/iam/credentials_report.json')
         # Save credentials report as a CSV
         decodedCredentialReport = credentialReport['Content'].decode("utf-8")
-        with open("audit_evidence/IAM/credentials_report.csv", "w") as file:
+        with open("audit_evidence/iam/credentials_report.csv", "w") as file:
             file.write(decodedCredentialReport)
 
     if config['IAM_Admin']:
         administrativeEntities = iam_client.list_entities_for_policy(
             PolicyArn='arn:aws:iam::aws:policy/AdministratorAccess'
         )
-        saveJson(administrativeEntities, 'audit_evidence/IAM/administrative_entities.json')
+        saveJson(administrativeEntities, 'audit_evidence/iam/administrative_entities.json')
 
         #if sepearate JSONs was not intentional, may be desireable to explore a dictionary or multi-dimension list 
         for group in administrativeEntities['PolicyGroups']:
             groupMembers = iam_client.get_group(GroupName=group['GroupName'])
-            saveJson(groupMembers, f'audit_evidence/IAM/groups/{group['GroupName']}_members.json')
+            saveJson(groupMembers, f'audit_evidence/iam/groups/{group['GroupName']}_members.json')
     
     if (config['IAM_UAR']):
         # Gather IAM group related evidence
         allGroups = fetchData(iam_client.list_groups)
-        saveJson(allGroups, f'audit_evidence/IAM/all_iam_groups.json')
+        saveJson(allGroups, f'audit_evidence/iam/all_iam_groups.json')
         for group in allGroups['Groups']:
             # Get and save group members
             groupMembers = fetchData(iam_client.get_group, GroupName=group['GroupName'])
-            saveJson(groupMembers, f"audit_evidence/IAM/groups/{group['GroupName']}/group_members.json")
+            saveJson(groupMembers, f"audit_evidence/iam/groups/{group['GroupName']}/group_members.json")
             # Get and save group's attached policies
             managedPolicies = fetchData(iam_client.list_attached_group_policies,GroupName=group['GroupName'])
-            saveJson(managedPolicies, f"audit_evidence/IAM/groups/{group['GroupName']}/attached_managed_policies.json")
+            saveJson(managedPolicies, f"audit_evidence/iam/groups/{group['GroupName']}/attached_managed_policies.json")
             # Get and save group's inline policies
             groupInlinePolicies = fetchData(iam_client.list_group_policies, GroupName=group['GroupName'])
-            saveJson(groupInlinePolicies, f"audit_evidence/IAM/groups/{group['GroupName']}/inline_policies.json")
+            saveJson(groupInlinePolicies, f"audit_evidence/iam/groups/{group['GroupName']}/inline_policies.json")
             # Save policy documents for each inline policies attached to the group.         
             for policy in groupInlinePolicies['PolicyNames']:
                 groupInlinePolicyDoc = iam_client.get_group_policy(GroupName=group['GroupName'], PolicyName=policy)
-                saveJson(groupInlinePolicyDoc, f"audit_evidence/IAM/groups/{group['GroupName']}/inline_policies/{policy}.json")
+                saveJson(groupInlinePolicyDoc, f"audit_evidence/iam/groups/{group['GroupName']}/inline_policies/{policy}.json")
 
         # Gather IAM user related evidence
         allUsers = fetchData(iam_client.list_users)
-        saveJson(allUsers, f'audit_evidence/IAM/all_iam_users.json')
+        saveJson(allUsers, f'audit_evidence/iam/all_iam_users.json')
 
         for user in allUsers['Users']:
             # Save managed policies attached directly to a user.
             managedPolicies = fetchData(iam_client.list_attached_user_policies,UserName=user['UserName'])
-            saveJson(managedPolicies, f"audit_evidence/IAM/users/{user['UserName']}/attached_managed_policies.json")
+            saveJson(managedPolicies, f"audit_evidence/iam/users/{user['UserName']}/attached_managed_policies.json")
             # Save inline policies attached directly to a user.
             userInlinePolicies = fetchData(iam_client.list_user_policies, UserName=user['UserName'])
-            saveJson(userInlinePolicies, f"audit_evidence/IAM/users/{user['UserName']}/inline_policies.json")
+            saveJson(userInlinePolicies, f"audit_evidence/iam/users/{user['UserName']}/inline_policies.json")
             # Save policy documents for each inline policies attached to the user.
             for policy in userInlinePolicies['PolicyNames']:
                 userInlinePolicyDoc = iam_client.get_user_policy(UserName=user['UserName'], PolicyName=policy)
-                saveJson(userInlinePolicyDoc, f"audit_evidence/IAM/users/{user['UserName']}/inline_policies/{policy}.json")   
+                saveJson(userInlinePolicyDoc, f"audit_evidence/iam/users/{user['UserName']}/inline_policies/{policy}.json")   
             # Save groups user is a member of.
             groupMembership = fetchData(iam_client.list_groups_for_user, UserName=user['UserName'])
-            saveJson(groupMembership, f"audit_evidence/IAM/users/{user['UserName']}/group_membership.json")
+            saveJson(groupMembership, f"audit_evidence/iam/users/{user['UserName']}/group_membership.json")
 
 
 def saveEC2Evidence(config):
     if not any ([config['EBS_Encryption'], config['EC2_Tags'], config['EC2_Public_Security_Groups']]):
-        # No EC2/EBS tests are in-scope.
+        # No ec2/EBS tests are in-scope.
         print('All EC2 & EBS options set to false.  Skipping.')
         return
     print('Gathering EC2 & EBS evidence')
@@ -207,7 +207,7 @@ def saveEC2Evidence(config):
             ec2_client = boto3.client('ec2', region_name=region)
             if config['EC2_Public_Security_Groups']:
                 allSecurityGroups = fetchData(ec2_client.describe_security_groups)
-                saveJson(allSecurityGroups, f'audit_evidence/EC2/regions/{region}/allSecurityGroups.json')
+                saveJson(allSecurityGroups, f'audit_evidence/ec2/regions/{region}/allSecurityGroups.json')
         except Exception as e:
             print("Exception in region: ", region)
             if 'InvalidClientTokenId' in e.response['Error']['Code']:
@@ -227,10 +227,10 @@ def saveGuardDutyEvidence(config):
     for region in config['inScopeRegions']:
         guardduty_client = boto3.client('guardduty', region_name=region)
         allDetectors = fetchData(guardduty_client.list_detectors)
-        saveJson(allDetectors, f'audit_evidence/GuardDuty/regions/{region}/all_detectors.json')
+        saveJson(allDetectors, f'audit_evidence/guardduty/regions/{region}/all_detectors.json')
         for detector_id in allDetectors['DetectorIds']:
             detectorDetails = guardduty_client.get_detector(DetectorId=detector_id)
-            saveJson(detectorDetails, f'audit_evidence/GuardDuty/regions/{region}/{detector_id}_config.json')
+            saveJson(detectorDetails, f'audit_evidence/guardduty/regions/{region}/{detector_id}_config.json')
             if config['GD_Findings']:
                 # Filter criteria for only active GuardDuty findings
                 active_findings_filter = {
@@ -242,7 +242,7 @@ def saveGuardDutyEvidence(config):
                 }
                 findingsBySeverity = guardduty_client.get_findings_statistics(DetectorId=detector_id, 
                 FindingStatisticTypes=['COUNT_BY_SEVERITY'], FindingCriteria=active_findings_filter)
-                saveJson(findingsBySeverity, f'audit_evidence/GuardDuty/regions/{region}/{detector_id}_findings_stats.json')
+                saveJson(findingsBySeverity, f'audit_evidence/guardduty/regions/{region}/{detector_id}_findings_stats.json')
 
                 # Step 1: List only ACTIVE finding IDs using filter
                 findings = []
@@ -270,7 +270,7 @@ def saveGuardDutyEvidence(config):
                     findings.extend(response['Findings'])
                 # Step 3: Sort by severity descending
                 findings.sort(key=lambda x: x['Severity'], reverse=True)
-                saveJson(findings, f'audit_evidence/GuardDuty/regions/{region}/{detector_id}_findings.json')
+                saveJson(findings, f'audit_evidence/guardduty/regions/{region}/{detector_id}_findings.json')
 
 def saveEventBridgeEvidence(config):
     if config['GD_Alerts']:
@@ -290,7 +290,7 @@ def saveEventBridgeEvidence(config):
                             if "sns" in target['Arn']:
                                 topicSubscriptions = sns_client.list_subscriptions_by_topic(TopicArn=target['Arn'])
                                 topicName = target['Arn'].split(':')[5]
-                                saveJson(topicSubscriptions, f"audit_evidence/SNS/{region}/{topicName}.json")
+                                saveJson(topicSubscriptions, f"audit_evidence/sns/{region}/{topicName}.json")
     else:
         print('Skipping EventBridge becuase GuardDuty Alerts were not selected for evidence gathering.')    
 
