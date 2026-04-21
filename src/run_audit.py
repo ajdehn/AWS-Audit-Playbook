@@ -44,6 +44,7 @@ if __name__ == "__main__":
     # Save audit report JSON file.
     with open(f"{tmp_folder_name}/aws_audit_report.json", "w") as f:
         json.dump(audit.to_dict(), f, indent=4)
+        print(f"Report generated: {tmp_folder_name}/aws_audit_report.json")
 
     generate_pdf_report(audit, audit.test_results, "AWS", file_name=f"{tmp_folder_name}/aws_audit_report.pdf")
 

@@ -36,7 +36,7 @@ class EvidenceClient:
             print(f"[FETCHING] {file_path}")
 
         data = fetch_fn()
-        save_json(data, file_path)
+        save_json(data, file_path.lower())
         return data
 
     """
@@ -267,9 +267,9 @@ def test_s3_encryption(audit, test_id, risk_rating=2):
         test_description="S3 buckets are encrypted at rest.",
         test_procedures=[
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
-            "Saved the list of buckets: S3/buckets.json.",
+            "Saved the list of buckets: s3/buckets.json.",
             "For each S3 bucket, obtained the encryption settings by calling the get_bucket_encryption() boto3 command.",
-            "For each S3 bucket, saved the encryption settings: S3/[bucket_name]/encryption.json.",
+            "For each S3 bucket, saved the encryption settings: s3/[bucket_name]/encryption.json.",
             "For each S3 bucket, inspected the encryption settings to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=["ServerSideEncryptionConfiguration is present in encryption.json."],
@@ -283,7 +283,7 @@ def test_s3_encryption(audit, test_id, risk_rating=2):
     
     s3 = audit.session.client("s3")
     # Obtain and save list of buckets.
-    buckets = audit.evidence_client.get("S3/buckets.json", lambda: s3.list_buckets())
+    buckets = audit.evidence_client.get("s3/buckets.json", lambda: s3.list_buckets())
     # Loop through each bucket
     for bucket in buckets.get("Buckets", []):
         sample = Sample(
@@ -296,7 +296,7 @@ def test_s3_encryption(audit, test_id, risk_rating=2):
             continue        
 
         # Obtain and save bucket's encryption settings.
-        enc = audit.evidence_client.get_aws(f"S3/buckets/{bucket['Name']}/encryption.json",
+        enc = audit.evidence_client.get_aws(f"s3/buckets/{bucket['Name']}/encryption.json",
             lambda: s3.get_bucket_encryption(Bucket=bucket['Name']),
             not_found_codes=["ServerSideEncryptionConfigurationNotFoundError"]
         )
@@ -318,9 +318,9 @@ def test_s3_public_access(audit, test_id, risk_rating=3):
         test_description="S3 buckets are configured to block public access.",
         test_procedures=[
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
-            "Saved the list of buckets: S3/buckets.json.",
+            "Saved the list of buckets: s3/buckets.json.",
             "For each bucket, obtained the public access block settings by calling the get_public_access_block() boto3 command.",
-            "For each bucket, saved the public access block settings: S3/[bucket_name]/public_access_block.json.",
+            "For each bucket, saved the public access block settings: s3/[bucket_name]/public_access_block.json.",
             "For each bucket, inspected the public access block settings to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=["BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets are set to true."],
@@ -334,7 +334,7 @@ def test_s3_public_access(audit, test_id, risk_rating=3):
 
     s3 = audit.session.client("s3")
     # Obtain and save list of buckets.
-    buckets = audit.evidence_client.get("S3/buckets.json", lambda: s3.list_buckets())
+    buckets = audit.evidence_client.get("s3/buckets.json", lambda: s3.list_buckets())
     # Evaluate each bucket
     for bucket in buckets.get("Buckets", []):
         sample = Sample(
@@ -348,7 +348,7 @@ def test_s3_public_access(audit, test_id, risk_rating=3):
         
         # Fetch public access block
         public_access_block = audit.evidence_client.get_aws(
-            f"S3/buckets/{bucket['Name']}/public_access_block.json",
+            f"s3/buckets/{bucket['Name']}/public_access_block.json",
             lambda: s3.get_public_access_block(Bucket=bucket["Name"]),
             not_found_codes=["NoSuchPublicAccessBlockConfiguration"]
         )
@@ -399,9 +399,9 @@ def test_s3_tags(audit, test_id, risk_rating=1):
         ),
         test_procedures=[
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
-            "Saved the list of buckets: S3/buckets.json.",
+            "Saved the list of buckets: s3/buckets.json.",
             "For each bucket, obtained its tags by calling the get_bucket_tagging() boto3 command.",
-            "For each bucket, saved the tags: S3/[bucket_name]/tags.json.",
+            "For each bucket, saved the tags: s3/[bucket_name]/tags.json.",
             f"For each bucket, inspected the tags to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
         test_attributes=[],
@@ -414,7 +414,7 @@ def test_s3_tags(audit, test_id, risk_rating=1):
         return test
 
     s3 = audit.session.client("s3")
-    buckets = audit.evidence_client.get("S3/buckets.json", lambda: s3.list_buckets())
+    buckets = audit.evidence_client.get("s3/buckets.json", lambda: s3.list_buckets())
 
     for bucket in buckets.get("Buckets", []):
         sample = Sample(
@@ -426,7 +426,7 @@ def test_s3_tags(audit, test_id, risk_rating=1):
 
         # Fetch bucket tags
         tags_response = audit.evidence_client.get_aws(
-            f"S3/buckets/{bucket['Name']}/tags.json",
+            f"s3/buckets/{bucket['Name']}/tags.json",
             lambda: s3.get_bucket_tagging(Bucket=bucket["Name"]),
             not_found_codes=["NoSuchTagSet"]
         )
@@ -453,9 +453,9 @@ def test_s3_secure_transport(audit, test_id, risk_rating=0):
         test_description= "S3 buckets are configured to deny unencrypted data in-transit.",
         test_procedures=[
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
-            "Saved the list of buckets: S3/buckets.json.",
+            "Saved the list of buckets: s3/buckets.json.",
             "For each bucket, obtained the bucket policy by calling the get_bucket_policy() boto3 command.",
-            "For each bucket, saved the bucket policy: S3/buckets/[bucket_name]/bucket_policy.json.",
+            "For each bucket, saved the bucket policy: s3/buckets/[bucket_name]/bucket_policy.json.",
             "For each bucket, inspected the bucket policy to determine if a statement exists that denies requests when aws:SecureTransport is false."
         ],
         test_attributes=[],
@@ -471,7 +471,7 @@ def test_s3_secure_transport(audit, test_id, risk_rating=0):
 
     # Obtain and save list of buckets
     buckets = audit.evidence_client.get(
-        "S3/buckets.json",
+        "s3/buckets.json",
         lambda: s3.list_buckets()
     )
 
@@ -487,7 +487,7 @@ def test_s3_secure_transport(audit, test_id, risk_rating=0):
 
         # Fetch bucket policy
         policy = audit.evidence_client.get_aws(
-            f"S3/buckets/{bucket_name}/bucket_policy.json",
+            f"s3/buckets/{bucket_name}/bucket_policy.json",
             lambda: s3.get_bucket_policy(Bucket=bucket_name),
             not_found_codes=["NoSuchBucketPolicy"]
         )
@@ -550,7 +550,7 @@ def test_iam_password_policy(audit, test_id, risk_rating=2):
         ),      
         test_procedures=[
             "Obtained the IAM password configuration by calling the get_account_password_policy() boto3 command.",
-            "Saved the AWS password policy: IAM/password_policy.json.",
+            "Saved the AWS password policy: iam/password_policy.json.",
             "Inspected the password configuration to determine if they comply with the test attribute(s) defined below."
         ],
         test_attributes=[
@@ -566,7 +566,7 @@ def test_iam_password_policy(audit, test_id, risk_rating=2):
     # Gather evidence
     iam = audit.session.client("iam")
     policy = audit.evidence_client.get_aws(
-        "IAM/password_policy.json",
+        "iam/password_policy.json",
         lambda: iam.get_account_password_policy(),
         not_found_codes=["NoSuchEntity"]
     )
@@ -636,7 +636,7 @@ def test_root_no_access_keys(audit, test_id, risk_rating=3):
         test_description="Root account does not have any active access keys.",      
         test_procedures=[
             "Obtained the AWS account summary by calling the get_account_summary() boto3 command.",
-            "Saved the account summary in the audit evidence folder (IAM/account_summary.json)",
+            "Saved the account summary in the audit evidence folder (iam/account_summary.json)",
             "Inspected the account summary to determine if 'AccountAccessKeysPresent' is set to 0."
         ],
         test_attributes=[],
@@ -649,7 +649,7 @@ def test_root_no_access_keys(audit, test_id, risk_rating=3):
 
     iam = audit.session.client("iam")
     summary = audit.evidence_client.get_aws(
-        "IAM/account_summary.json",
+        "iam/account_summary.json",
         lambda: iam.get_account_summary()
     )
 
@@ -670,7 +670,7 @@ def test_root_mfa_enabled(audit, test_id, risk_rating=3):
         test_description="Root account has MFA enabled.",
         test_procedures=[
             "Obtained the AWS account summary by calling the get_account_summary() boto3 command.",
-            "Saved the account summary: IAM/account_summary.json",
+            "Saved the account summary: iam/account_summary.json",
             "Inspected the account summary to determine if 'AccountMFAEnabled' is set to 1."
         ],
         test_attributes=[],
@@ -683,7 +683,7 @@ def test_root_mfa_enabled(audit, test_id, risk_rating=3):
 
     iam = audit.session.client("iam")
     summary = audit.evidence_client.get_aws(
-        "IAM/account_summary.json",
+        "iam/account_summary.json",
         lambda: iam.get_account_summary()
     )
 
@@ -704,12 +704,12 @@ def test_iam_users_mfa(audit, test_id, risk_rating=3):
         test_description="IAM users with an active console password have MFA enabled.",
         test_procedures=[
             "Obtained a list of IAM users by calling the list_users() boto3 command.",
-            "Saved the list of IAM users: IAM/users.json.",
+            "Saved the list of IAM users: iam/users.json.",
             "For each IAM user, obtained the login profile information by calling the get_login_profile() boto3 command.",
-            "For each IAM user, saved the login profile: IAM/users/[user_name]/login_profile.json.",
-            "Saved the login profile for each user in the audit evidence folder (IAM/users/[user_name]/login_profile.json).",
+            "For each IAM user, saved the login profile: iam/users/[user_name]/login_profile.json.",
+            "Saved the login profile for each user in the audit evidence folder (iam/users/[user_name]/login_profile.json).",
             "For each IAM user with a login profile, obtained the MFA device information by calling the list_mfa_devices() boto3 command.",
-            "For each IAM user with a login profile, saved the MFA device information: IAM/users/[user_name]/mfa_devices.json]",
+            "For each IAM user with a login profile, saved the MFA device information: iam/users/[user_name]/mfa_devices.json]",
             "For each IAM user with a login profile, inspected mfa_devices.json to determine if at least one MFA device is registered."
         ],
         test_attributes=[],
@@ -723,7 +723,7 @@ def test_iam_users_mfa(audit, test_id, risk_rating=3):
 
     iam = audit.session.client("iam")
     users = audit.evidence_client.get_aws(
-        "IAM/users.json",
+        "iam/users.json",
         lambda: iam.list_users()
     ).get("Users", [])
 
@@ -740,7 +740,7 @@ def test_iam_users_mfa(audit, test_id, risk_rating=3):
         # Check if user has a console password
         try:
             login_profile = audit.evidence_client.get_aws(
-                f"IAM/users/{username}/login_profile.json",
+                f"iam/users/{username}/login_profile.json",
                 lambda: iam.get_login_profile(UserName=username),
                 not_found_codes=["NoSuchEntity"]
             )
@@ -764,7 +764,7 @@ def test_iam_users_mfa(audit, test_id, risk_rating=3):
 
         # Check MFA devices
         mfa_devices = audit.evidence_client.get_aws(
-            f"IAM/users/{username}/mfa_devices.json",
+            f"iam/users/{username}/mfa_devices.json",
             lambda: iam.list_mfa_devices(UserName=username)
         ).get("MFADevices", [])
 
@@ -793,9 +793,9 @@ def test_iam_access_key_age(audit, test_id, risk_rating=3):
         test_description=f"IAM access keys are rotated at least every {max_age_days} days.",
         test_procedures=[
             "Obtained a list of IAM users by calling the list_users() boto3 command.",
-            "Saved the list of IAM users: IAM/users.json.",
+            "Saved the list of IAM users: iam/users.json.",
             "For each IAM user, obtained access key metadata by calling the list_access_keys() boto3 command.",
-            "For each IAM user, saved access key metadata: IAM/users/[user_name]/access_keys.json",
+            "For each IAM user, saved access key metadata: iam/users/[user_name]/access_keys.json",
             "Inspected the 'AccessKeyMetadata' for each user to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=[
@@ -811,7 +811,7 @@ def test_iam_access_key_age(audit, test_id, risk_rating=3):
 
     iam = audit.session.client("iam")
     users = audit.evidence_client.get_aws(
-        "IAM/users.json",
+        "iam/users.json",
         lambda: iam.list_users()
     )
 
@@ -821,7 +821,7 @@ def test_iam_access_key_age(audit, test_id, risk_rating=3):
         username = user["UserName"]
 
         keys = audit.evidence_client.get_aws(
-            f"IAM/users/{username}/access_keys.json",
+            f"iam/users/{username}/access_keys.json",
             lambda: iam.list_access_keys(UserName=username)
         )
 
@@ -872,7 +872,7 @@ def test_iam_access_key_age(audit, test_id, risk_rating=3):
 def get_regions(audit):
     ec2 = audit.session.client("ec2")
     regions = audit.evidence_client.get_aws(
-        "EC2/regions.json",
+        "ec2/regions.json",
         lambda: ec2.describe_regions(
             AllRegions=True,
             Filters=[
@@ -912,7 +912,7 @@ def test_rds_encryption(audit, test_id, risk_rating=2):
         test_description="RDS instances are encrypted at rest.",
         test_procedures=[
             "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
-            "For each in-scope region, saved the list of RDS instances: RDS/region_name/db_instances.json.",
+            "For each in-scope region, saved the list of RDS instances: rds/region_name/db_instances.json.",
             "For each RDS instance, inspected the `StorageEncrypted` setting to determine if it was set to `true`."
         ],
         test_attributes=[],
@@ -928,7 +928,7 @@ def test_rds_encryption(audit, test_id, risk_rating=2):
         rds = audit.session.client("rds", region_name=region)
 
         instances = audit.evidence_client.get_aws(
-                f"RDS/{region}/db_instances.json",
+                f"rds/{region}/db_instances.json",
                 fetch_fn=None,  # fetch_fn is not used when using paginator_params
                 paginator_params={
                     "client": rds,
@@ -964,7 +964,7 @@ def test_rds_public_access(audit, test_id, risk_rating=3):
         test_description="RDS instances are not publicly accessible.",
         test_procedures=[
             "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
-            "For each in-scope region, saved the list of RDS instances: RDS/[region_name]/db_instances.json)",
+            "For each in-scope region, saved the list of RDS instances: rds/[region_name]/db_instances.json)",
             "For each RDS instance, inspected the 'PubliclyAccessible' setting to determine if it was set to 'false'."
         ],
         test_attributes=[],
@@ -980,7 +980,7 @@ def test_rds_public_access(audit, test_id, risk_rating=3):
         rds = audit.session.client("rds", region_name=region)
 
         instances = audit.evidence_client.get_aws(
-            f"RDS/{region}/db_instances.json",
+            f"rds/{region}/db_instances.json",
             lambda: rds.describe_db_instances()
         )
 
@@ -1021,7 +1021,7 @@ def test_rds_tags(audit, test_id, risk_rating=1):
         ),
         test_procedures=[
             "For each in-scope region, obtained a list of RDS instances by calling describe_db_instances() boto3 command.",
-            "For each in-scope region, saved the list of RDS instances: RDS/[region_name]/db_instances.json).",
+            "For each in-scope region, saved the list of RDS instances: rds/[region_name]/db_instances.json).",
             f"For each RDS instance, reviewed the `TagList` to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
         test_attributes=[],
@@ -1037,7 +1037,7 @@ def test_rds_tags(audit, test_id, risk_rating=1):
         rds = audit.session.client("rds", region_name=region)
 
         instances = audit.evidence_client.get_aws(
-            f"RDS/{region}/db_instances.json",
+            f"rds/{region}/db_instances.json",
             fetch_fn=None,
             paginator_params={
                 "client": rds,
@@ -1075,7 +1075,7 @@ def test_rds_backup_retention(audit, test_id, risk_rating=1):
         test_description=f"RDS backups are retained for at least {required_rds_retention_days} days.",
         test_procedures=[
             "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
-            "For each in-scope region, saved the list of RDS instances: RDS/[region_name]/db_instances.json.",
+            "For each in-scope region, saved the list of RDS instances: rds/[region_name]/db_instances.json.",
             f"For each RDS instance, inspected the `BackupRetentionPeriod` to determine if it is greater than or equal to {required_rds_retention_days} days."
         ],
         test_attributes=[],
@@ -1091,7 +1091,7 @@ def test_rds_backup_retention(audit, test_id, risk_rating=1):
         rds = audit.session.client("rds", region_name=region)
 
         instances = audit.evidence_client.get_aws(
-            f"RDS/{region}/db_instances.json",
+            f"rds/{region}/db_instances.json",
             lambda: rds.describe_db_instances()
         )
 
@@ -1125,7 +1125,7 @@ def test_rds_auto_minor_version_upgrade(audit, test_id, risk_rating=1):
         test_description="RDS instances have automatic minor version upgrades enabled.",
         test_procedures=[
             "For each in-scope region, obtained a list of DB instances by calling the describe_db_instances() boto3 command.",
-            "For each in-scope region, saved the list of RDS instances: RDS/[region_name]/db_instances.json.",
+            "For each in-scope region, saved the list of RDS instances: rds/[region_name]/db_instances.json.",
             "For each RDS instance, inspected the 'AutoMinorVersionUpgrade' setting to determine if it was set to 'true'."
         ],
         test_attributes=[],
@@ -1141,7 +1141,7 @@ def test_rds_auto_minor_version_upgrade(audit, test_id, risk_rating=1):
         rds = audit.session.client("rds", region_name=region)
 
         instances = audit.evidence_client.get_aws(
-            f"RDS/{region}/db_instances.json",
+            f"rds/{region}/db_instances.json",
             fetch_fn=None,
             paginator_params={
                 "client": rds,
@@ -1183,7 +1183,7 @@ def test_rds_deletion_protection(audit, test_id, risk_rating=2):
         test_description="RDS instances have deletion protection enabled at the cluster or instance level.",
         test_procedures=[
             "For each in-scope region, obtained a list of RDS instances and RDS clusters using describe_db_instances() and describe_db_clusters() boto3 commands.",
-            "Saved the list of RDS instances: RDS/[region_name]/db_instances.json and DB clusters: RDS/[region_name]/db_clusters.json.",
+            "Saved the list of RDS instances: rds/[region_name]/db_instances.json and DB clusters: rds/[region_name]/db_clusters.json.",
             "Inspected each RDS instance to determine if 'DeletionProtection' was set to 'true' at the instance or cluster level."
         ],
         test_attributes=[],
@@ -1200,7 +1200,7 @@ def test_rds_deletion_protection(audit, test_id, risk_rating=2):
 
         # Get DB instances
         instances = audit.evidence_client.get_aws(
-            f"RDS/{region}/db_instances.json",
+            f"rds/{region}/db_instances.json",
             fetch_fn=None,
             paginator_params={
                 "client": rds,
@@ -1211,7 +1211,7 @@ def test_rds_deletion_protection(audit, test_id, risk_rating=2):
 
         # Get DB clusters
         clusters = audit.evidence_client.get_aws(
-            f"RDS/{region}/db_clusters.json",
+            f"rds/{region}/db_clusters.json",
             fetch_fn=None,
             paginator_params={
                 "client": rds,
@@ -1276,7 +1276,7 @@ def test_ec2_security_group_tags(audit, test_id, risk_rating=1):
         ),
         test_procedures=[
             "For each in-scope region, obtained a list of EC2 security groups by calling describe_security_groups() boto3 command.",
-            "For each in-scope region, saved the list of security groups: EC2/[region]/security_groups.json",
+            "For each in-scope region, saved the list of security groups: ec2/[region]/security_groups.json",
             f"Inspected each security group's 'Tags' attribute to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
         test_attributes=[],
@@ -1292,7 +1292,7 @@ def test_ec2_security_group_tags(audit, test_id, risk_rating=1):
         ec2 = audit.session.client("ec2", region_name=region)
 
         security_groups = audit.evidence_client.get_aws(
-            f"EC2/{region}/security_groups.json",
+            f"ec2/{region}/security_groups.json",
             fetch_fn=None,
             paginator_params={
                 "client": ec2,
@@ -1345,7 +1345,7 @@ def test_ec2_tags(audit, test_id, risk_rating=1):
         ),
         test_procedures=[
             "For each in-scope region, obtained the list of EC2 instances by calling describe_instances() boto3 command.",
-            "For each in-scope AWS region, saved the list of EC2 instances: EC2/[region_name]/instances.json",
+            "For each in-scope AWS region, saved the list of EC2 instances: ec2/[region_name]/instances.json",
             f"For each EC2 instance, reviewed the 'Tags' to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
         test_attributes=[],
@@ -1361,7 +1361,7 @@ def test_ec2_tags(audit, test_id, risk_rating=1):
         ec2 = audit.session.client("ec2", region_name=region)
 
         instances = audit.evidence_client.get_aws(
-            f"EC2/{region}/instances.json",
+            f"ec2/{region}/instances.json",
             fetch_fn=None,
             paginator_params={
                 "client": ec2,
@@ -1406,7 +1406,7 @@ def test_ebs_volume_encryption(audit, test_id, risk_rating=2):
         test_description="EBS volumes are encrypted at rest.",
         test_procedures=[
             "For each in-scope region, obtained a list of EBS volumes by calling describe_volumes() boto3 command.",
-            "For each in-scope region, saved the list of EBS volumes: EC2/[region_name]/volumes.json.",
+            "For each in-scope region, saved the list of EBS volumes: ec2/[region_name]/volumes.json.",
             "For each EBS volume, inspected the 'Encrypted' attribute to determine it is set to 'true'."
         ],
         test_attributes=[],
@@ -1422,7 +1422,7 @@ def test_ebs_volume_encryption(audit, test_id, risk_rating=2):
         ec2 = audit.session.client("ec2", region_name=region)
 
         volumes = audit.evidence_client.get_aws(
-            f"EC2/{region}/volumes.json",
+            f"ec2/{region}/volumes.json",
             fetch_fn=None,
             paginator_params={
                 "client": ec2,
@@ -1470,7 +1470,7 @@ def test_ebs_tags(audit, test_id, risk_rating=1):
         ),
         test_procedures=[
             "For each in-scope region, obtained the list of EBS volumes by calling describe_volumes() boto3 command.",
-            "Saved the list of volumes in the audit evidence folder (EC2/[region_name]/volumes.json).",
+            "Saved the list of volumes in the audit evidence folder (ec2/[region_name]/volumes.json).",
             "For each volume, obtained its tags from the 'Tags' attribute.",
             f"Inspected each EBS volume to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
@@ -1487,7 +1487,7 @@ def test_ebs_tags(audit, test_id, risk_rating=1):
         ec2 = audit.session.client("ec2", region_name=region)
 
         volumes = audit.evidence_client.get_aws(
-            f"EC2/{region}/volumes.json",
+            f"ec2/{region}/volumes.json",
             fetch_fn=None,
             paginator_params={
                 "client": ec2,
@@ -1528,7 +1528,7 @@ def test_ebs_default_encryption(audit, test_id, risk_rating=0):
         test_description="EBS volumes must have default encryption enabled in each region.",
         test_procedures=[
             "For each in-scope region, obtained the EBS default encryption settings by calling get_ebs_encryption_by_default() boto3 command.",
-            "For each in-scope region, saved the EBS default encryption settings: EC2/[region_name]/default_ebs_encryption.json.",
+            "For each in-scope region, saved the EBS default encryption settings: ec2/[region_name]/default_ebs_encryption.json.",
             "Inspected the configuration for each region to determine if 'EbsEncryptionByDefault' is set to True."
         ],
         test_attributes=[],
@@ -1544,7 +1544,7 @@ def test_ebs_default_encryption(audit, test_id, risk_rating=0):
         ec2 = audit.session.client("ec2", region_name=region)
 
         default_encryption = audit.evidence_client.get_aws(
-            f"EC2/{region}/default_ebs_encryption.json",
+            f"ec2/{region}/default_ebs_encryption.json",
             lambda: ec2.get_ebs_encryption_by_default()
         )
 
@@ -1650,10 +1650,10 @@ def test_cloudtrail_global_logging(audit, test_id, risk_rating=3):
         test_description="At least one multi-region CloudTrail trail has logging enabled.",
         test_procedures=[
             "Obtained a list of CloudTrail trails by calling the describe_trails() boto3 command.",
-            "Saved the list of CloudTrail trails: CloudTrail/trails.json.",
+            "Saved the list of CloudTrail trails: cloudtrail/trails.json.",
             "For each CloudTrail trail, inspected the trail configuration to determine whether 'IsMultiRegionTrail' is set to 'true'.",
             "For each multi-region trail, obtained the trail status by calling the get_trail_status() boto3 command.",
-            "For each multi-region trail, saved the trail status: CloudTrail/trails/[trail_name]/trail_status.json.",
+            "For each multi-region trail, saved the trail status: cloudtrail/trails/[trail_name]/trail_status.json.",
             "Inspected the trail configuration and status to determine if at least one trail complies with the test attribute(s) defined below."
         ],
         test_attributes=[
@@ -1668,7 +1668,7 @@ def test_cloudtrail_global_logging(audit, test_id, risk_rating=3):
 
     ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
-        "CloudTrail/trails.json",
+        "cloudtrail/trails.json",
         lambda: ct.describe_trails(includeShadowTrails=False)
     ).get("trailList", [])
 
@@ -1682,7 +1682,7 @@ def test_cloudtrail_global_logging(audit, test_id, risk_rating=3):
         if not trail.get("IsMultiRegionTrail", False):
             continue
         status = audit.evidence_client.get_aws(
-            f"CloudTrail/trails/{trail['Name']}/trail_status.json",
+            f"cloudtrail/trails/{trail['Name']}/trail_status.json",
             lambda: ct.get_trail_status(Name=trail["TrailARN"])
         )
         if status.get("IsLogging", False):
@@ -1705,7 +1705,7 @@ def test_cloudtrail_log_file_validation(audit, test_id, risk_rating=2):
         test_description="CloudTrail trails have log file validation enabled.",
         test_procedures=[
             "Obtained CloudTrail trails using the describe_trails() boto3 command.",
-            "Saved the trail configuration in the audit evidence folder (CloudTrail/trails.json).",
+            "Saved the trail configuration in the audit evidence folder (cloudtrail/trails.json).",
             "Inspected each trail's configuration to determine if 'LogFileValidationEnabled' was set to True for all trails."
         ],
         test_attributes=[],
@@ -1719,7 +1719,7 @@ def test_cloudtrail_log_file_validation(audit, test_id, risk_rating=2):
 
     ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
-        "CloudTrail/trails.json",
+        "cloudtrail/trails.json",
         lambda: ct.describe_trails(includeShadowTrails=False)
     ).get("trailList", [])
 
@@ -1759,9 +1759,9 @@ def test_cloudtrail_s3_bucket_protection(audit, test_id, risk_rating=3):
         test_description="CloudTrail S3 buckets are configured to block public access.",
         test_procedures=[
             "Obtained a list of CloudTrails by calling the describe_trails() boto3 command.",
-            "Saved the list of trails in the audit evidence folder (CloudTrail/trails.json).",
+            "Saved the list of trails in the audit evidence folder (cloudtrail/trails.json).",
             "For each trail, obtained the S3 bucket name and checked the bucket's public access block settings using get_public_access_block() boto3 command.",
-            "Saved the public access block settings for each bucket in the audit evidence folder (S3/buckets/[bucket_name]/public_access_block.json).",
+            "Saved the public access block settings for each bucket in the audit evidence folder (s3/buckets/[bucket_name]/public_access_block.json).",
             "Inspected the public access block settings for each S3 bucket containing CloudTrail logs to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=[
@@ -1777,7 +1777,7 @@ def test_cloudtrail_s3_bucket_protection(audit, test_id, risk_rating=3):
 
     ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
-        "CloudTrail/trails.json",
+        "cloudtrail/trails.json",
         lambda: ct.describe_trails()
     ).get("trailList", [])
 
@@ -1800,7 +1800,7 @@ def test_cloudtrail_s3_bucket_protection(audit, test_id, risk_rating=3):
 
         # Fetch public access block
         public_access_block = audit.evidence_client.get_aws(
-            f"S3/buckets/{bucket_name}/public_access_block.json",
+            f"s3/buckets/{bucket_name}/public_access_block.json",
             lambda: audit.session.client("s3").get_public_access_block(Bucket=bucket_name),
             not_found_codes=["NoSuchPublicAccessBlockConfiguration"]
         )
@@ -1847,9 +1847,9 @@ def test_cloudtrail_logging_recent_stops(audit, test_id, risk_rating=3):
         ),
         test_procedures=[
             "Obtained a list of CloudTrails by calling the describe_trails() boto3 command.",
-            "Saved the list of trails in the audit evidence folder (CloudTrail/trails.json).",
+            "Saved the list of trails in the audit evidence folder (cloudtrail/trails.json).",
             "For each trail, called get_trail_status() to check IsLogging and StopLoggingTime.",
-            f"Saved each trail's status in the audit evidence folder (CloudTrail/trails/[trail_name]/trail_status.json).",
+            f"Saved each trail's status in the audit evidence folder (cloudtrail/trails/[trail_name]/trail_status.json).",
             f"Inspected the 'TimeLoggingStopped' variable to determine if logging has been stopped in the last {lookback_days} days."
         ],
         test_attributes=[
@@ -1865,7 +1865,7 @@ def test_cloudtrail_logging_recent_stops(audit, test_id, risk_rating=3):
 
     ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
-        "CloudTrail/trails.json",
+        "cloudtrail/trails.json",
         lambda: ct.describe_trails()
     ).get("trailList", [])
 
@@ -1883,7 +1883,7 @@ def test_cloudtrail_logging_recent_stops(audit, test_id, risk_rating=3):
             continue
 
         status = audit.evidence_client.get_aws(
-            f"CloudTrail/trails/{trail_name}/trail_status.json",
+            f"cloudtrail/trails/{trail_name}/trail_status.json",
             lambda: ct.get_trail_status(Name=trail_name)
         )
 
@@ -1923,10 +1923,10 @@ def test_waf_enabled(audit, test_id, risk_rating=2):
         test_description="WAF is enabled on Application Load Balancers and API Gateways.",
         test_procedures=[
             "For each in-scope region, obtained a list of Web ACLs by calling list_web_acls() boto3 command.",
-            "Saved the list of Web ACLs (WAF/[region]/web_acls.json).",
+            "Saved the list of Web ACLs (wafv2/[region]/web_acls.json).",
             "For each Web ACL, obtained a list of associated resources by calling the list_resources_for_web_acl() boto3 command.",
             "By default the list_resources_for_web_acl() only provide a list of Application Load Balancers.",
-            "Saved the Application Load Balancers associated with the ACL (WAF/[region]/[web_acl_name]/resources.json).",
+            "Saved the Application Load Balancers associated with the ACL (wafv2/[region]/[web_acl_name]/resources.json).",
             "Re-ran the list_resources_for_web_acl() boto3 command to get the associated API Gateways.",     
             "For each in-scope region, obtained a list of Application Load Balancers using describe_load_balancers() boto3 command.",
             "Saved the list of load balancers in the audit evidence folder (ELBv2/[region_name]/load_balancers.json).",
@@ -1951,7 +1951,7 @@ def test_waf_enabled(audit, test_id, risk_rating=2):
 
         # Get list of Web ACLs (REGIONAL scope for ALB + API Gateway)
         web_acls = audit.evidence_client.get_aws(
-            f"WAF/{region}/web_acls.json",
+            f"wafv2/{region}/web_acls.json",
             lambda: waf.list_web_acls(Scope="REGIONAL")
         )
 
@@ -1963,7 +1963,7 @@ def test_waf_enabled(audit, test_id, risk_rating=2):
             web_acl_arn = acl["ARN"]
             # ALBs
             alb_resources = audit.evidence_client.get_aws(
-                f"WAF/{region}/{acl['Name']}/resources_alb.json",
+                f"wafv2/{region}/{acl['Name']}/resources_alb.json",
                 lambda: waf.list_resources_for_web_acl(
                     WebACLArn=web_acl_arn,
                     ResourceType="APPLICATION_LOAD_BALANCER"
@@ -1973,7 +1973,7 @@ def test_waf_enabled(audit, test_id, risk_rating=2):
 
             # API Gateway
             api_resources = audit.evidence_client.get_aws(
-                f"WAF/{region}/{acl['Name']}/resources_apigw.json",
+                f"wafv2/{region}/{acl['Name']}/resources_apigw.json",
                 lambda: waf.list_resources_for_web_acl(
                     WebACLArn=web_acl_arn,
                     ResourceType="API_GATEWAY"
@@ -2071,9 +2071,9 @@ def test_guardduty_enabled(audit, test_id, risk_rating=3):
         test_description="GuardDuty is enabled for all in-scope regions.",
         test_procedures=[
             "For each in-scope region, obtained a list of GuardDuty detectors by calling the list_detectors() boto3 command.",
-            "For each in-scope region, saved the list of detector IDs: GuardDuty/[region]/detectors.json.",
+            "For each in-scope region, saved the list of detector IDs: guardduty/[region]/detectors.json.",
             "For each detector ID, obtained detector configuration by calling the get_detector() boto3 command.",
-            "For each detector ID, saved the detector configuration: GuardDuty/[region]/[detector_id]/config.json.",
+            "For each detector ID, saved the detector configuration: guardduty/[region]/[detector_id]/config.json.",
             "For each detector ID, inspected the detector configuration to determine whether 'Status' is set to 'ENABLED'."
         ],
         test_attributes=[],
@@ -2097,7 +2097,7 @@ def test_guardduty_enabled(audit, test_id, risk_rating=3):
             continue
 
         detectors = audit.evidence_client.get_aws(
-            f"GuardDuty/{region}/detectors.json",
+            f"guardduty/{region}/detectors.json",
             lambda: gd.list_detectors()
         ).get("DetectorIds", [])
 
@@ -2111,7 +2111,7 @@ def test_guardduty_enabled(audit, test_id, risk_rating=3):
 
         for detector_id in detectors:
             config = audit.evidence_client.get_aws(
-                f"GuardDuty/{region}/{detector_id}/config.json",
+                f"guardduty/{region}/{detector_id}/config.json",
                 lambda: gd.get_detector(DetectorId=detector_id)
             )
 

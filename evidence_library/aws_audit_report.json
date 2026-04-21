@@ -7,7 +7,7 @@
                 "us-east-2"
             ]
         },
-        "report_date": "2026-04-20"
+        "report_date": "2026-04-21"
     },
     "test_results": [
         {
@@ -19,7 +19,7 @@
             "result_description": "",
             "test_procedures": [
                 "Obtained the AWS account summary by calling the get_account_summary() boto3 command.",
-                "Saved the account summary: IAM/account_summary.json",
+                "Saved the account summary: iam/account_summary.json",
                 "Inspected the account summary to determine if 'AccountMFAEnabled' is set to 1."
             ],
             "test_attributes": []
@@ -33,7 +33,7 @@
             "result_description": "",
             "test_procedures": [
                 "Obtained the AWS account summary by calling the get_account_summary() boto3 command.",
-                "Saved the account summary in the audit evidence folder (IAM/account_summary.json)",
+                "Saved the account summary in the audit evidence folder (iam/account_summary.json)",
                 "Inspected the account summary to determine if 'AccountAccessKeysPresent' is set to 0."
             ],
             "test_attributes": []
@@ -47,12 +47,12 @@
             "result_description": "Exceptions Noted. 4 IAM user(s) do not have MFA enabled.",
             "test_procedures": [
                 "Obtained a list of IAM users by calling the list_users() boto3 command.",
-                "Saved the list of IAM users: IAM/users.json.",
+                "Saved the list of IAM users: iam/users.json.",
                 "For each IAM user, obtained the login profile information by calling the get_login_profile() boto3 command.",
-                "For each IAM user, saved the login profile: IAM/users/[user_name]/login_profile.json.",
-                "Saved the login profile for each user in the audit evidence folder (IAM/users/[user_name]/login_profile.json).",
+                "For each IAM user, saved the login profile: iam/users/[user_name]/login_profile.json.",
+                "Saved the login profile for each user in the audit evidence folder (iam/users/[user_name]/login_profile.json).",
                 "For each IAM user with a login profile, obtained the MFA device information by calling the list_mfa_devices() boto3 command.",
-                "For each IAM user with a login profile, saved the MFA device information: IAM/users/[user_name]/mfa_devices.json]",
+                "For each IAM user with a login profile, saved the MFA device information: iam/users/[user_name]/mfa_devices.json]",
                 "For each IAM user with a login profile, inspected mfa_devices.json to determine if at least one MFA device is registered."
             ],
             "test_attributes": []
@@ -66,9 +66,9 @@
             "result_description": "Exceptions Noted. 1 IAM key(s) are over 90 days old.",
             "test_procedures": [
                 "Obtained a list of IAM users by calling the list_users() boto3 command.",
-                "Saved the list of IAM users: IAM/users.json.",
+                "Saved the list of IAM users: iam/users.json.",
                 "For each IAM user, obtained access key metadata by calling the list_access_keys() boto3 command.",
-                "For each IAM user, saved access key metadata: IAM/users/[user_name]/access_keys.json",
+                "For each IAM user, saved access key metadata: iam/users/[user_name]/access_keys.json",
                 "Inspected the 'AccessKeyMetadata' for each user to determine if they comply with the test attribute(s) below."
             ],
             "test_attributes": [
@@ -84,7 +84,7 @@
             "result_description": "Exceptions Noted. Minimum password length too short (current=14, required>=20)",
             "test_procedures": [
                 "Obtained the IAM password configuration by calling the get_account_password_policy() boto3 command.",
-                "Saved the AWS password policy: IAM/password_policy.json.",
+                "Saved the AWS password policy: iam/password_policy.json.",
                 "Inspected the password configuration to determine if they comply with the test attribute(s) defined below."
             ],
             "test_attributes": [
@@ -102,9 +102,9 @@
             "result_description": "",
             "test_procedures": [
                 "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
-                "Saved the list of buckets: S3/buckets.json.",
+                "Saved the list of buckets: s3/buckets.json.",
                 "For each S3 bucket, obtained the encryption settings by calling the get_bucket_encryption() boto3 command.",
-                "For each S3 bucket, saved the encryption settings: S3/[bucket_name]/encryption.json.",
+                "For each S3 bucket, saved the encryption settings: s3/[bucket_name]/encryption.json.",
                 "For each S3 bucket, inspected the encryption settings to determine if they comply with the test attribute(s) below."
             ],
             "test_attributes": [
@@ -120,9 +120,9 @@
             "result_description": "Exceptions Noted. 3 S3 buckets are not blocking public access.",
             "test_procedures": [
                 "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
-                "Saved the list of buckets: S3/buckets.json.",
+                "Saved the list of buckets: s3/buckets.json.",
                 "For each bucket, obtained the public access block settings by calling the get_public_access_block() boto3 command.",
-                "For each bucket, saved the public access block settings: S3/[bucket_name]/public_access_block.json.",
+                "For each bucket, saved the public access block settings: s3/[bucket_name]/public_access_block.json.",
                 "For each bucket, inspected the public access block settings to determine if they comply with the test attribute(s) below."
             ],
             "test_attributes": [
@@ -138,9 +138,9 @@
             "result_description": "Exceptions Noted. 4 S3 bucket(s) do not enforce secure transport (HTTPS).",
             "test_procedures": [
                 "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
-                "Saved the list of buckets: S3/buckets.json.",
+                "Saved the list of buckets: s3/buckets.json.",
                 "For each bucket, obtained the bucket policy by calling the get_bucket_policy() boto3 command.",
-                "For each bucket, saved the bucket policy: S3/buckets/[bucket_name]/bucket_policy.json.",
+                "For each bucket, saved the bucket policy: s3/buckets/[bucket_name]/bucket_policy.json.",
                 "For each bucket, inspected the bucket policy to determine if a statement exists that denies requests when aws:SecureTransport is false."
             ],
             "test_attributes": []
@@ -154,9 +154,9 @@
             "result_description": "Exceptions Noted. 2 bucket(s) missing required tags or have empty values.",
             "test_procedures": [
                 "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
-                "Saved the list of buckets: S3/buckets.json.",
+                "Saved the list of buckets: s3/buckets.json.",
                 "For each bucket, obtained its tags by calling the get_bucket_tagging() boto3 command.",
-                "For each bucket, saved the tags: S3/[bucket_name]/tags.json.",
+                "For each bucket, saved the tags: s3/[bucket_name]/tags.json.",
                 "For each bucket, inspected the tags to determine if the following tag keys exist and have non-empty values: ['owner', 'description', 'classification']"
             ],
             "test_attributes": []
@@ -170,7 +170,7 @@
             "result_description": "",
             "test_procedures": [
                 "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
-                "For each in-scope region, saved the list of RDS instances: RDS/[region_name]/db_instances.json.",
+                "For each in-scope region, saved the list of RDS instances: rds/[region_name]/db_instances.json.",
                 "For each RDS instance, inspected the `BackupRetentionPeriod` to determine if it is greater than or equal to 14 days."
             ],
             "test_attributes": []
@@ -184,7 +184,7 @@
             "result_description": "",
             "test_procedures": [
                 "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
-                "For each in-scope region, saved the list of RDS instances: RDS/region_name/db_instances.json.",
+                "For each in-scope region, saved the list of RDS instances: rds/region_name/db_instances.json.",
                 "For each RDS instance, inspected the `StorageEncrypted` setting to determine if it was set to `true`."
             ],
             "test_attributes": []
@@ -198,7 +198,7 @@
             "result_description": "",
             "test_procedures": [
                 "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
-                "For each in-scope region, saved the list of RDS instances: RDS/[region_name]/db_instances.json)",
+                "For each in-scope region, saved the list of RDS instances: rds/[region_name]/db_instances.json)",
                 "For each RDS instance, inspected the 'PubliclyAccessible' setting to determine if it was set to 'false'."
             ],
             "test_attributes": []
@@ -212,7 +212,7 @@
             "result_description": "",
             "test_procedures": [
                 "For each in-scope region, obtained a list of DB instances by calling the describe_db_instances() boto3 command.",
-                "For each in-scope region, saved the list of RDS instances: RDS/[region_name]/db_instances.json.",
+                "For each in-scope region, saved the list of RDS instances: rds/[region_name]/db_instances.json.",
                 "For each RDS instance, inspected the 'AutoMinorVersionUpgrade' setting to determine if it was set to 'true'."
             ],
             "test_attributes": []
@@ -226,7 +226,7 @@
             "result_description": "",
             "test_procedures": [
                 "For each in-scope region, obtained a list of RDS instances and RDS clusters using describe_db_instances() and describe_db_clusters() boto3 commands.",
-                "Saved the list of RDS instances: RDS/[region_name]/db_instances.json and DB clusters: RDS/[region_name]/db_clusters.json.",
+                "Saved the list of RDS instances: rds/[region_name]/db_instances.json and DB clusters: rds/[region_name]/db_clusters.json.",
                 "Inspected each RDS instance to determine if 'DeletionProtection' was set to 'true' at the instance or cluster level."
             ],
             "test_attributes": []
@@ -240,7 +240,7 @@
             "result_description": "",
             "test_procedures": [
                 "For each in-scope region, obtained a list of RDS instances by calling describe_db_instances() boto3 command.",
-                "For each in-scope region, saved the list of RDS instances: RDS/[region_name]/db_instances.json).",
+                "For each in-scope region, saved the list of RDS instances: rds/[region_name]/db_instances.json).",
                 "For each RDS instance, reviewed the `TagList` to determine if the following tag keys exist and have non-empty values: ['owner', 'description', 'classification']"
             ],
             "test_attributes": []
@@ -254,7 +254,7 @@
             "result_description": "Exceptions Noted. 1 EBS volume(s) are not encrypted.",
             "test_procedures": [
                 "For each in-scope region, obtained a list of EBS volumes by calling describe_volumes() boto3 command.",
-                "For each in-scope region, saved the list of EBS volumes: EC2/[region_name]/volumes.json.",
+                "For each in-scope region, saved the list of EBS volumes: ec2/[region_name]/volumes.json.",
                 "For each EBS volume, inspected the 'Encrypted' attribute to determine it is set to 'true'."
             ],
             "test_attributes": []
@@ -268,7 +268,7 @@
             "result_description": "Exceptions Noted. 2 region(s) do not have EBS default encryption enabled.",
             "test_procedures": [
                 "For each in-scope region, obtained the EBS default encryption settings by calling get_ebs_encryption_by_default() boto3 command.",
-                "For each in-scope region, saved the EBS default encryption settings: EC2/[region_name]/default_ebs_encryption.json.",
+                "For each in-scope region, saved the EBS default encryption settings: ec2/[region_name]/default_ebs_encryption.json.",
                 "Inspected the configuration for each region to determine if 'EbsEncryptionByDefault' is set to True."
             ],
             "test_attributes": []
@@ -282,7 +282,7 @@
             "result_description": "Exceptions Noted. 1 EBS volume(s) are missing required tags or have empty values.",
             "test_procedures": [
                 "For each in-scope region, obtained the list of EBS volumes by calling describe_volumes() boto3 command.",
-                "Saved the list of volumes in the audit evidence folder (EC2/[region_name]/volumes.json).",
+                "Saved the list of volumes in the audit evidence folder (ec2/[region_name]/volumes.json).",
                 "For each volume, obtained its tags from the 'Tags' attribute.",
                 "Inspected each EBS volume to determine if the following tag keys exist and have non-empty values: ['owner', 'description', 'classification']"
             ],
@@ -297,7 +297,7 @@
             "result_description": "Exceptions Noted. 1 EC2 instance(s) are missing required tags or have empty values.",
             "test_procedures": [
                 "For each in-scope region, obtained the list of EC2 instances by calling describe_instances() boto3 command.",
-                "For each in-scope AWS region, saved the list of EC2 instances: EC2/[region_name]/instances.json",
+                "For each in-scope AWS region, saved the list of EC2 instances: ec2/[region_name]/instances.json",
                 "For each EC2 instance, reviewed the 'Tags' to determine if the following tag keys exist and have non-empty values: ['owner', 'description', 'classification']"
             ],
             "test_attributes": []
@@ -311,7 +311,7 @@
             "result_description": "Exceptions Noted. 4 security group(s) are missing required tags or have empty values.",
             "test_procedures": [
                 "For each in-scope region, obtained a list of EC2 security groups by calling describe_security_groups() boto3 command.",
-                "For each in-scope region, saved the list of security groups: EC2/[region]/security_groups.json",
+                "For each in-scope region, saved the list of security groups: ec2/[region]/security_groups.json",
                 "Inspected each security group's 'Tags' attribute to determine if the following tag keys exist and have non-empty values: ['Owner', 'Description', 'ReviewedBy', 'LastReviewedDate']"
             ],
             "test_attributes": []
@@ -341,10 +341,10 @@
             "result_description": "",
             "test_procedures": [
                 "Obtained a list of CloudTrail trails by calling the describe_trails() boto3 command.",
-                "Saved the list of CloudTrail trails: CloudTrail/trails.json.",
+                "Saved the list of CloudTrail trails: cloudtrail/trails.json.",
                 "For each CloudTrail trail, inspected the trail configuration to determine whether 'IsMultiRegionTrail' is set to 'true'.",
                 "For each multi-region trail, obtained the trail status by calling the get_trail_status() boto3 command.",
-                "For each multi-region trail, saved the trail status: CloudTrail/trails/[trail_name]/trail_status.json.",
+                "For each multi-region trail, saved the trail status: cloudtrail/trails/[trail_name]/trail_status.json.",
                 "Inspected the trail configuration and status to determine if at least one trail complies with the test attribute(s) defined below."
             ],
             "test_attributes": [
@@ -360,7 +360,7 @@
             "result_description": "Exceptions Noted. 1 trail(s) do not have log file validation enabled.",
             "test_procedures": [
                 "Obtained CloudTrail trails using the describe_trails() boto3 command.",
-                "Saved the trail configuration in the audit evidence folder (CloudTrail/trails.json).",
+                "Saved the trail configuration in the audit evidence folder (cloudtrail/trails.json).",
                 "Inspected each trail's configuration to determine if 'LogFileValidationEnabled' was set to True for all trails."
             ],
             "test_attributes": []
@@ -374,9 +374,9 @@
             "result_description": "",
             "test_procedures": [
                 "Obtained a list of CloudTrails by calling the describe_trails() boto3 command.",
-                "Saved the list of trails in the audit evidence folder (CloudTrail/trails.json).",
+                "Saved the list of trails in the audit evidence folder (cloudtrail/trails.json).",
                 "For each trail, obtained the S3 bucket name and checked the bucket's public access block settings using get_public_access_block() boto3 command.",
-                "Saved the public access block settings for each bucket in the audit evidence folder (S3/buckets/[bucket_name]/public_access_block.json).",
+                "Saved the public access block settings for each bucket in the audit evidence folder (s3/buckets/[bucket_name]/public_access_block.json).",
                 "Inspected the public access block settings for each S3 bucket containing CloudTrail logs to determine if they comply with the test attribute(s) below."
             ],
             "test_attributes": [
@@ -392,9 +392,9 @@
             "result_description": "",
             "test_procedures": [
                 "Obtained a list of CloudTrails by calling the describe_trails() boto3 command.",
-                "Saved the list of trails in the audit evidence folder (CloudTrail/trails.json).",
+                "Saved the list of trails in the audit evidence folder (cloudtrail/trails.json).",
                 "For each trail, called get_trail_status() to check IsLogging and StopLoggingTime.",
-                "Saved each trail's status in the audit evidence folder (CloudTrail/trails/[trail_name]/trail_status.json).",
+                "Saved each trail's status in the audit evidence folder (cloudtrail/trails/[trail_name]/trail_status.json).",
                 "Inspected the 'TimeLoggingStopped' variable to determine if logging has been stopped in the last 365 days."
             ],
             "test_attributes": [
@@ -410,10 +410,10 @@
             "result_description": "",
             "test_procedures": [
                 "For each in-scope region, obtained a list of Web ACLs by calling list_web_acls() boto3 command.",
-                "Saved the list of Web ACLs (WAF/[region]/web_acls.json).",
+                "Saved the list of Web ACLs (wafv2/[region]/web_acls.json).",
                 "For each Web ACL, obtained a list of associated resources by calling the list_resources_for_web_acl() boto3 command.",
                 "By default the list_resources_for_web_acl() only provide a list of Application Load Balancers.",
-                "Saved the Application Load Balancers associated with the ACL (WAF/[region]/[web_acl_name]/resources.json).",
+                "Saved the Application Load Balancers associated with the ACL (wafv2/[region]/[web_acl_name]/resources.json).",
                 "Re-ran the list_resources_for_web_acl() boto3 command to get the associated API Gateways.",
                 "For each in-scope region, obtained a list of Application Load Balancers using describe_load_balancers() boto3 command.",
                 "Saved the list of load balancers in the audit evidence folder (ELBv2/[region_name]/load_balancers.json).",
@@ -433,9 +433,9 @@
             "result_description": "Exceptions Noted. GuardDuty is not enabled for 1 in-scope region(s).",
             "test_procedures": [
                 "For each in-scope region, obtained a list of GuardDuty detectors by calling the list_detectors() boto3 command.",
-                "For each in-scope region, saved the list of detector IDs: GuardDuty/[region]/detectors.json.",
+                "For each in-scope region, saved the list of detector IDs: guardduty/[region]/detectors.json.",
                 "For each detector ID, obtained detector configuration by calling the get_detector() boto3 command.",
-                "For each detector ID, saved the detector configuration: GuardDuty/[region]/[detector_id]/config.json.",
+                "For each detector ID, saved the detector configuration: guardduty/[region]/[detector_id]/config.json.",
                 "For each detector ID, inspected the detector configuration to determine whether 'Status' is set to 'ENABLED'."
             ],
             "test_attributes": []
