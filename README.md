@@ -15,7 +15,7 @@ This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) foun
    - [aws_tests.py](./src/aws_tests.py): Gathers evidence from boto3 (no screenshots required) and performs audit testing.
    - [build_report.py](./src/build_report.py): Builds a PDF version of the audit report (Ex. [aws_audit_report.pdf](./evidence_library/aws_audit_report.pdf)).
 - Project Outputs:
-   - [aws_audit_report.json](./evidence_library/aws_audit_report.json): Machine readable audit report that cleanly displays the scope, test results, and configuration.
+   - [aws_audit_report.json](./evidence_library/aws_audit_report.json): Machine readable audit report that clearly displays the scope, test results, and configuration.
    - [aws_audit_report.pdf](./evidence_library/aws_audit_report.pdf): Human readable report for people that aren't ready for JSON.
 
 ## Setup Instructions
