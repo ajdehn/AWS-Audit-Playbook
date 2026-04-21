@@ -6,7 +6,7 @@ An engineer sets their IAM user's password as "Spring2026!". Their account is co
 
 ## Test Procedures
 1. Obtained the AWS account password policy by calling the [get_account_password_policy()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/iam/client/get_account_password_policy.html) boto3 command. These settings are applicable to all IAM users in the account.
-2. Saved the AWS account password policy as [IAM/password_policy.json](/evidence_library/IAM/password_policy.json).
+2. Saved the AWS account password policy as [iam/password_policy.json](/evidence_library/iam/password_policy.json).
 3. Reviewed the `password_policy.json` file to determine whether the password policy settings meet organizational requirements, including:  
     * "MinimumPasswordLength" >= minimum length required in the password policy.
     * Password complexity requirements ("RequireSymbols", "RequireNumbers", "RequireUppercaseCharacters", and "RequireLowercaseCharacters") comply with the password policy.
