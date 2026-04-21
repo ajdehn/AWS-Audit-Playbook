@@ -1,18 +1,22 @@
 # About
-This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) founder of [AuditOps.io](https://www.auditops.io/). The goal of this project is to help auditors conduct **AWS audits, without screenshots**.
+This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) founder of [AuditOps.io](https://www.auditops.io/). The goal of this project is to **standardize** evidence collection for AWS, and help auditors conduct **AWS audits, without screenshots**.
 
 ## Why use this project
-- Auditors deserve high-quality evidence directly from AWS. Using this project, you will be able to share JSON files directly from boto3.
+- Auditors deserve consistent, high-quality evidence directly from AWS. Using this project, you will be able to share the required evidence via JSON files gathered from [boto3](https://docs.aws.amazon.com/boto3/latest/).
 - Screenshots are a waste of time for everyone, auditors included. This script takes **minutes** to gather the required evidence and generate the report.
-- Screenshots don't cut it when cloud configurations change daily. Auditors should be running this script daily (or at least weekly) and use it to start having risk-driven conversations with your Engineering teams.
+- Consistent, automated evidence collection is the biggest roadblock preventing us from achieving continuous monitoring. Once we achieve this, GRC teams will be able to have honest, risk-driven conversations with your Engineering teams.
 
 ## Project Overview
-- A read-only [script](./src/aws_tests.py) to generate and evaluate audit evidence (no screenshots required).
-   - The script creates a new folder (tmp/audit_evidence) that you can zip and share with your auditor.
-- A [JSON audit report](./evidence_library/aws_audit_report.json). This is a machine readable audit report and cleanly displays the scope, test results, and configuration.
-- A [report builder](./src/build_report.py) to create an [AWS Audit Report](./evidence_library/aws_audit_report.pdf).
-- A [library](./evidence_library/) of example audit evidence created from the script with the supporting JSON files.
-- List of [tests](./tests/) with detailed testing procedures.
+- Documentation:
+   - [Evidence Library](./evidence_library/): Example audit evidence generated and saved in a consistent format.
+   - [Test Library](./tests/): Documentation for how to perform audit tests on various AWS services (Example: s3_encryption). Each test includes a test description, an example risk, and detailed test procedures with links to the [boto3](https://docs.aws.amazon.com/boto3/latest/) documentation.
+- Logic / Python Scripts:
+   - [run_audit.py](./src/run_audit.py): Builds config file, defines scope, and runs aws_tests.py.
+   - [aws_tests.py](./src/aws_tests.py): Gathers evidence from boto3 (no screenshots required) and performs audit testing.
+   - [build_report.py](./src/build_report.py): Builds a PDF version of the audit report (Ex. [aws_audit_report.pdf](./evidence_library/aws_audit_report.pdf)).
+- Project Outputs:
+   - [aws_audit_report.json](./evidence_library/aws_audit_report.json): Machine readable audit report that cleanly displays the scope, test results, and configuration.
+   - [aws_audit_report.pdf](./evidence_library/aws_audit_report.pdf): Human readable report for people that aren't ready for JSON.
 
 ## Setup Instructions
 1. Install pre-requisites:
