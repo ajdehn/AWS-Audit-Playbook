@@ -101,6 +101,14 @@ class Sample:
             f"comments: {self.comments}\n"
         )
 
+    def to_dict(self):
+        return {
+            "sample_id": self.sample_id,
+            "is_excluded": self.is_excluded,
+            "is_passing": self.is_passing,
+            "comments": self.comments,
+        }
+
 # NOTE: Tests default to "is_passing: True" until there is a failing sample or other logic determines the test has failed.
 @dataclass
 class Test:
@@ -144,7 +152,7 @@ class Test:
         )
 
     def to_dict(self):
-        return {
+        result = {
             "test_id": self.test_id,
             "test_description": self.test_description,
             "risk_rating": self.risk_rating,
@@ -152,8 +160,13 @@ class Test:
             "is_passing": self.is_passing,
             "comments": self.comments,
             "test_procedures": self.test_procedures,
-            "test_attributes": self.test_attributes
+            "test_attributes": self.test_attributes,
         }
+        # Include samples, if present.
+        if self.samples:  
+            result["samples"] = [s.to_dict() for s in self.samples]
+
+        return result
 
     def create_risk_str(self):
         if self.risk_rating == 0: return "Informational"
@@ -227,34 +240,35 @@ def run_all_tests(audit):
     # TODO: Add GuardDuty findings sent to EventBridge every 15 minutes (default is 6 hours).
 
     test_definitions = [
-        ("IAM Root MFA", test_root_mfa_enabled),
-        ("IAM Root Access Key", test_root_no_access_keys),
-        ("IAM User MFA", test_iam_users_mfa),
-        ("IAM User Key Age", test_iam_access_key_age),
-        ("IAM Password", test_iam_password_policy),
-        ("S3 Encryption", test_s3_encryption),
-        ("S3 Public Access", test_s3_public_access),
-        ("S3 Secure Transport", test_s3_secure_transport),
-        ("S3 Tags", test_s3_tags),
-        ("RDS Backup Retention", test_rds_backup_retention),
-        ("RDS Encryption", test_rds_encryption),
-        ("RDS Public Access", test_rds_public_access),
-        ("RDS Automatic Upgrades", test_rds_auto_minor_version_upgrade),
-        ("RDS Deletion Protection", test_rds_deletion_protection),
-        ("RDS Tags", test_rds_tags),
-        ("EBS Volume Encryption", test_ebs_volume_encryption),
-        ("EBS Encryption Default", test_ebs_default_encryption),
-        ("EBS Tags", test_ebs_tags),
-        ("EC2 Tags", test_ec2_tags),
-        ("EC2 Security Group Tags", test_ec2_security_group_tags),
-        ("Lambda Tags", test_lambda_tags),
-        ("CloudTrail Multi-Region", test_cloudtrail_global_logging),
-        ("CloudTrail Log File Validation", test_cloudtrail_log_file_validation),
-        ("CloudTrail S3 Bucket Protection", test_cloudtrail_s3_bucket_protection),
-        ("CloudTrail Logging Recent Stops", test_cloudtrail_logging_recent_stops),
-        ("Web Application Firewall Enabled", test_waf_enabled),
-        ("GuardDuty Enabled", test_guardduty_enabled)
+        ("iam_root_mfa", test_iam_root_mfa),
+        ("iam_root_access_key", test_iam_root_access_key),
+        ("iam_users_mfa", test_iam_users_mfa),
+        ("iam_user_access_key_age", test_iam_user_access_key_age),
+        ("iam_password_policy", test_iam_password_policy),
+        ("s3_encryption", test_s3_encryption),
+        ("s3_public_access", test_s3_public_access),
+        ("s3_secure_transport", test_s3_secure_transport),
+        ("s3_tags", test_s3_tags),
+        ("rds_backup_retention", test_rds_backup_retention),
+        ("rds_encryption", test_rds_encryption),
+        ("rds_public_access", test_rds_public_access),
+        ("rds_auto_minor_version_upgrade", test_rds_auto_minor_version_upgrade),
+        ("rds_deletion_protection", test_rds_deletion_protection),
+        ("rds_tags", test_rds_tags),
+        ("ebs_volume_encryption", test_ebs_volume_encryption),
+        ("ebs_default_encryption", test_ebs_default_encryption),
+        ("ebs_tags", test_ebs_tags),
+        ("ec2_tags", test_ec2_tags),
+        ("ec2_security_group_tags", test_ec2_security_group_tags),
+        ("lambda_tags", test_lambda_tags),
+        ("cloudtrail_multi_region", test_cloudtrail_multi_region),
+        ("cloudtrail_log_file_validation", test_cloudtrail_log_file_validation),
+        ("cloudtrail_s3_bucket_protection", test_cloudtrail_s3_bucket_protection),
+        ("cloudtrail_logging_recent_stops", test_cloudtrail_logging_recent_stops),
+        ("wafv2_enabled", test_wafv2_enabled),
+        ("guardduty_enabled", test_guardduty_enabled),
     ]
+
     tests = []
     for test_id, test_fn in test_definitions:
         tests.append(run_test_safely(audit, test_fn, test_id))
@@ -537,7 +551,7 @@ def test_s3_secure_transport(audit, test_id, risk_rating=0):
     return test
 
 def test_iam_password_policy(audit, test_id, risk_rating=2):
-    # Retrieve values from config. If not available, set safe defaults.
+    # Retrieve values from config. If not available, use defaults.
     test_config = audit.config.get("test_config") or {}
     required_min_length = test_config.get("iam_password_min_length", 14)
     req_min_complexity_types = test_config.get("iam_password_min_complexity_types", 4)
@@ -630,13 +644,13 @@ def test_iam_password_policy(audit, test_id, risk_rating=2):
         test.comments = "Exceptions Noted. " + test.comments
     return test
 
-def test_root_no_access_keys(audit, test_id, risk_rating=3):
+def test_iam_root_access_key(audit, test_id, risk_rating=3):
     test = Test(
         test_id=test_id,
         test_description="Root account does not have any active access keys.",      
         test_procedures=[
             "Obtained the AWS account summary by calling the get_account_summary() boto3 command.",
-            "Saved the account summary in the audit evidence folder (iam/account_summary.json)",
+            "Saved the account summary: iam/account_summary.json.",
             "Inspected the account summary to determine if 'AccountAccessKeysPresent' is set to 0."
         ],
         test_attributes=[],
@@ -664,7 +678,7 @@ def test_root_no_access_keys(audit, test_id, risk_rating=3):
 
     return test
 
-def test_root_mfa_enabled(audit, test_id, risk_rating=3):
+def test_iam_root_mfa(audit, test_id, risk_rating=3):
     test = Test(
         test_id=test_id,
         test_description="Root account has MFA enabled.",
@@ -784,13 +798,13 @@ def test_iam_users_mfa(audit, test_id, risk_rating=3):
 
     return test
 
-def test_iam_access_key_age(audit, test_id, risk_rating=3):
+def test_iam_user_access_key_age(audit, test_id, risk_rating=3):
     test_config = audit.config.get("test_config") or {}
     max_age_days = test_config.get("iam_key_max_age", 90)
 
     test = Test(
         test_id=test_id,
-        test_description=f"IAM access keys are rotated at least every {max_age_days} days.",
+        test_description=f"IAM user access keys are rotated at least every {max_age_days} days.",
         test_procedures=[
             "Obtained a list of IAM users by calling the list_users() boto3 command.",
             "Saved the list of IAM users: iam/users.json.",
@@ -1644,7 +1658,7 @@ def test_lambda_tags(audit, test_id, risk_rating=1):
 
     return test
 
-def test_cloudtrail_global_logging(audit, test_id, risk_rating=3):
+def test_cloudtrail_multi_region(audit, test_id, risk_rating=3):
     test = Test(
         test_id=test_id,
         test_description="At least one multi-region CloudTrail trail has logging enabled.",
@@ -1917,7 +1931,7 @@ def test_cloudtrail_logging_recent_stops(audit, test_id, risk_rating=3):
 
     return test
 
-def test_waf_enabled(audit, test_id, risk_rating=2):
+def test_wafv2_enabled(audit, test_id, risk_rating=2):
     test = Test(
         test_id=test_id,
         test_description="WAF is enabled on Application Load Balancers and API Gateways.",
