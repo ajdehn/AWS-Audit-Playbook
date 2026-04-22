@@ -7,16 +7,16 @@
                 "us-east-2"
             ]
         },
-        "report_date": "2026-04-21"
+        "report_date": "2026-04-22"
     },
     "test_results": [
         {
-            "test_id": "IAM Root MFA",
+            "test_id": "iam_root_mfa",
             "test_description": "Root account has MFA enabled.",
             "risk_rating": 3,
             "is_excluded": false,
-            "result": "Pass",
-            "result_description": "",
+            "is_passing": true,
+            "comments": "",
             "test_procedures": [
                 "Obtained the AWS account summary by calling the get_account_summary() boto3 command.",
                 "Saved the account summary: iam/account_summary.json",
@@ -25,26 +25,26 @@
             "test_attributes": []
         },
         {
-            "test_id": "IAM Root Access Key",
+            "test_id": "iam_root_access_key",
             "test_description": "Root account does not have any active access keys.",
             "risk_rating": 3,
             "is_excluded": false,
-            "result": "Pass",
-            "result_description": "",
+            "is_passing": true,
+            "comments": "",
             "test_procedures": [
                 "Obtained the AWS account summary by calling the get_account_summary() boto3 command.",
-                "Saved the account summary in the audit evidence folder (iam/account_summary.json)",
+                "Saved the account summary: iam/account_summary.json.",
                 "Inspected the account summary to determine if 'AccountAccessKeysPresent' is set to 0."
             ],
             "test_attributes": []
         },
         {
-            "test_id": "IAM User MFA",
+            "test_id": "iam_users_mfa",
             "test_description": "IAM users with an active console password have MFA enabled.",
             "risk_rating": 3,
             "is_excluded": false,
-            "result": "Fail",
-            "result_description": "Exceptions Noted. 4 IAM user(s) do not have MFA enabled.",
+            "is_passing": false,
+            "comments": "Exceptions Noted. 4 IAM user(s) do not have MFA enabled.",
             "test_procedures": [
                 "Obtained a list of IAM users by calling the list_users() boto3 command.",
                 "Saved the list of IAM users: iam/users.json.",
@@ -55,15 +55,65 @@
                 "For each IAM user with a login profile, saved the MFA device information: iam/users/[user_name]/mfa_devices.json]",
                 "For each IAM user with a login profile, inspected mfa_devices.json to determine if at least one MFA device is registered."
             ],
-            "test_attributes": []
+            "test_attributes": [],
+            "samples": [
+                {
+                    "sample_id": {
+                        "user": "audit-user"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": "User has no console password (programmatic access only)."
+                },
+                {
+                    "sample_id": {
+                        "user": "goose"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "No MFA device enabled for this user."
+                },
+                {
+                    "sample_id": {
+                        "user": "iceman"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "No MFA device enabled for this user."
+                },
+                {
+                    "sample_id": {
+                        "user": "itauditguy"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                },
+                {
+                    "sample_id": {
+                        "user": "maverick"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "No MFA device enabled for this user."
+                },
+                {
+                    "sample_id": {
+                        "user": "slider"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "No MFA device enabled for this user."
+                }
+            ]
         },
         {
-            "test_id": "IAM User Key Age",
-            "test_description": "IAM access keys are rotated at least every 90 days.",
+            "test_id": "iam_user_access_key_age",
+            "test_description": "IAM user access keys are rotated at least every 90 days.",
             "risk_rating": 3,
             "is_excluded": false,
-            "result": "Fail",
-            "result_description": "Exceptions Noted. 1 IAM key(s) are over 90 days old.",
+            "is_passing": false,
+            "comments": "Exceptions Noted. 1 IAM key(s) are over 90 days old.",
             "test_procedures": [
                 "Obtained a list of IAM users by calling the list_users() boto3 command.",
                 "Saved the list of IAM users: iam/users.json.",
@@ -73,15 +123,35 @@
             ],
             "test_attributes": [
                 "'CREATE_DATE <= 90 days ago (for keys with an 'ACTIVE' status)."
+            ],
+            "samples": [
+                {
+                    "sample_id": {
+                        "user": "audit-user",
+                        "access_key_id": "AKIA3TURCXF5OWBHPICR"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                },
+                {
+                    "sample_id": {
+                        "user": "itauditguy",
+                        "access_key_id": "AKIA3TURCXF5GCAELVHX"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "Key is 1185 days old."
+                }
             ]
         },
         {
-            "test_id": "IAM Password",
+            "test_id": "iam_password_policy",
             "test_description": "IAM passwords must comply with the organizations password complexity requirements.",
             "risk_rating": 2,
             "is_excluded": false,
-            "result": "Fail",
-            "result_description": "Exceptions Noted. Minimum password length too short (current=14, required>=20)",
+            "is_passing": false,
+            "comments": "Exceptions Noted. Minimum password length too short (current=14, required>=20)",
             "test_procedures": [
                 "Obtained the IAM password configuration by calling the get_account_password_policy() boto3 command.",
                 "Saved the AWS password policy: iam/password_policy.json.",
@@ -94,12 +164,12 @@
             ]
         },
         {
-            "test_id": "S3 Encryption",
+            "test_id": "s3_encryption",
             "test_description": "S3 buckets are encrypted at rest.",
             "risk_rating": 2,
             "is_excluded": false,
-            "result": "Pass",
-            "result_description": "",
+            "is_passing": true,
+            "comments": "",
             "test_procedures": [
                 "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
                 "Saved the list of buckets: s3/buckets.json.",
@@ -109,15 +179,57 @@
             ],
             "test_attributes": [
                 "ServerSideEncryptionConfiguration is present in encryption.json."
+            ],
+            "samples": [
+                {
+                    "sample_id": {
+                        "bucket_name": "aws-cloudtrail-logs-798094440826-aa81e64c"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                },
+                {
+                    "sample_id": {
+                        "bucket_name": "bad-bucket-54321"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                },
+                {
+                    "sample_id": {
+                        "bucket_name": "config-bucket-798094440826"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                },
+                {
+                    "sample_id": {
+                        "bucket_name": "itauditguy"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                },
+                {
+                    "sample_id": {
+                        "bucket_name": "taylor-swift-secret-vault"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                }
             ]
         },
         {
-            "test_id": "S3 Public Access",
+            "test_id": "s3_public_access",
             "test_description": "S3 buckets are configured to block public access.",
             "risk_rating": 3,
             "is_excluded": false,
-            "result": "Fail",
-            "result_description": "Exceptions Noted. 3 S3 buckets are not blocking public access.",
+            "is_passing": false,
+            "comments": "Exceptions Noted. 3 S3 buckets are not blocking public access.",
             "test_procedures": [
                 "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
                 "Saved the list of buckets: s3/buckets.json.",
@@ -127,15 +239,57 @@
             ],
             "test_attributes": [
                 "BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets are set to true."
+            ],
+            "samples": [
+                {
+                    "sample_id": {
+                        "bucket_name": "aws-cloudtrail-logs-798094440826-aa81e64c"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                },
+                {
+                    "sample_id": {
+                        "bucket_name": "bad-bucket-54321"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "No Public Access Block configuration found."
+                },
+                {
+                    "sample_id": {
+                        "bucket_name": "config-bucket-798094440826"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                },
+                {
+                    "sample_id": {
+                        "bucket_name": "itauditguy"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "One or more public access settings are disabled"
+                },
+                {
+                    "sample_id": {
+                        "bucket_name": "taylor-swift-secret-vault"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "One or more public access settings are disabled"
+                }
             ]
         },
         {
-            "test_id": "S3 Secure Transport",
+            "test_id": "s3_secure_transport",
             "test_description": "S3 buckets are configured to deny unencrypted data in-transit.",
             "risk_rating": 0,
             "is_excluded": false,
-            "result": "Fail",
-            "result_description": "Exceptions Noted. 4 S3 bucket(s) do not enforce secure transport (HTTPS).",
+            "is_passing": false,
+            "comments": "Exceptions Noted. 4 S3 bucket(s) do not enforce secure transport (HTTPS).",
             "test_procedures": [
                 "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
                 "Saved the list of buckets: s3/buckets.json.",
@@ -143,15 +297,57 @@
                 "For each bucket, saved the bucket policy: s3/buckets/[bucket_name]/bucket_policy.json.",
                 "For each bucket, inspected the bucket policy to determine if a statement exists that denies requests when aws:SecureTransport is false."
             ],
-            "test_attributes": []
+            "test_attributes": [],
+            "samples": [
+                {
+                    "sample_id": {
+                        "bucket_name": "aws-cloudtrail-logs-798094440826-aa81e64c"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                },
+                {
+                    "sample_id": {
+                        "bucket_name": "bad-bucket-54321"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "No bucket policy statement enforcing SecureTransport."
+                },
+                {
+                    "sample_id": {
+                        "bucket_name": "config-bucket-798094440826"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "No bucket policy statement enforcing SecureTransport."
+                },
+                {
+                    "sample_id": {
+                        "bucket_name": "itauditguy"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "No bucket policy statement enforcing SecureTransport."
+                },
+                {
+                    "sample_id": {
+                        "bucket_name": "taylor-swift-secret-vault"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "No bucket policy statement enforcing SecureTransport."
+                }
+            ]
         },
         {
-            "test_id": "S3 Tags",
+            "test_id": "s3_tags",
             "test_description": "S3 buckets must have required tags applied and tag values must not be empty.",
             "risk_rating": 1,
             "is_excluded": false,
-            "result": "Fail",
-            "result_description": "Exceptions Noted. 2 bucket(s) missing required tags or have empty values.",
+            "is_passing": false,
+            "comments": "Exceptions Noted. 2 bucket(s) missing required tags or have empty values.",
             "test_procedures": [
                 "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
                 "Saved the list of buckets: s3/buckets.json.",
@@ -159,15 +355,57 @@
                 "For each bucket, saved the tags: s3/[bucket_name]/tags.json.",
                 "For each bucket, inspected the tags to determine if the following tag keys exist and have non-empty values: ['owner', 'description', 'classification']"
             ],
-            "test_attributes": []
+            "test_attributes": [],
+            "samples": [
+                {
+                    "sample_id": {
+                        "bucket_name": "aws-cloudtrail-logs-798094440826-aa81e64c"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "Missing tags: ['classification']. "
+                },
+                {
+                    "sample_id": {
+                        "bucket_name": "bad-bucket-54321"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                },
+                {
+                    "sample_id": {
+                        "bucket_name": "config-bucket-798094440826"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "Tags not found on this bucket."
+                },
+                {
+                    "sample_id": {
+                        "bucket_name": "itauditguy"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                },
+                {
+                    "sample_id": {
+                        "bucket_name": "taylor-swift-secret-vault"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                }
+            ]
         },
         {
-            "test_id": "RDS Backup Retention",
+            "test_id": "rds_backup_retention",
             "test_description": "RDS backups are retained for at least 14 days.",
             "risk_rating": 1,
             "is_excluded": false,
-            "result": "Pass",
-            "result_description": "",
+            "is_passing": true,
+            "comments": "",
             "test_procedures": [
                 "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
                 "For each in-scope region, saved the list of RDS instances: rds/[region_name]/db_instances.json.",
@@ -176,12 +414,12 @@
             "test_attributes": []
         },
         {
-            "test_id": "RDS Encryption",
+            "test_id": "rds_encryption",
             "test_description": "RDS instances are encrypted at rest.",
             "risk_rating": 2,
             "is_excluded": false,
-            "result": "Pass",
-            "result_description": "",
+            "is_passing": true,
+            "comments": "",
             "test_procedures": [
                 "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
                 "For each in-scope region, saved the list of RDS instances: rds/region_name/db_instances.json.",
@@ -190,12 +428,12 @@
             "test_attributes": []
         },
         {
-            "test_id": "RDS Public Access",
+            "test_id": "rds_public_access",
             "test_description": "RDS instances are not publicly accessible.",
             "risk_rating": 3,
             "is_excluded": false,
-            "result": "Pass",
-            "result_description": "",
+            "is_passing": true,
+            "comments": "",
             "test_procedures": [
                 "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
                 "For each in-scope region, saved the list of RDS instances: rds/[region_name]/db_instances.json)",
@@ -204,12 +442,12 @@
             "test_attributes": []
         },
         {
-            "test_id": "RDS Automatic Upgrades",
+            "test_id": "rds_auto_minor_version_upgrade",
             "test_description": "RDS instances have automatic minor version upgrades enabled.",
             "risk_rating": 1,
             "is_excluded": false,
-            "result": "Pass",
-            "result_description": "",
+            "is_passing": true,
+            "comments": "",
             "test_procedures": [
                 "For each in-scope region, obtained a list of DB instances by calling the describe_db_instances() boto3 command.",
                 "For each in-scope region, saved the list of RDS instances: rds/[region_name]/db_instances.json.",
@@ -218,12 +456,12 @@
             "test_attributes": []
         },
         {
-            "test_id": "RDS Deletion Protection",
+            "test_id": "rds_deletion_protection",
             "test_description": "RDS instances have deletion protection enabled at the cluster or instance level.",
             "risk_rating": 2,
             "is_excluded": false,
-            "result": "Pass",
-            "result_description": "",
+            "is_passing": true,
+            "comments": "",
             "test_procedures": [
                 "For each in-scope region, obtained a list of RDS instances and RDS clusters using describe_db_instances() and describe_db_clusters() boto3 commands.",
                 "Saved the list of RDS instances: rds/[region_name]/db_instances.json and DB clusters: rds/[region_name]/db_clusters.json.",
@@ -232,12 +470,12 @@
             "test_attributes": []
         },
         {
-            "test_id": "RDS Tags",
+            "test_id": "rds_tags",
             "test_description": "RDS instances must have required tags applied and tag values must not be empty.",
             "risk_rating": 1,
             "is_excluded": false,
-            "result": "Pass",
-            "result_description": "",
+            "is_passing": true,
+            "comments": "",
             "test_procedures": [
                 "For each in-scope region, obtained a list of RDS instances by calling describe_db_instances() boto3 command.",
                 "For each in-scope region, saved the list of RDS instances: rds/[region_name]/db_instances.json).",
@@ -246,83 +484,172 @@
             "test_attributes": []
         },
         {
-            "test_id": "EBS Volume Encryption",
+            "test_id": "ebs_volume_encryption",
             "test_description": "EBS volumes are encrypted at rest.",
             "risk_rating": 2,
             "is_excluded": false,
-            "result": "Fail",
-            "result_description": "Exceptions Noted. 1 EBS volume(s) are not encrypted.",
+            "is_passing": false,
+            "comments": "Exceptions Noted. 1 EBS volume(s) are not encrypted.",
             "test_procedures": [
                 "For each in-scope region, obtained a list of EBS volumes by calling describe_volumes() boto3 command.",
                 "For each in-scope region, saved the list of EBS volumes: ec2/[region_name]/volumes.json.",
                 "For each EBS volume, inspected the 'Encrypted' attribute to determine it is set to 'true'."
             ],
-            "test_attributes": []
+            "test_attributes": [],
+            "samples": [
+                {
+                    "sample_id": {
+                        "region": "us-east-1",
+                        "volume_id": "vol-0fad5b6c1c9198060"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "EBS volume is not encrypted."
+                }
+            ]
         },
         {
-            "test_id": "EBS Encryption Default",
+            "test_id": "ebs_default_encryption",
             "test_description": "EBS volumes must have default encryption enabled in each region.",
             "risk_rating": 0,
             "is_excluded": false,
-            "result": "Fail",
-            "result_description": "Exceptions Noted. 2 region(s) do not have EBS default encryption enabled.",
+            "is_passing": false,
+            "comments": "Exceptions Noted. 2 region(s) do not have EBS default encryption enabled.",
             "test_procedures": [
                 "For each in-scope region, obtained the EBS default encryption settings by calling get_ebs_encryption_by_default() boto3 command.",
                 "For each in-scope region, saved the EBS default encryption settings: ec2/[region_name]/default_ebs_encryption.json.",
                 "Inspected the configuration for each region to determine if 'EbsEncryptionByDefault' is set to True."
             ],
-            "test_attributes": []
+            "test_attributes": [],
+            "samples": [
+                {
+                    "sample_id": {
+                        "region": "us-east-1"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "EBS default encryption is not enabled in this region."
+                },
+                {
+                    "sample_id": {
+                        "region": "us-east-2"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "EBS default encryption is not enabled in this region."
+                }
+            ]
         },
         {
-            "test_id": "EBS Tags",
+            "test_id": "ebs_tags",
             "test_description": "EBS volumes must have required tags applied and tag values must not be empty.",
             "risk_rating": 1,
             "is_excluded": false,
-            "result": "Fail",
-            "result_description": "Exceptions Noted. 1 EBS volume(s) are missing required tags or have empty values.",
+            "is_passing": false,
+            "comments": "Exceptions Noted. 1 EBS volume(s) are missing required tags or have empty values.",
             "test_procedures": [
                 "For each in-scope region, obtained the list of EBS volumes by calling describe_volumes() boto3 command.",
                 "Saved the list of volumes in the audit evidence folder (ec2/[region_name]/volumes.json).",
                 "For each volume, obtained its tags from the 'Tags' attribute.",
                 "Inspected each EBS volume to determine if the following tag keys exist and have non-empty values: ['owner', 'description', 'classification']"
             ],
-            "test_attributes": []
+            "test_attributes": [],
+            "samples": [
+                {
+                    "sample_id": {
+                        "region": "us-east-1",
+                        "volume_id": "vol-0fad5b6c1c9198060"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "Missing tags: ['owner', 'description', 'classification']. "
+                }
+            ]
         },
         {
-            "test_id": "EC2 Tags",
+            "test_id": "ec2_tags",
             "test_description": "EC2 instances must have required tags applied and tag values must not be empty.",
             "risk_rating": 1,
             "is_excluded": false,
-            "result": "Fail",
-            "result_description": "Exceptions Noted. 1 EC2 instance(s) are missing required tags or have empty values.",
+            "is_passing": false,
+            "comments": "Exceptions Noted. 1 EC2 instance(s) are missing required tags or have empty values.",
             "test_procedures": [
                 "For each in-scope region, obtained the list of EC2 instances by calling describe_instances() boto3 command.",
                 "For each in-scope AWS region, saved the list of EC2 instances: ec2/[region_name]/instances.json",
                 "For each EC2 instance, reviewed the 'Tags' to determine if the following tag keys exist and have non-empty values: ['owner', 'description', 'classification']"
             ],
-            "test_attributes": []
+            "test_attributes": [],
+            "samples": [
+                {
+                    "sample_id": {
+                        "region": "us-east-1",
+                        "instance_id": "i-00ad64923065104d8"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "Missing tags: ['owner', 'description', 'classification']. "
+                }
+            ]
         },
         {
-            "test_id": "EC2 Security Group Tags",
+            "test_id": "ec2_security_group_tags",
             "test_description": "EC2 security groups have required tags applied and tag values are not be empty.",
             "risk_rating": 1,
             "is_excluded": false,
-            "result": "Fail",
-            "result_description": "Exceptions Noted. 4 security group(s) are missing required tags or have empty values.",
+            "is_passing": false,
+            "comments": "Exceptions Noted. 4 security group(s) are missing required tags or have empty values.",
             "test_procedures": [
                 "For each in-scope region, obtained a list of EC2 security groups by calling describe_security_groups() boto3 command.",
                 "For each in-scope region, saved the list of security groups: ec2/[region]/security_groups.json",
                 "Inspected each security group's 'Tags' attribute to determine if the following tag keys exist and have non-empty values: ['Owner', 'Description', 'ReviewedBy', 'LastReviewedDate']"
             ],
-            "test_attributes": []
+            "test_attributes": [],
+            "samples": [
+                {
+                    "sample_id": {
+                        "region": "us-east-1",
+                        "security_group_id": "sg-0d3a9f0b108d87954"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "Missing tags: ['ReviewedBy', 'LastReviewedDate']. "
+                },
+                {
+                    "sample_id": {
+                        "region": "us-east-1",
+                        "security_group_id": "sg-0c8fdfe934b59f4fa"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "Missing tags: ['Owner', 'Description', 'ReviewedBy', 'LastReviewedDate']. "
+                },
+                {
+                    "sample_id": {
+                        "region": "us-east-1",
+                        "security_group_id": "sg-0f1c8a3d07e49bb15"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "Missing tags: ['Owner', 'Description', 'ReviewedBy', 'LastReviewedDate']. "
+                },
+                {
+                    "sample_id": {
+                        "region": "us-east-2",
+                        "security_group_id": "sg-0281bd23cf2b7ec63"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "Missing tags: ['Owner', 'Description', 'ReviewedBy', 'LastReviewedDate']. "
+                }
+            ]
         },
         {
-            "test_id": "Lambda Tags",
+            "test_id": "lambda_tags",
             "test_description": "Lambda functions must have required tags applied and tag values must not be empty.",
             "risk_rating": 1,
             "is_excluded": false,
-            "result": "Pass",
-            "result_description": "",
+            "is_passing": true,
+            "comments": "",
             "test_procedures": [
                 "For each in-scope region, obtained the list of Lambda functions by calling list_functions() boto3 command.",
                 "Saved the list of functions in the audit evidence folder (Lambda/[region_name]/functions.json).",
@@ -333,12 +660,12 @@
             "test_attributes": []
         },
         {
-            "test_id": "CloudTrail Multi-Region",
+            "test_id": "cloudtrail_multi_region",
             "test_description": "At least one multi-region CloudTrail trail has logging enabled.",
             "risk_rating": 3,
             "is_excluded": false,
-            "result": "Pass",
-            "result_description": "",
+            "is_passing": true,
+            "comments": "",
             "test_procedures": [
                 "Obtained a list of CloudTrail trails by calling the describe_trails() boto3 command.",
                 "Saved the list of CloudTrail trails: cloudtrail/trails.json.",
@@ -352,26 +679,36 @@
             ]
         },
         {
-            "test_id": "CloudTrail Log File Validation",
+            "test_id": "cloudtrail_log_file_validation",
             "test_description": "CloudTrail trails have log file validation enabled.",
             "risk_rating": 2,
             "is_excluded": false,
-            "result": "Fail",
-            "result_description": "Exceptions Noted. 1 trail(s) do not have log file validation enabled.",
+            "is_passing": false,
+            "comments": "Exceptions Noted. 1 trail(s) do not have log file validation enabled.",
             "test_procedures": [
                 "Obtained CloudTrail trails using the describe_trails() boto3 command.",
                 "Saved the trail configuration in the audit evidence folder (cloudtrail/trails.json).",
                 "Inspected each trail's configuration to determine if 'LogFileValidationEnabled' was set to True for all trails."
             ],
-            "test_attributes": []
+            "test_attributes": [],
+            "samples": [
+                {
+                    "sample_id": {
+                        "trail_name": "management-events"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "Log file validation is disabled."
+                }
+            ]
         },
         {
-            "test_id": "CloudTrail S3 Bucket Protection",
+            "test_id": "cloudtrail_s3_bucket_protection",
             "test_description": "CloudTrail S3 buckets are configured to block public access.",
             "risk_rating": 3,
             "is_excluded": false,
-            "result": "Pass",
-            "result_description": "",
+            "is_passing": true,
+            "comments": "",
             "test_procedures": [
                 "Obtained a list of CloudTrails by calling the describe_trails() boto3 command.",
                 "Saved the list of trails in the audit evidence folder (cloudtrail/trails.json).",
@@ -381,15 +718,26 @@
             ],
             "test_attributes": [
                 "CloudTrail S3 buckets must block public access (BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets = True)."
+            ],
+            "samples": [
+                {
+                    "sample_id": {
+                        "trail_name": "management-events",
+                        "bucket_name": "aws-cloudtrail-logs-798094440826-aa81e64c"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                }
             ]
         },
         {
-            "test_id": "CloudTrail Logging Recent Stops",
+            "test_id": "cloudtrail_logging_recent_stops",
             "test_description": "CloudTrail logging has not been stopped in the last 365 days.",
             "risk_rating": 3,
             "is_excluded": false,
-            "result": "Pass",
-            "result_description": "",
+            "is_passing": true,
+            "comments": "",
             "test_procedures": [
                 "Obtained a list of CloudTrails by calling the describe_trails() boto3 command.",
                 "Saved the list of trails in the audit evidence folder (cloudtrail/trails.json).",
@@ -399,15 +747,25 @@
             ],
             "test_attributes": [
                 "'TimeLoggingStopped' must be empty OR is more than 365 days ago."
+            ],
+            "samples": [
+                {
+                    "sample_id": {
+                        "trail_name": "management-events"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                }
             ]
         },
         {
-            "test_id": "Web Application Firewall Enabled",
+            "test_id": "wafv2_enabled",
             "test_description": "WAF is enabled on Application Load Balancers and API Gateways.",
             "risk_rating": 2,
             "is_excluded": false,
-            "result": "Pass",
-            "result_description": "",
+            "is_passing": true,
+            "comments": "",
             "test_procedures": [
                 "For each in-scope region, obtained a list of Web ACLs by calling list_web_acls() boto3 command.",
                 "Saved the list of Web ACLs (wafv2/[region]/web_acls.json).",
@@ -425,12 +783,12 @@
             "test_attributes": []
         },
         {
-            "test_id": "GuardDuty Enabled",
+            "test_id": "guardduty_enabled",
             "test_description": "GuardDuty is enabled for all in-scope regions.",
             "risk_rating": 3,
             "is_excluded": false,
-            "result": "Fail",
-            "result_description": "Exceptions Noted. GuardDuty is not enabled for 1 in-scope region(s).",
+            "is_passing": false,
+            "comments": "Exceptions Noted. GuardDuty is not enabled for 1 in-scope region(s).",
             "test_procedures": [
                 "For each in-scope region, obtained a list of GuardDuty detectors by calling the list_detectors() boto3 command.",
                 "For each in-scope region, saved the list of detector IDs: guardduty/[region]/detectors.json.",
@@ -438,7 +796,25 @@
                 "For each detector ID, saved the detector configuration: guardduty/[region]/[detector_id]/config.json.",
                 "For each detector ID, inspected the detector configuration to determine whether 'Status' is set to 'ENABLED'."
             ],
-            "test_attributes": []
+            "test_attributes": [],
+            "samples": [
+                {
+                    "sample_id": {
+                        "region": "us-east-1"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                },
+                {
+                    "sample_id": {
+                        "region": "us-east-2"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "No GuardDuty detectors in region."
+                }
+            ]
         }
     ],
     "config": {
