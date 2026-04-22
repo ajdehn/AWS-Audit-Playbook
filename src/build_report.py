@@ -52,8 +52,8 @@ def render_audit_cover_page(audit, tool_name, styles, tests):
 
     date_str = datetime.now(timezone.utc).strftime('%Y-%m-%d')
     total = len(tests)
-    failed = sum(1 for c in tests if not c.result)
-    excluded = sum(1 for c in tests if c.is_excluded)
+    failed = sum(1 for t in tests if not t.is_passing)
+    excluded = sum(1 for t in tests if t.is_excluded)
     passed = total - failed - excluded
 
     audit_metadata = [
@@ -107,7 +107,7 @@ def render_test_summary(test, page_width):
 
     # Conclusion
     conclusion = Paragraph(
-        f"<font color='{PASS_COLOR if test.result else FAIL_COLOR}'><b>{'Pass' if test.result else 'Fail'}</b></font>",
+        f"<font color='{PASS_COLOR if test.is_passing else FAIL_COLOR}'><b>{'Pass' if test.is_passing else 'Fail'}</b></font>",
         VALUE_STYLE
     )
     
@@ -124,9 +124,9 @@ def render_test_summary(test, page_width):
         # Add test attributes only when populated.
         table_data.insert(4, [Paragraph("Test Attributes", LABEL_STYLE), test_attributes])
 
-    # Add row to summary table if test failed and result_description is populated.
-    if not test.result and test.result_description:
-        table_data.append([Paragraph("Comments", LABEL_STYLE), Paragraph(test.result_description, VALUE_STYLE)])
+    # Add row to summary table if test failed and comments is populated.
+    if not test.is_passing and test.comments:
+        table_data.append([Paragraph("Comments", LABEL_STYLE), Paragraph(test.comments, VALUE_STYLE)])
 
     table_width = page_width - 2 * 72
     table = Table(table_data, colWidths=[table_width * 0.25, table_width * 0.75])
@@ -135,14 +135,14 @@ def render_test_summary(test, page_width):
     return table
 
 """
-    Render sample results table (if present).
+    Render sample table (if present).
 """
 def render_sample_table(test, page_width):
     if not test.table_headers:
         return None
 
     # Sort failing samples to top of the table.
-    test.samples = sorted(test.samples, key=lambda s: (s.result))
+    test.samples = sorted(test.samples, key=lambda s: (s.is_passing))
 
     table_data = []
     # Header row
@@ -160,14 +160,14 @@ def render_sample_table(test, page_width):
 
         # Document Result
         if not sample.is_excluded:
-            result_text = "Pass" if sample.result else "Fail"
-            result_color = PASS_COLOR if sample.result else FAIL_COLOR
+            result_text = "Pass" if sample.is_passing else "Fail"
+            result_color = PASS_COLOR if sample.is_passing else FAIL_COLOR
             row.append(Paragraph(f"<font color='{result_color}'>{result_text}</font>", CENTER_STYLE))
         else:
-            sample.result = False
+            sample.is_passing = False
             row.append(Paragraph("Excluded", CENTER_STYLE))
 
-        if not sample.result:
+        if not sample.is_passing:
             # Add comments if sample failed.
             row.append(Paragraph(str(sample.comments), VALUE_STYLE))
 
@@ -202,12 +202,12 @@ def render_summary_page(tests, styles):
             test_result = "Out of Scope"
             row.append(Paragraph(test_result, CENTER_STYLE))
         else:
-            test_result = "Pass" if test.result else "Fail"
-            result_color = PASS_COLOR if test.result else FAIL_COLOR
+            test_result = "Pass" if test.is_passing else "Fail"
+            result_color = PASS_COLOR if test.is_passing else FAIL_COLOR
             row.append(Paragraph(f"<font color='{result_color}'>{test_result}</font>", VALUE_STYLE))
         row.append(Paragraph(str(test.risk_rating_str), VALUE_STYLE))
         # TODO: Add test exclusion rationale to table.
-        row.append(Paragraph(test.result_description, VALUE_STYLE))
+        row.append(Paragraph(test.comments, VALUE_STYLE))
         
         test_summary_data.append(row)
 
@@ -229,7 +229,7 @@ Structure:
 def generate_pdf_report(audit, tests, tool_name, file_name="tmp/audit_report.pdf"):
 
     # Sort by failing tests, and then by risk rating.
-    tests = sorted(tests, key=lambda c: (c.result, -c.risk_rating))
+    tests = sorted(tests, key=lambda c: (c.is_passing, -c.risk_rating))
 
     doc = SimpleDocTemplate(file_name, pagesize=letter,
     title=f"{tool_name} Audit Report", author="AJ Dehn", subject=f"Summarizes audit findings from {tool_name}")

@@ -85,23 +85,23 @@ class EvidenceClient:
 
         return self.get(relative_path, wrapped)
 
-# NOTE: Sample results are set to "False" until logic determines sample passes the testing criteria.
+# NOTE: Samples default to "is_passing: False" until logic determines sample passes the testing criteria.
 @dataclass
 class Sample:
     sample_id: Dict[str, Any]
     test_id: str
-    result: bool = False
+    is_passing: bool = False
     is_excluded: bool = False
     comments: str = ""
 
     def __str__(self):
         return (
             f"sample_id: {self.sample_id}\n"
-            f"result: {self.result}\n"
+            f"is_passing: {self.is_passing}\n"
             f"comments: {self.comments}\n"
         )
 
-# NOTE: Test result is true by default. This set to false when a sample or other logic determines the test has failed.
+# NOTE: Tests default to "is_passing: True" until there is a failing sample or other logic determines the test has failed.
 @dataclass
 class Test:
     test_id: str
@@ -114,12 +114,12 @@ class Test:
     table_headers: Optional[List[str]] = None
     include_sample_number: bool = False
     samples: List["Sample"] = field(default_factory=list)
-    result: bool = True
-    result_description: str = ""
+    is_passing: bool = True
+    is_excluded: bool = False
+    comments: str = ""
     num_findings: int = 0
     num_exclusions: int = 0
     total_population: int = 0
-    is_excluded: bool = False
     risk_rating_str: str = ""
 
     def __post_init__(self):
@@ -131,7 +131,7 @@ class Test:
         )
 
         if self.is_excluded:
-            self.result_description = "Test is excluded. See exclusions.json"
+            self.comments = "Test is excluded. See exclusions.json"
 
     def __str__(self):
         return (
@@ -139,8 +139,8 @@ class Test:
             f"test_description: {self.test_description}\n"
             f"risk_rating: {self.risk_rating}\n"
             f"is_excluded: {self.is_excluded}\n"
-            f"result: {'Pass' if self.result else 'Fail'}\n"
-            f"result_description: {self.result_description}\n"
+            f"is_passing: {self.is_passing}\n"
+            f"comments: {self.comments}\n"
         )
 
     def to_dict(self):
@@ -149,8 +149,8 @@ class Test:
             "test_description": self.test_description,
             "risk_rating": self.risk_rating,
             "is_excluded": self.is_excluded,
-            "result": "Pass" if self.result else "Fail",
-            "result_description": self.result_description,
+            "is_passing": self.is_passing,
+            "comments": self.comments,
             "test_procedures": self.test_procedures,
             "test_attributes": self.test_attributes
         }
@@ -165,7 +165,7 @@ class Test:
 
     def evaluate_samples(self):
         if self.is_excluded:
-            self.result = False
+            self.is_passing = False
             self.num_findings = 0
             self.total_population = 0
             self.num_exclusions = 0
@@ -182,14 +182,14 @@ class Test:
 
         if not in_scope_samples:
             # No valid samples. Test passes with a population of zero.
-            self.result = True
+            self.is_passing = True
             return self
 
         # Count findings (failures)
-        self.num_findings = sum(1 for s in in_scope_samples if not s.result)
+        self.num_findings = sum(1 for s in in_scope_samples if not s.is_passing)
 
-        # Final result
-        self.result = self.num_findings == 0
+        # Test passing if there are no findings.
+        self.is_passing = self.num_findings == 0
         return self
 
 
@@ -212,8 +212,8 @@ def run_test_safely(audit, test_fn, test_id):
             table_headers=["Error"],
             risk_rating=3
         )
-        test.result = False
-        test.result_description = f"Test execution failed. Please manually investigate."
+        test.is_passing = False
+        test.comments = f"Test execution failed. Please manually investigate."
         print(f"ERROR: Running {test_id} test failed. Moving to the next test.")
 
         return test
@@ -301,15 +301,15 @@ def test_s3_encryption(audit, test_id, risk_rating=2):
             not_found_codes=["ServerSideEncryptionConfigurationNotFoundError"]
         )
         if enc.get("ServerSideEncryptionConfiguration"):
-            sample.result = True
+            sample.is_passing = True
         else:
             sample.comments = "No encryption configuration found"
         test.samples.append(sample)
 
     test.evaluate_samples()
-    if not test.result:
+    if not test.is_passing:
         # Document exception language.
-        test.result_description = f"Exceptions Noted. {test.num_findings} S3 bucket(s) are not encrypted."
+        test.comments = f"Exceptions Noted. {test.num_findings} S3 bucket(s) are not encrypted."
     return test
 
 def test_s3_public_access(audit, test_id, risk_rating=3):
@@ -363,19 +363,19 @@ def test_s3_public_access(audit, test_id, risk_rating=3):
         block_policy = config.get("BlockPublicPolicy", False)
         restrict_buckets = config.get("RestrictPublicBuckets", False)
 
-        # Determine result
+        # Document conclusion
         is_blocking_public_access = all([block_acls, ignore_acls, block_policy, restrict_buckets])
         if is_blocking_public_access:
-            sample.result = True
+            sample.is_passing = True
         else:
             sample.comments = "One or more public access settings are disabled"
         test.samples.append(sample)
 
 
     test.evaluate_samples()
-    if not test.result:
+    if not test.is_passing:
         # Document exception language.
-        test.result_description = f"Exceptions Noted. {test.num_findings} S3 buckets are not blocking public access."
+        test.comments = f"Exceptions Noted. {test.num_findings} S3 buckets are not blocking public access."
     return test
 
 # TODO: Update logic for opt-in regions
@@ -440,8 +440,8 @@ def test_s3_tags(audit, test_id, risk_rating=1):
         test.samples.append(sample)
 
     test.evaluate_samples()
-    if not test.result:
-        test.result_description = (
+    if not test.is_passing:
+        test.comments = (
             f"Exceptions Noted. {test.num_findings} bucket(s) missing required tags or have empty values."
         )
 
@@ -521,7 +521,7 @@ def test_s3_secure_transport(audit, test_id, risk_rating=0):
                 break
 
         if secure_transport_enforced:
-            sample.result = True
+            sample.is_passing = True
         else:
             sample.comments = "No bucket policy statement enforcing SecureTransport."
 
@@ -529,8 +529,8 @@ def test_s3_secure_transport(audit, test_id, risk_rating=0):
 
     test.evaluate_samples()
 
-    if not test.result:
-        test.result_description = (
+    if not test.is_passing:
+        test.comments = (
             f"Exceptions Noted. {test.num_findings} S3 bucket(s) do not enforce secure transport (HTTPS)."
         )
 
@@ -571,8 +571,8 @@ def test_iam_password_policy(audit, test_id, risk_rating=2):
         not_found_codes=["NoSuchEntity"]
     )
     if not policy:
-        test.result = False
-        test.result_description = "Exceptions Noted. No password policy configured."
+        test.is_passing = False
+        test.comments = "Exceptions Noted. No password policy configured."
         return test
 
     password_policy = policy.get("PasswordPolicy", {})
@@ -623,11 +623,11 @@ def test_iam_password_policy(audit, test_id, risk_rating=2):
                 f"Password max age too high (current={actual_max_password_age}, required<={required_max_password_age}.)"
             )
 
-    # --- Final result ---
-    test.result = len(failures) == 0
-    if not test.result:
-        test.result_description = "; ".join(failures)
-        test.result_description = "Exceptions Noted. " + test.result_description
+    # --- Document conclusion ---
+    test.is_passing = len(failures) == 0
+    if not test.is_passing:
+        test.comments = "; ".join(failures)
+        test.comments = "Exceptions Noted. " + test.comments
     return test
 
 def test_root_no_access_keys(audit, test_id, risk_rating=3):
@@ -657,10 +657,10 @@ def test_root_no_access_keys(audit, test_id, risk_rating=3):
     root_keys = account_summary.get("AccountAccessKeysPresent", 0)
 
     if root_keys == 0:
-        test.result = True
+        test.is_passing = True
     else:
-        test.result = False
-        test.result_description = f"Exceptions Noted. Root account has {root_keys} access key(s)"
+        test.is_passing = False
+        test.comments = f"Exceptions Noted. Root account has {root_keys} access key(s)"
 
     return test
 
@@ -691,10 +691,10 @@ def test_root_mfa_enabled(audit, test_id, risk_rating=3):
     mfa_enabled = account_summary.get("AccountMFAEnabled", 0)
 
     if mfa_enabled == 1:
-        test.result = True
+        test.is_passing = True
     else:
-        test.result = False
-        test.result_description = "Exceptions Noted. Root account does not have MFA enabled."
+        test.is_passing = False
+        test.comments = "Exceptions Noted. Root account does not have MFA enabled."
         
     return test
 
@@ -757,7 +757,7 @@ def test_iam_users_mfa(audit, test_id, risk_rating=3):
         # Check if login profile in null.
         login_profile = login_profile or {}
         if not login_profile.get("LoginProfile"):
-            sample.result = True
+            sample.is_passing = True
             sample.comments = "User has no console password (programmatic access only)."
             test.samples.append(sample)
             continue
@@ -769,7 +769,7 @@ def test_iam_users_mfa(audit, test_id, risk_rating=3):
         ).get("MFADevices", [])
 
         if mfa_devices:
-            sample.result = True
+            sample.is_passing = True
         else:
             sample.comments = "No MFA device enabled for this user."
 
@@ -777,8 +777,8 @@ def test_iam_users_mfa(audit, test_id, risk_rating=3):
 
     test.evaluate_samples()
 
-    if not test.result:
-        test.result_description = (
+    if not test.is_passing:
+        test.comments = (
             f"Exceptions Noted. {test.num_findings} IAM user(s) do not have MFA enabled."
         )
 
@@ -851,21 +851,21 @@ def test_iam_access_key_age(audit, test_id, risk_rating=3):
             actual_age_days = (now - create_date).days
 
             if actual_age_days <= max_age_days:
-                sample.result = True
+                sample.is_passing = True
             else:
                 sample.comments = f"Key is {actual_age_days} days old."
 
             test.samples.append(sample)
 
     test.evaluate_samples()
-    if not test.result:
+    if not test.is_passing:
         # Document exception language.
-        test.result_description = f"Exceptions Noted. {test.num_findings} IAM key(s) are over {max_age_days} days old."
+        test.comments = f"Exceptions Noted. {test.num_findings} IAM key(s) are over {max_age_days} days old."
     return test
 
 """
     NOTE: Used by region based tests (EC2, RDS, SNS, GuardDuty, etc)
-    Return in-scope AWS regions based on config.json. If not set, return result from describe_regions.
+    Return in-scope AWS regions based on config.json. If not set, return response from describe_regions.
     Raises:
         ValueError: If config contains invalid regions.
 """
@@ -947,15 +947,15 @@ def test_rds_encryption(audit, test_id, risk_rating=2):
                 continue
 
             if db.get("StorageEncrypted"):
-                sample.result = True
+                sample.is_passing = True
             else:
                 sample.comments = "RDS instance is not encrypted."
 
             test.samples.append(sample)
     test.evaluate_samples()
-    if not test.result:
+    if not test.is_passing:
         # Document exception language.
-        test.result_description = f"Exceptions Noted. {test.num_findings} RDS instance(s) are not encrypted."
+        test.comments = f"Exceptions Noted. {test.num_findings} RDS instance(s) are not encrypted."
     return test
 
 def test_rds_public_access(audit, test_id, risk_rating=3):
@@ -994,16 +994,16 @@ def test_rds_public_access(audit, test_id, risk_rating=3):
                 continue
 
             if not db.get("PubliclyAccessible", False):
-                sample.result = True
+                sample.is_passing = True
             else:
                 sample.comments = "Instance is publicly accessible."
 
             test.samples.append(sample)
 
     test.evaluate_samples()
-    if not test.result:
+    if not test.is_passing:
         # Document exception language.
-        test.result_description = f"Exceptions Noted. {test.num_findings} RDS instance(s) are publicly accessible."
+        test.comments = f"Exceptions Noted. {test.num_findings} RDS instance(s) are publicly accessible."
     return test
 
 def test_rds_tags(audit, test_id, risk_rating=1):
@@ -1060,8 +1060,8 @@ def test_rds_tags(audit, test_id, risk_rating=1):
             test.samples.append(sample)
 
     test.evaluate_samples()
-    if not test.result:
-        test.result_description = (
+    if not test.is_passing:
+        test.comments = (
             f"Exceptions Noted. {test.num_findings} RDS instance(s) are missing required tags or have empty values."
         )
 
@@ -1107,16 +1107,16 @@ def test_rds_backup_retention(audit, test_id, risk_rating=1):
             actual_retention_days = db.get("BackupRetentionPeriod", 0)
 
             if actual_retention_days >= required_rds_retention_days:
-                sample.result = True
+                sample.is_passing = True
             else:
                 sample.comments = f"Retention is {actual_retention_days} days"
 
             test.samples.append(sample)
 
     test.evaluate_samples()
-    if not test.result:
+    if not test.is_passing:
         # Document exception language.
-        test.result_description = f"Exceptions Noted. {test.num_findings} RDS instance(s) do not retain backups for at least {required_rds_retention_days} days."
+        test.comments = f"Exceptions Noted. {test.num_findings} RDS instance(s) do not retain backups for at least {required_rds_retention_days} days."
     return test
 
 def test_rds_auto_minor_version_upgrade(audit, test_id, risk_rating=1):
@@ -1163,15 +1163,15 @@ def test_rds_auto_minor_version_upgrade(audit, test_id, risk_rating=1):
                 continue
 
             if db.get("AutoMinorVersionUpgrade"):
-                sample.result = True
+                sample.is_passing = True
             else:
                 sample.comments = "Automatic minor version upgrades are not enabled."
 
             test.samples.append(sample)
 
     test.evaluate_samples()
-    if not test.result:
-        test.result_description = (
+    if not test.is_passing:
+        test.comments = (
             f"Exceptions Noted. {test.num_findings} RDS instance(s) do not have automatic minor version upgrades enabled."
         )
 
@@ -1248,7 +1248,7 @@ def test_rds_deletion_protection(audit, test_id, risk_rating=2):
 
             # Pass if either instance OR cluster has deletion protection
             if instance_protection or cluster_protection:
-                sample.result = True
+                sample.is_passing = True
             else:
                 if cluster_id:
                     sample.comments = "Deletion protection is not enabled at either the instance or cluster level."
@@ -1257,8 +1257,8 @@ def test_rds_deletion_protection(audit, test_id, risk_rating=2):
             test.samples.append(sample)
 
     test.evaluate_samples()
-    if not test.result:
-        test.result_description = (
+    if not test.is_passing:
+        test.comments = (
             f"Exceptions Noted. {test.num_findings} RDS instance(s) do not have deletion protection enabled."
         )
 
@@ -1323,8 +1323,8 @@ def test_ec2_security_group_tags(audit, test_id, risk_rating=1):
             test.samples.append(sample)
 
     test.evaluate_samples()
-    if not test.result:
-        test.result_description = (
+    if not test.is_passing:
+        test.comments = (
             f"Exceptions Noted. {test.num_findings} security group(s) are missing required tags or have empty values."
         )
 
@@ -1393,8 +1393,8 @@ def test_ec2_tags(audit, test_id, risk_rating=1):
                 test.samples.append(sample)
 
     test.evaluate_samples()
-    if not test.result:
-        test.result_description = (
+    if not test.is_passing:
+        test.comments = (
             f"Exceptions Noted. {test.num_findings} EC2 instance(s) are missing required tags or have empty values."
         )
 
@@ -1441,15 +1441,15 @@ def test_ebs_volume_encryption(audit, test_id, risk_rating=2):
                 continue
 
             if volume.get("Encrypted"):
-                sample.result = True
+                sample.is_passing = True
             else:
                 sample.comments = "EBS volume is not encrypted."
 
             test.samples.append(sample)
 
     test.evaluate_samples()
-    if not test.result:
-        test.result_description = (
+    if not test.is_passing:
+        test.comments = (
             f"Exceptions Noted. {test.num_findings} EBS volume(s) are not encrypted."
         )
 
@@ -1514,8 +1514,8 @@ def test_ebs_tags(audit, test_id, risk_rating=1):
             test.samples.append(sample)
 
     test.evaluate_samples()
-    if not test.result:
-        test.result_description = (
+    if not test.is_passing:
+        test.comments = (
             f"Exceptions Noted. {test.num_findings} EBS volume(s) are missing required tags or have empty values."
         )
 
@@ -1557,15 +1557,15 @@ def test_ebs_default_encryption(audit, test_id, risk_rating=0):
             continue
 
         if default_encryption.get("EbsEncryptionByDefault"):
-            sample.result = True
+            sample.is_passing = True
         else:
             sample.comments = "EBS default encryption is not enabled in this region."
 
         test.samples.append(sample)
 
     test.evaluate_samples()
-    if not test.result:
-        test.result_description = (
+    if not test.is_passing:
+        test.comments = (
             f"Exceptions Noted. {test.num_findings} region(s) do not have EBS default encryption enabled."
         )
 
@@ -1637,8 +1637,8 @@ def test_lambda_tags(audit, test_id, risk_rating=1):
             test.samples.append(sample)
 
     test.evaluate_samples()
-    if not test.result:
-        test.result_description = (
+    if not test.is_passing:
+        test.comments = (
             f"Exceptions Noted. {test.num_findings} Lambda function(s) are missing required tags or have empty values."
         )
 
@@ -1673,8 +1673,8 @@ def test_cloudtrail_global_logging(audit, test_id, risk_rating=3):
     ).get("trailList", [])
 
     if not trails:
-        test.result = False
-        test.result_description = "Exceptions Noted. No CloudTrail trail was found."
+        test.is_passing = False
+        test.comments = "Exceptions Noted. No CloudTrail trail was found."
         return test
 
     found_valid_trail = False
@@ -1690,10 +1690,10 @@ def test_cloudtrail_global_logging(audit, test_id, risk_rating=3):
             break
 
     if found_valid_trail:
-        test.result = True
+        test.is_passing = True
     else:
-        test.result = False
-        test.result_description = (
+        test.is_passing = False
+        test.comments = (
             "Exceptions Noted. No multi-region CloudTrail trail with active logging was found."
         )
 
@@ -1724,8 +1724,8 @@ def test_cloudtrail_log_file_validation(audit, test_id, risk_rating=2):
     ).get("trailList", [])
 
     if not trails:
-        test.result = False
-        test.result_description = "Exceptions Noted. No CloudTrail trails are configured."
+        test.is_passing = False
+        test.comments = "Exceptions Noted. No CloudTrail trails are configured."
         return test
 
     for trail in trails:
@@ -1740,14 +1740,14 @@ def test_cloudtrail_log_file_validation(audit, test_id, risk_rating=2):
 
         log_validation = trail.get("LogFileValidationEnabled", False)
         if log_validation:
-            sample.result = True
+            sample.is_passing = True
         else:
             sample.comments = "Log file validation is disabled."
         test.samples.append(sample)
 
     test.evaluate_samples()
-    if not test.result:
-        test.result_description = (
+    if not test.is_passing:
+        test.comments = (
             f"Exceptions Noted. {test.num_findings} trail(s) do not have log file validation enabled."
         )
 
@@ -1816,9 +1816,9 @@ def test_cloudtrail_s3_bucket_protection(audit, test_id, risk_rating=3):
         block_policy = config.get("BlockPublicPolicy", False)
         restrict_buckets = config.get("RestrictPublicBuckets", False)
 
-        # Determine result
+        # Document conclusion
         if all([block_acls, ignore_acls, block_policy, restrict_buckets]):
-            sample.result = True
+            sample.is_passing = True
         else:
             sample.comments = "One or more public access settings are not enabled."
 
@@ -1826,8 +1826,8 @@ def test_cloudtrail_s3_bucket_protection(audit, test_id, risk_rating=3):
 
     test.evaluate_samples()
 
-    if not test.result:
-        test.result_description = (
+    if not test.is_passing:
+        test.comments = (
             f"Exceptions Noted. {test.num_findings} CloudTrail bucket(s) are not blocking public access."
         )
 
@@ -1895,22 +1895,22 @@ def test_cloudtrail_logging_recent_stops(audit, test_id, risk_rating=3):
             if isinstance(stop_time, str):
                 stop_time = datetime.fromisoformat(stop_time.replace("Z", "+00:00"))
 
-        # Determine result
+        # Document conclusion
         if not is_logging:
-            sample.result = False
+            sample.is_passing = False
             sample.comments = "CloudTrail logging is currently stopped."
         elif stop_time and stop_time >= lookback_threshold:
-            sample.result = False
+            sample.is_passing = False
             sample.comments = f"Logging was stopped recently on {stop_time.isoformat()}."
         else:
-            sample.result = True
+            sample.is_passing = True
 
         test.samples.append(sample)
 
     test.evaluate_samples()
 
-    if not test.result:
-        test.result_description = (
+    if not test.is_passing:
+        test.comments = (
             f"Exceptions Noted. {test.num_findings} trail(s) are not currently logging or have been stopped "
             f"within the last {lookback_days} days."
         )
@@ -2019,7 +2019,7 @@ def test_waf_enabled(audit, test_id, risk_rating=2):
             )
 
             if alb_attached:
-                sample.result = True
+                sample.is_passing = True
             else:
                 sample.comments = "No WAF Web ACL associated."
 
@@ -2051,15 +2051,15 @@ def test_waf_enabled(audit, test_id, risk_rating=2):
             )
 
             if api_gw_attached:
-                sample.result = True
+                sample.is_passing = True
             else:
                 sample.comments = "No WAF Web ACL associated."
 
             test.samples.append(sample)
 
     test.evaluate_samples()
-    if not test.result:
-        test.result_description = (
+    if not test.is_passing:
+        test.comments = (
             f"Exceptions Noted. {test.num_findings} resource(s) do not have WAF enabled."
         )
 
@@ -2102,7 +2102,7 @@ def test_guardduty_enabled(audit, test_id, risk_rating=3):
         ).get("DetectorIds", [])
 
         if not detectors:
-            sample.result = False
+            sample.is_passing = False
             sample.comments = "No GuardDuty detectors in region."
             test.samples.append(sample)
             continue
@@ -2120,17 +2120,17 @@ def test_guardduty_enabled(audit, test_id, risk_rating=3):
                 break
 
         if enabled_detector_found:
-            sample.result = True
+            sample.is_passing = True
         else:
-            sample.result = False
+            sample.is_passing = False
             sample.comments = "Detector(s) found but none are enabled."
 
         test.samples.append(sample)
 
     test.evaluate_samples()
 
-    if not test.result:
-        test.result_description = (
+    if not test.is_passing:
+        test.comments = (
             f"Exceptions Noted. GuardDuty is not enabled for {test.num_findings} in-scope region(s)."
         )
 
