@@ -143,7 +143,7 @@ def process_sample_exclusion(test, sample, audit):
 
 def process_test_pass_fail(sample, condition, fail_msg):
     if condition:
-        sample.result = True
+        sample.is_passing = True
     else:
         sample.comments = fail_msg
 
@@ -168,7 +168,7 @@ Args:
     resource_tags (dict): Dictionary of tag key/value pairs from the resource.
 
 Returns:
-    None. Updates sample.result and sample.comments in-place.
+    None. Updates sample.is_passing and sample.comments in-place.
 """
 def evaluate_tags(sample, required_tags, actual_resource_tags):
     # Normalize keys to lowercase for comparison
@@ -185,7 +185,7 @@ def evaluate_tags(sample, required_tags, actual_resource_tags):
             empty_tags.append(key)
 
     if not missing_tags and not empty_tags:
-        sample.result = True
+        sample.is_passing = True
     else:
         if missing_tags:
             sample.comments += f"Missing tags: {missing_tags}. "
