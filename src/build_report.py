@@ -50,11 +50,11 @@ def render_audit_cover_page(audit, tool_name, styles, tests):
     elements.append(Paragraph("Audit Summary", styles["Heading1"]))
     elements.append(Spacer(1, 12))
 
+    # TODO: Consider adding transparency for excluded tests from JSON file.
     date_str = datetime.now(timezone.utc).strftime('%Y-%m-%d')
     total = len(tests)
     failed = sum(1 for t in tests if not t.is_passing)
-    excluded = sum(1 for t in tests if t.is_excluded)
-    passed = total - failed - excluded
+    passed = total - failed
 
     audit_metadata = [
         [Paragraph("Prepared By", LABEL_STYLE), Paragraph("AJ Dehn", VALUE_STYLE)], 
@@ -63,7 +63,6 @@ def render_audit_cover_page(audit, tool_name, styles, tests):
         [Paragraph("Number of tests", LABEL_STYLE), Paragraph(str(total), VALUE_STYLE)], 
         [Paragraph("Passed", LABEL_STYLE), Paragraph(format_count_with_pct(passed, total), VALUE_STYLE)],
         [Paragraph("Failed", LABEL_STYLE), Paragraph(format_count_with_pct(failed, total), VALUE_STYLE)],
-        [Paragraph("Out of Scope", LABEL_STYLE), Paragraph(format_count_with_pct(excluded, total), VALUE_STYLE)]
     ]
 
     audit_metadata_table = Table(audit_metadata, colWidths=[150, 100], hAlign="LEFT")
@@ -198,15 +197,10 @@ def render_summary_page(tests, styles):
     for test in tests:
         row = []
         row.append(Paragraph(str(test.test_description), VALUE_STYLE))
-        if test.is_excluded:
-            test_result = "Out of Scope"
-            row.append(Paragraph(test_result, CENTER_STYLE))
-        else:
-            test_result = "Pass" if test.is_passing else "Fail"
-            result_color = PASS_COLOR if test.is_passing else FAIL_COLOR
-            row.append(Paragraph(f"<font color='{result_color}'>{test_result}</font>", VALUE_STYLE))
+        test_result = "Pass" if test.is_passing else "Fail"
+        result_color = PASS_COLOR if test.is_passing else FAIL_COLOR
+        row.append(Paragraph(f"<font color='{result_color}'>{test_result}</font>", VALUE_STYLE))
         row.append(Paragraph(str(test.risk_rating_str), VALUE_STYLE))
-        # TODO: Add test exclusion rationale to table.
         row.append(Paragraph(test.comments, VALUE_STYLE))
         
         test_summary_data.append(row)
@@ -245,17 +239,16 @@ def generate_pdf_report(audit, tests, tool_name, file_name="tmp/audit_report.pdf
 
     # Detailed Findings
     for test in tests:
-        if not test.is_excluded:
-            summary_table = render_test_summary(test, page_width)
-            elements.append(KeepTogether(summary_table))
-            elements.append(Spacer(1, 16))
-            sample_table = render_sample_table(test, page_width)
-            if sample_table:
-                elements.append(KeepTogether(sample_table))
-                # Create new page if test includes sample table.
-                elements.append(PageBreak())
-            else:
-                elements.append(Spacer(1, 30))
+        summary_table = render_test_summary(test, page_width)
+        elements.append(KeepTogether(summary_table))
+        elements.append(Spacer(1, 16))
+        sample_table = render_sample_table(test, page_width)
+        if sample_table:
+            elements.append(KeepTogether(sample_table))
+            # Create new page if test includes sample table.
+            elements.append(PageBreak())
+        else:
+            elements.append(Spacer(1, 30))
 
     doc.build(elements)
     print(f"Report generated: {file_name}")
