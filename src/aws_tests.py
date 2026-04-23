@@ -10,21 +10,10 @@ import os
 
 class EvidenceClient:
     def __init__(self, evidence_folder_path, debug=False):
-        """
-        base_path: root folder for evidence (e.g., audit.evidence_folder)
-        debug: print cache behavior
-        """
-        self.base_path = evidence_folder_path
-        self.debug = debug
+        self.base_path = evidence_folder_path       # Path to audit evidence folder.
+        self.debug = debug                          # Print cache behavior
 
-    # ---------------------------
-    # Public API
-    # ---------------------------
     def get(self, relative_path, fetch_fn):
-        """
-        Fetch data with simple caching (no expiration).
-        """
-        # TODO: Consider lowercasing by using .lower()
         file_path = os.path.join(self.base_path, relative_path)
 
         if os.path.exists(file_path):
@@ -116,14 +105,12 @@ class Test:
     test_description: str
     test_procedures: List[str]
     test_attributes: List[str]
-    audit: Audit
     # Rating Matrix: 0 - Informational, 1 - Low, 2 - Medium, 3 - High.
-    risk_rating: int    
+    risk_rating: int
     table_headers: Optional[List[str]] = None
     include_sample_number: bool = False
     samples: List["Sample"] = field(default_factory=list)
     is_passing: bool = True
-    is_excluded: bool = False
     comments: str = ""
     num_findings: int = 0
     num_exclusions: int = 0
@@ -132,23 +119,14 @@ class Test:
 
     def __post_init__(self):
         self.risk_rating_str = self.create_risk_str()
-        # Set exclusion status AFTER object is created
-        self.is_excluded = is_test_excluded(
-            self.test_id,
-            self.audit.config
-        )
-
-        if self.is_excluded:
-            self.comments = "Test is excluded. See exclusions.json"
 
     def __str__(self):
         return (
             f"test_id: {self.test_id}\n"
             f"test_description: {self.test_description}\n"
             f"risk_rating: {self.risk_rating}\n"
-            f"is_excluded: {self.is_excluded}\n"
             f"is_passing: {self.is_passing}\n"
-            f"comments: {self.comments}\n"
+            f"comments: {self.comments}\n"         
         )
 
     def to_dict(self):
@@ -156,7 +134,6 @@ class Test:
             "test_id": self.test_id,
             "test_description": self.test_description,
             "risk_rating": self.risk_rating,
-            "is_excluded": self.is_excluded,
             "is_passing": self.is_passing,
             "comments": self.comments,
             "test_procedures": self.test_procedures,
@@ -177,32 +154,20 @@ class Test:
             raise ValueError(f"Invalid risk rating: {self.risk_rating}. Accepted values are 0 - 3.")
 
     def evaluate_samples(self):
-        if self.is_excluded:
-            self.is_passing = False
-            self.num_findings = 0
-            self.total_population = 0
-            self.num_exclusions = 0
-            return self
-
-        # Determine total population (includes pass, fail, and exclusions)
         self.total_population = len(self.samples)
+        in_scope_count = 0
 
-        # Count exclusions first
-        self.num_exclusions = sum(1 for s in self.samples if s.is_excluded)
+        for s in self.samples:
+            if s.is_excluded:
+                self.num_exclusions += 1
+            else:
+                in_scope_count += 1
+                if not s.is_passing:
+                    self.num_findings += 1
 
-        # Filter in-scope samples
-        in_scope_samples = [s for s in self.samples if not s.is_excluded]
-
-        if not in_scope_samples:
-            # No valid samples. Test passes with a population of zero.
-            self.is_passing = True
-            return self
-
-        # Count findings (failures)
-        self.num_findings = sum(1 for s in in_scope_samples if not s.is_passing)
-
-        # Test passing if there are no findings.
+        # NOTE: Will pass if there are 0 samples.
         self.is_passing = self.num_findings == 0
+
         return self
 
 
@@ -221,7 +186,6 @@ def run_test_safely(audit, test_fn, test_id):
             test_description=f"{test_id} (Execution Failed)",
             test_procedures=["Test execution failed."],
             test_attributes=[],
-            audit=audit,
             table_headers=["Error"],
             risk_rating=3
         )
@@ -271,7 +235,11 @@ def run_all_tests(audit):
 
     tests = []
     for test_id, test_fn in test_definitions:
-        tests.append(run_test_safely(audit, test_fn, test_id))
+        if is_test_excluded(test_id, audit.config):
+            # Move to next test.
+            continue
+        else:
+            tests.append(run_test_safely(audit, test_fn, test_id))
     
     return tests
 
@@ -287,13 +255,9 @@ def test_s3_encryption(audit, test_id, risk_rating=2):
             "For each S3 bucket, inspected the encryption settings to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=["ServerSideEncryptionConfiguration is present in encryption.json."],
-        audit=audit,
         table_headers=["Bucket Name", "Result", "Comments"],
         risk_rating=risk_rating
     )
-    if test.is_excluded:
-        # No further testing required.
-        return test
     
     s3 = audit.session.client("s3")
     # Obtain and save list of buckets.
@@ -338,13 +302,9 @@ def test_s3_public_access(audit, test_id, risk_rating=3):
             "For each bucket, inspected the public access block settings to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=["BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets are set to true."],
-        audit=audit,
         table_headers=["Bucket Name", "Result", "Comments"],
         risk_rating=risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     s3 = audit.session.client("s3")
     # Obtain and save list of buckets.
@@ -419,13 +379,9 @@ def test_s3_tags(audit, test_id, risk_rating=1):
             f"For each bucket, inspected the tags to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
         test_attributes=[],
-        audit=audit,
         table_headers=["Bucket Name", "Result", "Comments"],
         risk_rating=risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     s3 = audit.session.client("s3")
     buckets = audit.evidence_client.get("s3/buckets.json", lambda: s3.list_buckets())
@@ -473,13 +429,9 @@ def test_s3_secure_transport(audit, test_id, risk_rating=0):
             "For each bucket, inspected the bucket policy to determine if a statement exists that denies requests when aws:SecureTransport is false."
         ],
         test_attributes=[],
-        audit=audit,
         table_headers=["Bucket Name", "Result", "Comments"],
         risk_rating=risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     s3 = audit.session.client("s3")
 
@@ -573,7 +525,6 @@ def test_iam_password_policy(audit, test_id, risk_rating=2):
             "RequireUppercaseCharacters, and RequireLowercaseCharacters) are set to True.",
             f"PasswordReusePrevention must be >= {required_password_history}."
         ],
-        audit=audit,
         risk_rating=risk_rating
     )
 
@@ -654,12 +605,8 @@ def test_iam_root_access_key(audit, test_id, risk_rating=3):
             "Inspected the account summary to determine if 'AccountAccessKeysPresent' is set to 0."
         ],
         test_attributes=[],
-        audit=audit,
         risk_rating = risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     iam = audit.session.client("iam")
     summary = audit.evidence_client.get_aws(
@@ -688,12 +635,8 @@ def test_iam_root_mfa(audit, test_id, risk_rating=3):
             "Inspected the account summary to determine if 'AccountMFAEnabled' is set to 1."
         ],
         test_attributes=[],
-        audit=audit,
         risk_rating=risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     iam = audit.session.client("iam")
     summary = audit.evidence_client.get_aws(
@@ -727,13 +670,9 @@ def test_iam_users_mfa(audit, test_id, risk_rating=3):
             "For each IAM user with a login profile, inspected mfa_devices.json to determine if at least one MFA device is registered."
         ],
         test_attributes=[],
-        audit=audit,
         table_headers=["IAM User Name", "Result", "Comments"],
         risk_rating=risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     iam = audit.session.client("iam")
     users = audit.evidence_client.get_aws(
@@ -815,13 +754,9 @@ def test_iam_user_access_key_age(audit, test_id, risk_rating=3):
         test_attributes=[
             f"'CREATE_DATE <= {max_age_days} days ago (for keys with an 'ACTIVE' status)."
         ],
-        audit=audit,
         table_headers=["User", "Access Key ID", "Result", "Comments"],
         risk_rating=risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     iam = audit.session.client("iam")
     users = audit.evidence_client.get_aws(
@@ -930,13 +865,9 @@ def test_rds_encryption(audit, test_id, risk_rating=2):
             "For each RDS instance, inspected the `StorageEncrypted` setting to determine if it was set to `true`."
         ],
         test_attributes=[],
-        audit=audit,
         table_headers=["Region", "DB Instance", "Result", "Comments"],
         risk_rating=risk_rating        
     )
-
-    if test.is_excluded:
-        return test
 
     for region in audit.in_scope_regions:
         rds = audit.session.client("rds", region_name=region)
@@ -982,13 +913,9 @@ def test_rds_public_access(audit, test_id, risk_rating=3):
             "For each RDS instance, inspected the 'PubliclyAccessible' setting to determine if it was set to 'false'."
         ],
         test_attributes=[],
-        audit=audit,
         table_headers=["Region", "DB Instance", "Result", "Comments"],
         risk_rating=risk_rating        
     )
-
-    if test.is_excluded:
-        return test
 
     for region in audit.in_scope_regions:
         rds = audit.session.client("rds", region_name=region)
@@ -1039,13 +966,9 @@ def test_rds_tags(audit, test_id, risk_rating=1):
             f"For each RDS instance, reviewed the `TagList` to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
         test_attributes=[],
-        audit=audit,
         table_headers=["Region", "DB Instance", "Result", "Comments"],
         risk_rating=risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     for region in audit.in_scope_regions:
         rds = audit.session.client("rds", region_name=region)
@@ -1093,13 +1016,9 @@ def test_rds_backup_retention(audit, test_id, risk_rating=1):
             f"For each RDS instance, inspected the `BackupRetentionPeriod` to determine if it is greater than or equal to {required_rds_retention_days} days."
         ],
         test_attributes=[],
-        audit=audit,
         table_headers=["Region", "DB Instance", "Result", "Comments"],
         risk_rating=risk_rating        
     )
-
-    if test.is_excluded:
-        return test
 
     for region in audit.in_scope_regions:
         rds = audit.session.client("rds", region_name=region)
@@ -1143,13 +1062,9 @@ def test_rds_auto_minor_version_upgrade(audit, test_id, risk_rating=1):
             "For each RDS instance, inspected the 'AutoMinorVersionUpgrade' setting to determine if it was set to 'true'."
         ],
         test_attributes=[],
-        audit=audit,
         table_headers=["Region", "DB Instance", "Result", "Comments"],
         risk_rating=risk_rating        
     )
-
-    if test.is_excluded:
-        return test
 
     for region in audit.in_scope_regions:
         rds = audit.session.client("rds", region_name=region)
@@ -1201,13 +1116,9 @@ def test_rds_deletion_protection(audit, test_id, risk_rating=2):
             "Inspected each RDS instance to determine if 'DeletionProtection' was set to 'true' at the instance or cluster level."
         ],
         test_attributes=[],
-        audit=audit,
         table_headers=["Region", "DB Instance", "Result", "Comments"],
         risk_rating=risk_rating        
     )
-
-    if test.is_excluded:
-        return test
 
     for region in audit.in_scope_regions:
         rds = audit.session.client("rds", region_name=region)
@@ -1294,13 +1205,9 @@ def test_ec2_security_group_tags(audit, test_id, risk_rating=1):
             f"Inspected each security group's 'Tags' attribute to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
         test_attributes=[],
-        audit=audit,
         table_headers=["Region", "Security Group ID", "Result", "Comments"],
         risk_rating=risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     for region in audit.in_scope_regions:
         ec2 = audit.session.client("ec2", region_name=region)
@@ -1363,13 +1270,9 @@ def test_ec2_tags(audit, test_id, risk_rating=1):
             f"For each EC2 instance, reviewed the 'Tags' to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
         test_attributes=[],
-        audit=audit,
         table_headers=["Region", "Instance ID", "Result", "Comments"],
         risk_rating=risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     for region in audit.in_scope_regions:
         ec2 = audit.session.client("ec2", region_name=region)
@@ -1424,13 +1327,9 @@ def test_ebs_volume_encryption(audit, test_id, risk_rating=2):
             "For each EBS volume, inspected the 'Encrypted' attribute to determine it is set to 'true'."
         ],
         test_attributes=[],
-        audit=audit,
         table_headers=["Region", "Volume ID", "Result", "Comments"],
         risk_rating=risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     for region in audit.in_scope_regions:
         ec2 = audit.session.client("ec2", region_name=region)
@@ -1489,13 +1388,9 @@ def test_ebs_tags(audit, test_id, risk_rating=1):
             f"Inspected each EBS volume to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
         test_attributes=[],
-        audit=audit,
         table_headers=["Region", "Volume ID", "Result", "Comments"],
         risk_rating=risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     for region in audit.in_scope_regions:
         ec2 = audit.session.client("ec2", region_name=region)
@@ -1546,13 +1441,9 @@ def test_ebs_default_encryption(audit, test_id, risk_rating=0):
             "Inspected the configuration for each region to determine if 'EbsEncryptionByDefault' is set to True."
         ],
         test_attributes=[],
-        audit=audit,
         table_headers=["Region", "Result", "Comments"],
         risk_rating=risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     for region in audit.in_scope_regions:
         ec2 = audit.session.client("ec2", region_name=region)
@@ -1606,13 +1497,9 @@ def test_lambda_tags(audit, test_id, risk_rating=1):
             f"Inspected each Lambda function to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
         test_attributes=[],
-        audit=audit,
         table_headers=["Region", "Function Name", "Result", "Comments"],
         risk_rating=risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     for region in audit.in_scope_regions:
         lambda_client = audit.session.client("lambda", region_name=region)
@@ -1673,12 +1560,8 @@ def test_cloudtrail_multi_region(audit, test_id, risk_rating=3):
         test_attributes=[
             "At least one trail must have IsMultiRegionTrail = true and IsLogging = true."
         ],
-        audit=audit,
         risk_rating=risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
@@ -1723,13 +1606,9 @@ def test_cloudtrail_log_file_validation(audit, test_id, risk_rating=2):
             "Inspected each trail's configuration to determine if 'LogFileValidationEnabled' was set to True for all trails."
         ],
         test_attributes=[],
-        audit=audit,
         table_headers=["Trail Name", "Result", "Comments"],
         risk_rating=risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
@@ -1781,13 +1660,9 @@ def test_cloudtrail_s3_bucket_protection(audit, test_id, risk_rating=3):
         test_attributes=[
             "CloudTrail S3 buckets must block public access (BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets = True)."
         ],
-        audit=audit,
         table_headers=["Trail Name", "Bucket Name", "Result", "Comments"],
         risk_rating=risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
@@ -1869,13 +1744,9 @@ def test_cloudtrail_logging_recent_stops(audit, test_id, risk_rating=3):
         test_attributes=[
             f"'TimeLoggingStopped' must be empty OR is more than {lookback_days} days ago."
         ],
-        audit=audit,
         table_headers=["Trail Name", "Is Logging", "Last Stop Time", "Result", "Comments"],
         risk_rating=risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
@@ -1950,13 +1821,9 @@ def test_wafv2_enabled(audit, test_id, risk_rating=2):
             "For each API gateway to check if it was associated with a Web ACL."
         ],
         test_attributes=[],
-        audit=audit,
         table_headers=["Region", "Resource Type", "Resource ID", "Result", "Comments"],
         risk_rating=risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     for region in audit.in_scope_regions:
         waf = audit.session.client("wafv2", region_name=region)
@@ -2091,13 +1958,9 @@ def test_guardduty_enabled(audit, test_id, risk_rating=3):
             "For each detector ID, inspected the detector configuration to determine whether 'Status' is set to 'ENABLED'."
         ],
         test_attributes=[],
-        audit=audit,
         table_headers=["Region", "Result", "Comments"],
         risk_rating=risk_rating
     )
-
-    if test.is_excluded:
-        return test
 
     for region in audit.in_scope_regions:
         gd = audit.session.client("guardduty", region_name=region)
