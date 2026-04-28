@@ -122,25 +122,6 @@ def is_exclusion_active(exclusion):
 
     return False
 
-def process_sample_exclusion(test, sample, audit):
-    exclusions = audit.config.get("sample_exclusions", {}).get(test.test_id, [])
-    if not isinstance(exclusions, list):
-        return False  # Invalid sample exclusion structure
-
-    for e in exclusions:
-        if not is_exclusion_active(e):
-            continue
-
-        config_sample_id = e.get("sample_id", {})
-
-        if all(sample.sample_id.get(k) == v for k, v in config_sample_id.items()):
-                sample.is_excluded = True
-                sample.comments = "Sample is excluded. See config.json"
-                test.samples.append(sample)
-                return True
-
-    return False
-
 def process_test_pass_fail(sample, condition, fail_msg):
     if condition:
         sample.is_passing = True
