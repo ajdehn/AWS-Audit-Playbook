@@ -623,48 +623,6 @@ def test_iam_user_access_key_age(audit, test_id, risk_rating=3):
         test.comments = f"Exceptions Noted. {test.num_findings} IAM key(s) are over {max_age_days} days old."
     return test
 
-"""
-    NOTE: Used by region based tests (EC2, RDS, SNS, GuardDuty, etc)
-    Return in-scope AWS regions based on config.json. If not set, return response from describe_regions.
-    Raises:
-        ValueError: If config contains invalid regions.
-"""
-def get_regions(audit):
-    ec2 = audit.session.client("ec2")
-    regions = audit.evidence_client.get_aws(
-        "ec2/regions.json",
-        lambda: ec2.describe_regions(
-            AllRegions=True,
-            Filters=[
-                {
-                    "Name": "opt-in-status",
-                    "Values": ["opt-in-not-required", "opted-in"]}
-            ]
-        )
-    )
-    available_regions = {r["RegionName"] for r in regions["Regions"]}
-
-    # Pull from config and lower-case region values
-    test_config = audit.config.get("test_config") or {}
-    config_regions = test_config.get("in_scope_regions", [])
-    config_regions = [r.lower() for r in config_regions]
-
-    if not config_regions:
-        # in_scope_regions not set in config value. Return all available regions.
-        return sorted(available_regions)
-
-    # Check for invalid regions
-    config_regions_set = set(config_regions)
-    invalid_regions = config_regions_set - available_regions
-    if invalid_regions:
-        raise ValueError(
-            f"Invalid regions in config: {sorted(invalid_regions)}. "
-            f"Valid regions are: {sorted(available_regions)}"
-        )
-
-    # Return validated regions
-    return [r for r in config_regions if r in available_regions]
-
 
 def test_rds_encryption(audit, test_id, risk_rating=2):
     test = Test(

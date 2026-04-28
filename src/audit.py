@@ -1,21 +1,17 @@
 from datetime import datetime, timezone
 from evidence_client import EvidenceClient
-from utils import load_config, create_session, get_aws_account_id
-import aws_tests
 
 class Audit:
-    """
-    Initializes the audit instance with the provided attributes.
-    """
     def __init__(self, tmp_folder="tmp",
     config_file_path="config.json"):
-        self.evidence_folder = f"{tmp_folder}/audit_evidence"       # Name of the evidence_folder
-        self.config = load_config(config_file_path)                 # Control and sample exclusions
+        self.tmp_folder = tmp_folder
+        self.evidence_folder = f"{tmp_folder}/audit_evidence"
         self.evidence_client = EvidenceClient(evidence_folder_path=self.evidence_folder, debug=False)
-        self.session = create_session()
-        self.in_scope_regions = aws_tests.get_regions(self)        
-        self.aws_account_id = get_aws_account_id(self)
-        self.test_results = ""
+        self.config = None
+        self.session = None
+        self.aws_account_id = None
+        self.test_results = None        
+        self.in_scope_regions = None
 
     def to_dict(self):
         return {
