@@ -7,14 +7,13 @@
                 "us-east-2"
             ]
         },
-        "report_date": "2026-04-22"
+        "report_date": "2026-04-29"
     },
     "test_results": [
         {
             "test_id": "iam_root_mfa",
             "test_description": "Root account has MFA enabled.",
             "risk_rating": 3,
-            "is_excluded": false,
             "is_passing": true,
             "comments": "",
             "test_procedures": [
@@ -28,7 +27,6 @@
             "test_id": "iam_root_access_key",
             "test_description": "Root account does not have any active access keys.",
             "risk_rating": 3,
-            "is_excluded": false,
             "is_passing": true,
             "comments": "",
             "test_procedures": [
@@ -42,7 +40,6 @@
             "test_id": "iam_users_mfa",
             "test_description": "IAM users with an active console password have MFA enabled.",
             "risk_rating": 3,
-            "is_excluded": false,
             "is_passing": false,
             "comments": "Exceptions Noted. 4 IAM user(s) do not have MFA enabled.",
             "test_procedures": [
@@ -111,7 +108,6 @@
             "test_id": "iam_user_access_key_age",
             "test_description": "IAM user access keys are rotated at least every 90 days.",
             "risk_rating": 3,
-            "is_excluded": false,
             "is_passing": false,
             "comments": "Exceptions Noted. 1 IAM key(s) are over 90 days old.",
             "test_procedures": [
@@ -141,7 +137,7 @@
                     },
                     "is_excluded": false,
                     "is_passing": false,
-                    "comments": "Key is 1185 days old."
+                    "comments": "Key is 1192 days old."
                 }
             ]
         },
@@ -149,7 +145,6 @@
             "test_id": "iam_password_policy",
             "test_description": "IAM passwords must comply with the organizations password complexity requirements.",
             "risk_rating": 2,
-            "is_excluded": false,
             "is_passing": false,
             "comments": "Exceptions Noted. Minimum password length too short (current=14, required>=20)",
             "test_procedures": [
@@ -167,7 +162,6 @@
             "test_id": "s3_encryption",
             "test_description": "S3 buckets are encrypted at rest.",
             "risk_rating": 2,
-            "is_excluded": false,
             "is_passing": true,
             "comments": "",
             "test_procedures": [
@@ -227,9 +221,8 @@
             "test_id": "s3_public_access",
             "test_description": "S3 buckets are configured to block public access.",
             "risk_rating": 3,
-            "is_excluded": false,
             "is_passing": false,
-            "comments": "Exceptions Noted. 3 S3 buckets are not blocking public access.",
+            "comments": "Exceptions Noted. 2 S3 buckets are not blocking public access.",
             "test_procedures": [
                 "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
                 "Saved the list of buckets: s3/buckets.json.",
@@ -253,9 +246,9 @@
                     "sample_id": {
                         "bucket_name": "bad-bucket-54321"
                     },
-                    "is_excluded": false,
+                    "is_excluded": true,
                     "is_passing": false,
-                    "comments": "No Public Access Block configuration found."
+                    "comments": "Sample is excluded. See config.json"
                 },
                 {
                     "sample_id": {
@@ -287,9 +280,8 @@
             "test_id": "s3_secure_transport",
             "test_description": "S3 buckets are configured to deny unencrypted data in-transit.",
             "risk_rating": 0,
-            "is_excluded": false,
             "is_passing": false,
-            "comments": "Exceptions Noted. 4 S3 bucket(s) do not enforce secure transport (HTTPS).",
+            "comments": "Exceptions Noted. 5 S3 bucket(s) do not enforce secure transport (HTTPS).",
             "test_procedures": [
                 "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
                 "Saved the list of buckets: s3/buckets.json.",
@@ -304,8 +296,8 @@
                         "bucket_name": "aws-cloudtrail-logs-798094440826-aa81e64c"
                     },
                     "is_excluded": false,
-                    "is_passing": true,
-                    "comments": ""
+                    "is_passing": false,
+                    "comments": "Unable to parse bucket policy."
                 },
                 {
                     "sample_id": {
@@ -313,7 +305,7 @@
                     },
                     "is_excluded": false,
                     "is_passing": false,
-                    "comments": "No bucket policy statement enforcing SecureTransport."
+                    "comments": "Unable to parse bucket policy."
                 },
                 {
                     "sample_id": {
@@ -321,7 +313,7 @@
                     },
                     "is_excluded": false,
                     "is_passing": false,
-                    "comments": "No bucket policy statement enforcing SecureTransport."
+                    "comments": "Unable to parse bucket policy."
                 },
                 {
                     "sample_id": {
@@ -329,7 +321,7 @@
                     },
                     "is_excluded": false,
                     "is_passing": false,
-                    "comments": "No bucket policy statement enforcing SecureTransport."
+                    "comments": "Unable to parse bucket policy."
                 },
                 {
                     "sample_id": {
@@ -337,7 +329,7 @@
                     },
                     "is_excluded": false,
                     "is_passing": false,
-                    "comments": "No bucket policy statement enforcing SecureTransport."
+                    "comments": "Unable to parse bucket policy."
                 }
             ]
         },
@@ -345,7 +337,6 @@
             "test_id": "s3_tags",
             "test_description": "S3 buckets must have required tags applied and tag values must not be empty.",
             "risk_rating": 1,
-            "is_excluded": false,
             "is_passing": false,
             "comments": "Exceptions Noted. 2 bucket(s) missing required tags or have empty values.",
             "test_procedures": [
@@ -403,7 +394,6 @@
             "test_id": "rds_backup_retention",
             "test_description": "RDS backups are retained for at least 14 days.",
             "risk_rating": 1,
-            "is_excluded": false,
             "is_passing": true,
             "comments": "",
             "test_procedures": [
@@ -417,7 +407,6 @@
             "test_id": "rds_encryption",
             "test_description": "RDS instances are encrypted at rest.",
             "risk_rating": 2,
-            "is_excluded": false,
             "is_passing": true,
             "comments": "",
             "test_procedures": [
@@ -431,7 +420,6 @@
             "test_id": "rds_public_access",
             "test_description": "RDS instances are not publicly accessible.",
             "risk_rating": 3,
-            "is_excluded": false,
             "is_passing": true,
             "comments": "",
             "test_procedures": [
@@ -445,7 +433,6 @@
             "test_id": "rds_auto_minor_version_upgrade",
             "test_description": "RDS instances have automatic minor version upgrades enabled.",
             "risk_rating": 1,
-            "is_excluded": false,
             "is_passing": true,
             "comments": "",
             "test_procedures": [
@@ -459,7 +446,6 @@
             "test_id": "rds_deletion_protection",
             "test_description": "RDS instances have deletion protection enabled at the cluster or instance level.",
             "risk_rating": 2,
-            "is_excluded": false,
             "is_passing": true,
             "comments": "",
             "test_procedures": [
@@ -473,7 +459,6 @@
             "test_id": "rds_tags",
             "test_description": "RDS instances must have required tags applied and tag values must not be empty.",
             "risk_rating": 1,
-            "is_excluded": false,
             "is_passing": true,
             "comments": "",
             "test_procedures": [
@@ -487,7 +472,6 @@
             "test_id": "ebs_volume_encryption",
             "test_description": "EBS volumes are encrypted at rest.",
             "risk_rating": 2,
-            "is_excluded": false,
             "is_passing": false,
             "comments": "Exceptions Noted. 1 EBS volume(s) are not encrypted.",
             "test_procedures": [
@@ -512,7 +496,6 @@
             "test_id": "ebs_default_encryption",
             "test_description": "EBS volumes must have default encryption enabled in each region.",
             "risk_rating": 0,
-            "is_excluded": false,
             "is_passing": false,
             "comments": "Exceptions Noted. 2 region(s) do not have EBS default encryption enabled.",
             "test_procedures": [
@@ -544,7 +527,6 @@
             "test_id": "ebs_tags",
             "test_description": "EBS volumes must have required tags applied and tag values must not be empty.",
             "risk_rating": 1,
-            "is_excluded": false,
             "is_passing": false,
             "comments": "Exceptions Noted. 1 EBS volume(s) are missing required tags or have empty values.",
             "test_procedures": [
@@ -570,7 +552,6 @@
             "test_id": "ec2_tags",
             "test_description": "EC2 instances must have required tags applied and tag values must not be empty.",
             "risk_rating": 1,
-            "is_excluded": false,
             "is_passing": false,
             "comments": "Exceptions Noted. 1 EC2 instance(s) are missing required tags or have empty values.",
             "test_procedures": [
@@ -595,7 +576,6 @@
             "test_id": "ec2_security_group_tags",
             "test_description": "EC2 security groups have required tags applied and tag values are not be empty.",
             "risk_rating": 1,
-            "is_excluded": false,
             "is_passing": false,
             "comments": "Exceptions Noted. 4 security group(s) are missing required tags or have empty values.",
             "test_procedures": [
@@ -647,14 +627,13 @@
             "test_id": "lambda_tags",
             "test_description": "Lambda functions must have required tags applied and tag values must not be empty.",
             "risk_rating": 1,
-            "is_excluded": false,
             "is_passing": true,
             "comments": "",
             "test_procedures": [
                 "For each in-scope region, obtained the list of Lambda functions by calling list_functions() boto3 command.",
-                "Saved the list of functions in the audit evidence folder (Lambda/[region_name]/functions.json).",
+                "Saved the list of functions in the audit evidence folder (lambda/[region_name]/functions.json).",
                 "For each function, obtained its tags using list_tags() boto3 command.",
-                "Saved the tags for each function in the audit evidence folder (Lambda/[region_name]/functions/[function_name]/tags.json).",
+                "Saved the tags for each function in the audit evidence folder (lambda/[region_name]/functions/[function_name]/tags.json).",
                 "Inspected each Lambda function to determine if the following tag keys exist and have non-empty values: ['owner', 'description', 'classification']"
             ],
             "test_attributes": []
@@ -663,7 +642,6 @@
             "test_id": "cloudtrail_multi_region",
             "test_description": "At least one multi-region CloudTrail trail has logging enabled.",
             "risk_rating": 3,
-            "is_excluded": false,
             "is_passing": true,
             "comments": "",
             "test_procedures": [
@@ -682,7 +660,6 @@
             "test_id": "cloudtrail_log_file_validation",
             "test_description": "CloudTrail trails have log file validation enabled.",
             "risk_rating": 2,
-            "is_excluded": false,
             "is_passing": false,
             "comments": "Exceptions Noted. 1 trail(s) do not have log file validation enabled.",
             "test_procedures": [
@@ -706,7 +683,6 @@
             "test_id": "cloudtrail_s3_bucket_protection",
             "test_description": "CloudTrail S3 buckets are configured to block public access.",
             "risk_rating": 3,
-            "is_excluded": false,
             "is_passing": true,
             "comments": "",
             "test_procedures": [
@@ -735,7 +711,6 @@
             "test_id": "cloudtrail_logging_recent_stops",
             "test_description": "CloudTrail logging has not been stopped in the last 365 days.",
             "risk_rating": 3,
-            "is_excluded": false,
             "is_passing": true,
             "comments": "",
             "test_procedures": [
@@ -763,7 +738,6 @@
             "test_id": "wafv2_enabled",
             "test_description": "WAF is enabled on Application Load Balancers and API Gateways.",
             "risk_rating": 2,
-            "is_excluded": false,
             "is_passing": true,
             "comments": "",
             "test_procedures": [
@@ -774,10 +748,10 @@
                 "Saved the Application Load Balancers associated with the ACL (wafv2/[region]/[web_acl_name]/resources.json).",
                 "Re-ran the list_resources_for_web_acl() boto3 command to get the associated API Gateways.",
                 "For each in-scope region, obtained a list of Application Load Balancers using describe_load_balancers() boto3 command.",
-                "Saved the list of load balancers in the audit evidence folder (ELBv2/[region_name]/load_balancers.json).",
+                "Saved the list of load balancers in the audit evidence folder (elbv2/[region_name]/load_balancers.json).",
                 "For each load balancer, checked if Load Balancer ARN was associated with a Web ACL.",
                 "For each in-scope region, obtained a list of API Gateways using get_rest_apis() boto3 command.",
-                "Saved the list of API Gateways in the audit evidence folder (APIGateway/[region_name]/rest_apis.json).",
+                "Saved the list of API Gateways in the audit evidence folder (apigateway/[region_name]/rest_apis.json).",
                 "For each API gateway to check if it was associated with a Web ACL."
             ],
             "test_attributes": []
@@ -786,7 +760,6 @@
             "test_id": "guardduty_enabled",
             "test_description": "GuardDuty is enabled for all in-scope regions.",
             "risk_rating": 3,
-            "is_excluded": false,
             "is_passing": false,
             "comments": "Exceptions Noted. GuardDuty is not enabled for 1 in-scope region(s).",
             "test_procedures": [
@@ -838,6 +811,20 @@
             ]
         },
         "test_exclusions": {},
-        "sample_exclusions": {}
+        "sample_exclusions": {
+            "s3_public_access": [
+                {
+                    "sample_id": {
+                        "bucket_name": "bad-bucket-54321"
+                    },
+                    "rationale": "This bucket is intentionally public for testing",
+                    "permanent": false,
+                    "expiration_date": "2026-12-31",
+                    "approvers": [
+                        "john.doe@acme.com"
+                    ]
+                }
+            ]
+        }
     }
 }

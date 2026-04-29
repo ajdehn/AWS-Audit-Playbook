@@ -1,11 +1,11 @@
 {
     "ResponseMetadata": {
-        "RequestId": "XK35Q485TB61DTN7",
-        "HostId": "MsP3XZPtD4ZPAiLgX+LIhJA0BndFqmodY7n9C7eHmGjq4YRVM3Get+30CBfwmu0ChL+GmudXald96UMrT0Exk1ZqY2jyCNiE",
+        "RequestId": "XK32NKX3K3J4CSVC",
+        "HostId": "UmqSSS5/dDLWALcKRJt6+DRABBHEOtlXtnS0Qu6yzZ+pkAJcoU7obnmNr+weWf9IsDB7fUsKOFA=",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "x-amz-id-2": "MsP3XZPtD4ZPAiLgX+LIhJA0BndFqmodY7n9C7eHmGjq4YRVM3Get+30CBfwmu0ChL+GmudXald96UMrT0Exk1ZqY2jyCNiE",
-            "x-amz-request-id": "XK35Q485TB61DTN7",
+            "x-amz-id-2": "UmqSSS5/dDLWALcKRJt6+DRABBHEOtlXtnS0Qu6yzZ+pkAJcoU7obnmNr+weWf9IsDB7fUsKOFA=",
+            "x-amz-request-id": "XK32NKX3K3J4CSVC",
             "date": "Tue, 28 Apr 2026 21:28:44 GMT",
             "transfer-encoding": "chunked",
             "server": "AmazonS3"
@@ -21,7 +21,7 @@
                 "BucketKeyEnabled": false,
                 "BlockedEncryptionTypes": {
                     "EncryptionType": [
-                        "NONE"
+                        "SSE-C"
                     ]
                 }
             }

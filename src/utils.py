@@ -159,12 +159,6 @@ def is_exclusion_active(exclusion):
 
     return False
 
-def process_test_pass_fail(sample, condition, fail_msg):
-    if condition:
-        sample.is_passing = True
-    else:
-        sample.comments = fail_msg
-
 def confirm_delete_folder(folder_path):
     if os.path.exists(folder_path):
         confirm = input(f"Folder '{folder_path}' exists. Do you want to delete it? (y/N): ").strip().lower()

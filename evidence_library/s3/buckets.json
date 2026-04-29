@@ -1,12 +1,12 @@
 {
     "ResponseMetadata": {
-        "RequestId": "RSC3F3EENYX42HJZ",
-        "HostId": "PDgTqkkCVsJl08A7/EpfxNfZXrVaPBsFuXwfBemw4bOtAci7AxbCJDnoDAKYVvXzxfA59BGXjss=",
+        "RequestId": "70T18GQGAVMSTAN4",
+        "HostId": "xtbk+3ADe9xUzFAW6fvZVk8B3QkgO+a6ADvmYcaFEFiYYSBxSkg4e6WkblYAp0PSeqIjxyfj4ic=",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "x-amz-id-2": "PDgTqkkCVsJl08A7/EpfxNfZXrVaPBsFuXwfBemw4bOtAci7AxbCJDnoDAKYVvXzxfA59BGXjss=",
-            "x-amz-request-id": "RSC3F3EENYX42HJZ",
-            "date": "Mon, 13 Apr 2026 18:45:40 GMT",
+            "x-amz-id-2": "xtbk+3ADe9xUzFAW6fvZVk8B3QkgO+a6ADvmYcaFEFiYYSBxSkg4e6WkblYAp0PSeqIjxyfj4ic=",
+            "x-amz-request-id": "70T18GQGAVMSTAN4",
+            "date": "Tue, 28 Apr 2026 21:28:43 GMT",
             "content-type": "application/xml",
             "transfer-encoding": "chunked",
             "server": "AmazonS3"
@@ -23,6 +23,11 @@
             "Name": "bad-bucket-54321",
             "CreationDate": "2023-03-11 21:41:46+00:00",
             "BucketArn": "arn:aws:s3:::bad-bucket-54321"
+        },
+        {
+            "Name": "config-bucket-798094440826",
+            "CreationDate": "2026-04-18 12:05:10+00:00",
+            "BucketArn": "arn:aws:s3:::config-bucket-798094440826"
         },
         {
             "Name": "itauditguy",
