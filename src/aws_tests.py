@@ -1204,9 +1204,9 @@ def test_lambda_tags(audit, test_id, risk_rating=1):
         ),
         test_procedures=[
             "For each in-scope region, obtained the list of Lambda functions by calling list_functions() boto3 command.",
-            "Saved the list of functions in the audit evidence folder (Lambda/[region_name]/functions.json).",
+            "Saved the list of functions in the audit evidence folder (lambda/[region_name]/functions.json).",
             "For each function, obtained its tags using list_tags() boto3 command.",
-            "Saved the tags for each function in the audit evidence folder (Lambda/[region_name]/functions/[function_name]/tags.json).",
+            "Saved the tags for each function in the audit evidence folder (lambda/[region_name]/functions/[function_name]/tags.json).",
             f"Inspected each Lambda function to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
         test_attributes=[],
@@ -1218,7 +1218,7 @@ def test_lambda_tags(audit, test_id, risk_rating=1):
         lambda_client = audit.session.client("lambda", region_name=region)
 
         functions = audit.evidence_client.get_aws(
-            f"Lambda/{region}/functions.json",
+            f"lambda/{region}/functions.json",
             fetch_fn=None,
             paginator_params={
                 "client": lambda_client,
@@ -1235,7 +1235,7 @@ def test_lambda_tags(audit, test_id, risk_rating=1):
             # Fetch tags via ARN
             arn = fn.get("FunctionArn")
             tags_response = audit.evidence_client.get_aws(
-                f"Lambda/{region}/functions/{fn['FunctionName']}/tags.json",
+                f"lambda/{region}/functions/{fn['FunctionName']}/tags.json",
                 lambda: lambda_client.list_tags(Resource=arn)
             )
 
@@ -1508,10 +1508,10 @@ def test_wafv2_enabled(audit, test_id, risk_rating=2):
             "Saved the Application Load Balancers associated with the ACL (wafv2/[region]/[web_acl_name]/resources.json).",
             "Re-ran the list_resources_for_web_acl() boto3 command to get the associated API Gateways.",     
             "For each in-scope region, obtained a list of Application Load Balancers using describe_load_balancers() boto3 command.",
-            "Saved the list of load balancers in the audit evidence folder (ELBv2/[region_name]/load_balancers.json).",
+            "Saved the list of load balancers in the audit evidence folder (elbv2/[region_name]/load_balancers.json).",
             "For each load balancer, checked if Load Balancer ARN was associated with a Web ACL.",
             "For each in-scope region, obtained a list of API Gateways using get_rest_apis() boto3 command.",
-            "Saved the list of API Gateways in the audit evidence folder (APIGateway/[region_name]/rest_apis.json).",
+            "Saved the list of API Gateways in the audit evidence folder (apigateway/[region_name]/rest_apis.json).",
             "For each API gateway to check if it was associated with a Web ACL."
         ],
         test_attributes=[],
@@ -1558,7 +1558,7 @@ def test_wafv2_enabled(audit, test_id, risk_rating=2):
 
         # ALBs
         lbs = audit.evidence_client.get_aws(
-            f"ELBv2/{region}/load_balancers.json",
+            f"elbv2/{region}/load_balancers.json",
             fetch_fn=None,
             paginator_params={
                 "client": elbv2,
@@ -1600,7 +1600,7 @@ def test_wafv2_enabled(audit, test_id, risk_rating=2):
 
         # API Gateway (REST APIs)
         apis = audit.evidence_client.get_aws(
-            f"APIGateway/{region}/rest_apis.json",
+            f"apigateway/{region}/rest_apis.json",
             lambda: apigw.get_rest_apis()
         )
 
