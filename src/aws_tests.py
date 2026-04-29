@@ -1,175 +1,9 @@
-from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Any
-from utils import is_test_excluded, process_sample_exclusion, evaluate_tags, save_json, load_json_if_exists
-import boto3
-import botocore
+from utils import is_test_excluded, evaluate_tags
+from sample import Sample
+from test import Test
+from botocore.exceptions import ClientError
 from datetime import datetime, timezone, timedelta
 import traceback
-import json
-import os
-
-class EvidenceClient:
-    def __init__(self, evidence_folder_path, debug=False):
-        self.base_path = evidence_folder_path       # Path to audit evidence folder.
-        self.debug = debug                          # Print cache behavior
-
-    def get(self, relative_path, fetch_fn):
-        file_path = os.path.join(self.base_path, relative_path)
-
-        if os.path.exists(file_path):
-            if self.debug:
-                print(f"[CACHE HIT] {file_path}")
-            return load_json_if_exists(file_path)
-
-        if self.debug:
-            print(f"[FETCHING] {file_path}")
-
-        data = fetch_fn()
-        save_json(data, file_path.lower())
-        return data
-
-    """
-        AWS-safe fetch wrapper with optional pagination support.
-        Returns flattened ResponseMetadata (from last page).
-
-        paginator_params: dict with keys:
-        - method_name: str (e.g., 'list_users')
-        - pagination_key: str (key in each page to combine, e.g., 'Users')
-        - params: dict (parameters to pass to the AWS method)
-    """
-    def get_aws(self, relative_path, fetch_fn, not_found_codes=None, paginator_params=None):
-        def wrapped():
-            try:
-                if paginator_params:
-                    client = paginator_params.get("client") # boto3 client
-                    method_name = paginator_params["method_name"]
-                    pagination_key = paginator_params["pagination_key"]
-                    params = paginator_params.get("params", {})
-
-                    paginator = client.get_paginator(method_name)
-                    items = []
-                    last_metadata = {}
-
-                    for page in paginator.paginate(**params):
-                        # Collect items
-                        items.extend(page.get(pagination_key, []))
-
-                        # Keep overwriting → ends up with last page metadata
-                        last_metadata = page.get("ResponseMetadata", {})
-
-                    return {
-                        pagination_key: items,
-                        "ResponseMetadata":  last_metadata
-                    }
-
-                # Non-paginated call
-                response = fetch_fn()
-                return response
-
-            except botocore.exceptions.ClientError as e:
-                code = e.response["Error"]["Code"]
-                if not_found_codes and code in not_found_codes:
-                    return None
-                raise
-
-        return self.get(relative_path, wrapped)
-
-# NOTE: Samples default to "is_passing: False" until logic determines sample passes the testing criteria.
-@dataclass
-class Sample:
-    sample_id: Dict[str, Any]
-    test_id: str
-    is_passing: bool = False
-    is_excluded: bool = False
-    comments: str = ""
-
-    def __str__(self):
-        return (
-            f"sample_id: {self.sample_id}\n"
-            f"is_passing: {self.is_passing}\n"
-            f"comments: {self.comments}\n"
-        )
-
-    def to_dict(self):
-        return {
-            "sample_id": self.sample_id,
-            "is_excluded": self.is_excluded,
-            "is_passing": self.is_passing,
-            "comments": self.comments,
-        }
-
-# NOTE: Tests default to "is_passing: True" until there is a failing sample or other logic determines the test has failed.
-@dataclass
-class Test:
-    test_id: str
-    test_description: str
-    test_procedures: List[str]
-    test_attributes: List[str]
-    # Rating Matrix: 0 - Informational, 1 - Low, 2 - Medium, 3 - High.
-    risk_rating: int
-    table_headers: Optional[List[str]] = None
-    include_sample_number: bool = False
-    samples: List["Sample"] = field(default_factory=list)
-    is_passing: bool = True
-    comments: str = ""
-    num_findings: int = 0
-    num_exclusions: int = 0
-    total_population: int = 0
-    risk_rating_str: str = ""
-
-    def __post_init__(self):
-        self.risk_rating_str = self.create_risk_str()
-
-    def __str__(self):
-        return (
-            f"test_id: {self.test_id}\n"
-            f"test_description: {self.test_description}\n"
-            f"risk_rating: {self.risk_rating}\n"
-            f"is_passing: {self.is_passing}\n"
-            f"comments: {self.comments}\n"         
-        )
-
-    def to_dict(self):
-        result = {
-            "test_id": self.test_id,
-            "test_description": self.test_description,
-            "risk_rating": self.risk_rating,
-            "is_passing": self.is_passing,
-            "comments": self.comments,
-            "test_procedures": self.test_procedures,
-            "test_attributes": self.test_attributes,
-        }
-        # Include samples, if present.
-        if self.samples:  
-            result["samples"] = [s.to_dict() for s in self.samples]
-
-        return result
-
-    def create_risk_str(self):
-        if self.risk_rating == 0: return "Informational"
-        elif self.risk_rating == 1: return "Low"
-        elif self.risk_rating == 2: return "Medium"
-        elif self.risk_rating == 3: return "High"
-        else:
-            raise ValueError(f"Invalid risk rating: {self.risk_rating}. Accepted values are 0 - 3.")
-
-    def evaluate_samples(self):
-        self.total_population = len(self.samples)
-        in_scope_count = 0
-
-        for s in self.samples:
-            if s.is_excluded:
-                self.num_exclusions += 1
-            else:
-                in_scope_count += 1
-                if not s.is_passing:
-                    self.num_findings += 1
-
-        # NOTE: Will pass if there are 0 samples.
-        self.is_passing = self.num_findings == 0
-
-        return self
-
 
 def run_test_safely(audit, test_fn, test_id):
     try:
@@ -264,14 +98,9 @@ def test_s3_encryption(audit, test_id, risk_rating=2):
     buckets = audit.evidence_client.get("s3/buckets.json", lambda: s3.list_buckets())
     # Loop through each bucket
     for bucket in buckets.get("Buckets", []):
-        sample = Sample(
-            sample_id={"bucket_name": bucket['Name']},
-            test_id=test_id
-        )
-
-        if process_sample_exclusion(test, sample, audit):
-            # Move to next sample, if excluded.
-            continue        
+        sample = Sample(sample_id={"bucket_name": bucket['Name']})
+        if sample.check_excluded(test, audit):
+            continue
 
         # Obtain and save bucket's encryption settings.
         enc = audit.evidence_client.get_aws(f"s3/buckets/{bucket['Name']}/encryption.json",
@@ -311,13 +140,8 @@ def test_s3_public_access(audit, test_id, risk_rating=3):
     buckets = audit.evidence_client.get("s3/buckets.json", lambda: s3.list_buckets())
     # Evaluate each bucket
     for bucket in buckets.get("Buckets", []):
-        sample = Sample(
-            sample_id={"bucket_name": bucket["Name"]},
-            test_id=test_id
-        )
-
-        if process_sample_exclusion(test, sample, audit):
-            # Move to next sample, if excluded.
+        sample = Sample(sample_id={"bucket_name": bucket["Name"]})
+        if sample.check_excluded(test, audit):
             continue
         
         # Fetch public access block
@@ -344,7 +168,6 @@ def test_s3_public_access(audit, test_id, risk_rating=3):
         else:
             sample.comments = "One or more public access settings are disabled"
         test.samples.append(sample)
-
 
     test.evaluate_samples()
     if not test.is_passing:
@@ -387,11 +210,8 @@ def test_s3_tags(audit, test_id, risk_rating=1):
     buckets = audit.evidence_client.get("s3/buckets.json", lambda: s3.list_buckets())
 
     for bucket in buckets.get("Buckets", []):
-        sample = Sample(
-            sample_id={"bucket_name": bucket["Name"]},
-            test_id=test_id
-        )
-        if process_sample_exclusion(test, sample, audit):
+        sample = Sample(sample_id={"bucket_name": bucket["Name"]})
+        if sample.check_excluded(test, audit):
             continue
 
         # Fetch bucket tags
@@ -443,12 +263,8 @@ def test_s3_secure_transport(audit, test_id, risk_rating=0):
 
     for bucket in buckets.get("Buckets", []):
         bucket_name = bucket["Name"]
-        sample = Sample(
-            sample_id={"bucket_name": bucket_name},
-            test_id=test_id
-        )
-
-        if process_sample_exclusion(test, sample, audit):
+        sample = Sample(sample_id={"bucket_name": bucket_name})
+        if sample.check_excluded(test, audit):
             continue
 
         # Fetch bucket policy
@@ -682,12 +498,8 @@ def test_iam_users_mfa(audit, test_id, risk_rating=3):
 
     for user in users:
         username = user["UserName"]
-        sample = Sample(
-            sample_id={"user": username},
-            test_id=test_id
-        )
-
-        if process_sample_exclusion(test, sample, audit):
+        sample = Sample(sample_id={"user": username})
+        if sample.check_excluded(test, audit):
             continue
 
         # Check if user has a console password
@@ -697,7 +509,7 @@ def test_iam_users_mfa(audit, test_id, risk_rating=3):
                 lambda: iam.get_login_profile(UserName=username),
                 not_found_codes=["NoSuchEntity"]
             )
-        except botocore.exceptions.ClientError as e:
+        except ClientError as e:
             code = e.response["Error"]["Code"]
             if code == "NoSuchEntity":
                 sample.is_excluded = True
@@ -779,16 +591,15 @@ def test_iam_user_access_key_age(audit, test_id, risk_rating=3):
                 sample_id={
                     "user": username,
                     "access_key_id": key["AccessKeyId"]
-                },
-                test_id=test_id
+                }
             )
+            if sample.check_excluded(test, audit):
+                continue
+
             if key["Status"] != "Active":
                 sample.is_excluded = True
                 sample.comments = "N/A - key is inactive."
                 test.samples.append(sample)
-                continue
-
-            if process_sample_exclusion(test, sample, audit):
                 continue
 
             create_date = key["CreateDate"]
@@ -811,48 +622,6 @@ def test_iam_user_access_key_age(audit, test_id, risk_rating=3):
         # Document exception language.
         test.comments = f"Exceptions Noted. {test.num_findings} IAM key(s) are over {max_age_days} days old."
     return test
-
-"""
-    NOTE: Used by region based tests (EC2, RDS, SNS, GuardDuty, etc)
-    Return in-scope AWS regions based on config.json. If not set, return response from describe_regions.
-    Raises:
-        ValueError: If config contains invalid regions.
-"""
-def get_regions(audit):
-    ec2 = audit.session.client("ec2")
-    regions = audit.evidence_client.get_aws(
-        "ec2/regions.json",
-        lambda: ec2.describe_regions(
-            AllRegions=True,
-            Filters=[
-                {
-                    "Name": "opt-in-status",
-                    "Values": ["opt-in-not-required", "opted-in"]}
-            ]
-        )
-    )
-    available_regions = {r["RegionName"] for r in regions["Regions"]}
-
-    # Pull from config and lower-case region values
-    test_config = audit.config.get("test_config") or {}
-    config_regions = test_config.get("in_scope_regions", [])
-    config_regions = [r.lower() for r in config_regions]
-
-    if not config_regions:
-        # in_scope_regions not set in config value. Return all available regions.
-        return sorted(available_regions)
-
-    # Check for invalid regions
-    config_regions_set = set(config_regions)
-    invalid_regions = config_regions_set - available_regions
-    if invalid_regions:
-        raise ValueError(
-            f"Invalid regions in config: {sorted(invalid_regions)}. "
-            f"Valid regions are: {sorted(available_regions)}"
-        )
-
-    # Return validated regions
-    return [r for r in config_regions if r in available_regions]
 
 
 def test_rds_encryption(audit, test_id, risk_rating=2):
@@ -883,12 +652,8 @@ def test_rds_encryption(audit, test_id, risk_rating=2):
             )
 
         for db in instances.get("DBInstances", []):
-            sample = Sample(
-                sample_id={"region": region, "db_instance": db["DBInstanceIdentifier"]},
-                test_id=test_id
-            )
-
-            if process_sample_exclusion(test, sample, audit):
+            sample = Sample(sample_id={"region": region, "db_instance": db["DBInstanceIdentifier"]})
+            if sample.check_excluded(test, audit):
                 continue
 
             if db.get("StorageEncrypted"):
@@ -926,12 +691,8 @@ def test_rds_public_access(audit, test_id, risk_rating=3):
         )
 
         for db in instances.get("DBInstances", []):
-            sample = Sample(
-                sample_id={"region": region, "db_instance": db["DBInstanceIdentifier"]},
-                test_id=test_id
-            )
-
-            if process_sample_exclusion(test, sample, audit):
+            sample = Sample(sample_id={"region": region, "db_instance": db["DBInstanceIdentifier"]})
+            if sample.check_excluded(test, audit):
                 continue
 
             if not db.get("PubliclyAccessible", False):
@@ -984,12 +745,8 @@ def test_rds_tags(audit, test_id, risk_rating=1):
         )
 
         for db in instances.get("DBInstances", []):
-            sample = Sample(
-                sample_id={"region": region, "db_instance": db["DBInstanceIdentifier"]},
-                test_id=test_id
-            )
-
-            if process_sample_exclusion(test, sample, audit):
+            sample = Sample(sample_id={"region": region, "db_instance": db["DBInstanceIdentifier"]})
+            if sample.check_excluded(test, audit):
                 continue
 
             actual_db_tags = {t["Key"]: t.get("Value", "") for t in db.get("TagList", [])}
@@ -1029,12 +786,8 @@ def test_rds_backup_retention(audit, test_id, risk_rating=1):
         )
 
         for db in instances.get("DBInstances", []):
-            sample = Sample(
-                sample_id={"region": region, "db_instance": db["DBInstanceIdentifier"]},
-                test_id=test_id
-            )
-
-            if process_sample_exclusion(test, sample, audit):
+            sample = Sample(sample_id={"region": region, "db_instance": db["DBInstanceIdentifier"]})
+            if sample.check_excluded(test, audit):
                 continue
 
             actual_retention_days = db.get("BackupRetentionPeriod", 0)
@@ -1080,15 +833,8 @@ def test_rds_auto_minor_version_upgrade(audit, test_id, risk_rating=1):
         )
 
         for db in instances.get("DBInstances", []):
-            sample = Sample(
-                sample_id={
-                    "region": region,
-                    "db_instance": db["DBInstanceIdentifier"]
-                },
-                test_id=test_id
-            )
-
-            if process_sample_exclusion(test, sample, audit):
+            sample = Sample(sample_id={"region": region, "db_instance": db["DBInstanceIdentifier"]})
+            if sample.check_excluded(test, audit):
                 continue
 
             if db.get("AutoMinorVersionUpgrade"):
@@ -1152,15 +898,8 @@ def test_rds_deletion_protection(audit, test_id, risk_rating=2):
         }
 
         for db in instances.get("DBInstances", []):
-            sample = Sample(
-                sample_id={
-                    "region": region,
-                    "db_instance": db["DBInstanceIdentifier"]
-                },
-                test_id=test_id
-            )
-
-            if process_sample_exclusion(test, sample, audit):
+            sample = Sample(sample_id={"region": region, "db_instance": db["DBInstanceIdentifier"]})
+            if sample.check_excluded(test, audit):
                 continue
 
             instance_protection = db.get("DeletionProtection", False)
@@ -1223,15 +962,8 @@ def test_ec2_security_group_tags(audit, test_id, risk_rating=1):
         )
 
         for sg in security_groups.get("SecurityGroups", []):
-            sample = Sample(
-                sample_id={
-                    "region": region,
-                    "security_group_id": sg["GroupId"]
-                },
-                test_id=test_id
-            )
-
-            if process_sample_exclusion(test, sample, audit):
+            sample = Sample(sample_id={"region": region, "security_group_id": sg["GroupId"]})
+            if sample.check_excluded(test, audit):
                 continue
 
             # Security group tags
@@ -1289,15 +1021,8 @@ def test_ec2_tags(audit, test_id, risk_rating=1):
 
         for reservation in instances.get("Reservations", []):
             for instance in reservation.get("Instances", []):
-                sample = Sample(
-                    sample_id={
-                        "region": region,
-                        "instance_id": instance["InstanceId"]
-                    },
-                    test_id=test_id
-                )
-
-                if process_sample_exclusion(test, sample, audit):
+                sample = Sample(sample_id={"region": region, "instance_id": instance["InstanceId"]})
+                if sample.check_excluded(test, audit):
                     continue
 
                 # EC2 tags come in the 'Tags' attribute
@@ -1345,12 +1070,8 @@ def test_ebs_volume_encryption(audit, test_id, risk_rating=2):
         )
 
         for volume in volumes.get("Volumes", []):
-            sample = Sample(
-                sample_id={"region": region, "volume_id": volume["VolumeId"]},
-                test_id=test_id
-            )
-
-            if process_sample_exclusion(test, sample, audit):
+            sample = Sample(sample_id={"region": region, "volume_id": volume["VolumeId"]})
+            if sample.check_excluded(test, audit):
                 continue
 
             if volume.get("Encrypted"):
@@ -1406,12 +1127,8 @@ def test_ebs_tags(audit, test_id, risk_rating=1):
         )
 
         for volume in volumes.get("Volumes", []):
-            sample = Sample(
-                sample_id={"region": region, "volume_id": volume["VolumeId"]},
-                test_id=test_id
-            )
-
-            if process_sample_exclusion(test, sample, audit):
+            sample = Sample(sample_id={"region": region, "volume_id": volume["VolumeId"]})
+            if sample.check_excluded(test, audit):
                 continue
 
             # EBS tags come in the 'Tags' attribute
@@ -1453,12 +1170,8 @@ def test_ebs_default_encryption(audit, test_id, risk_rating=0):
             lambda: ec2.get_ebs_encryption_by_default()
         )
 
-        sample = Sample(
-            sample_id={"region": region},
-            test_id=test_id
-        )
-
-        if process_sample_exclusion(test, sample, audit):
+        sample = Sample(sample_id={"region": region})
+        if sample.check_excluded(test, audit):
             continue
 
         if default_encryption.get("EbsEncryptionByDefault"):
@@ -1491,9 +1204,9 @@ def test_lambda_tags(audit, test_id, risk_rating=1):
         ),
         test_procedures=[
             "For each in-scope region, obtained the list of Lambda functions by calling list_functions() boto3 command.",
-            "Saved the list of functions in the audit evidence folder (Lambda/[region_name]/functions.json).",
+            "Saved the list of functions in the audit evidence folder (lambda/[region_name]/functions.json).",
             "For each function, obtained its tags using list_tags() boto3 command.",
-            "Saved the tags for each function in the audit evidence folder (Lambda/[region_name]/functions/[function_name]/tags.json).",
+            "Saved the tags for each function in the audit evidence folder (lambda/[region_name]/functions/[function_name]/tags.json).",
             f"Inspected each Lambda function to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
         test_attributes=[],
@@ -1505,7 +1218,7 @@ def test_lambda_tags(audit, test_id, risk_rating=1):
         lambda_client = audit.session.client("lambda", region_name=region)
 
         functions = audit.evidence_client.get_aws(
-            f"Lambda/{region}/functions.json",
+            f"lambda/{region}/functions.json",
             fetch_fn=None,
             paginator_params={
                 "client": lambda_client,
@@ -1515,21 +1228,14 @@ def test_lambda_tags(audit, test_id, risk_rating=1):
         )
 
         for fn in functions.get("Functions", []):
-            sample = Sample(
-                sample_id={
-                    "region": region,
-                    "function_name": fn["FunctionName"]
-                },
-                test_id=test_id
-            )
-
-            if process_sample_exclusion(test, sample, audit):
+            sample = Sample(sample_id={"region": region, "function_name": fn["FunctionName"]})
+            if sample.check_excluded(test, audit):
                 continue
 
             # Fetch tags via ARN
             arn = fn.get("FunctionArn")
             tags_response = audit.evidence_client.get_aws(
-                f"Lambda/{region}/functions/{fn['FunctionName']}/tags.json",
+                f"lambda/{region}/functions/{fn['FunctionName']}/tags.json",
                 lambda: lambda_client.list_tags(Resource=arn)
             )
 
@@ -1623,12 +1329,8 @@ def test_cloudtrail_log_file_validation(audit, test_id, risk_rating=2):
 
     for trail in trails:
         trail_name = trail["Name"]
-        sample = Sample(
-            sample_id={"trail_name": trail_name},
-            test_id=test_id
-        )
-
-        if process_sample_exclusion(test, sample, audit):
+        sample = Sample(sample_id={"trail_name": trail_name})
+        if sample.check_excluded(test, audit):
             continue
 
         log_validation = trail.get("LogFileValidationEnabled", False)
@@ -1674,12 +1376,8 @@ def test_cloudtrail_s3_bucket_protection(audit, test_id, risk_rating=3):
         trail_name = trail.get("Name")
         bucket_name = trail.get("S3BucketName")
 
-        sample = Sample(
-            sample_id={"trail_name": trail_name, "bucket_name": bucket_name},
-            test_id=test_id
-        )
-
-        if process_sample_exclusion(test, sample, audit):
+        sample = Sample(sample_id={"trail_name": trail_name, "bucket_name": bucket_name})
+        if sample.check_excluded(test, audit):
             continue
 
         if not bucket_name:
@@ -1759,12 +1457,8 @@ def test_cloudtrail_logging_recent_stops(audit, test_id, risk_rating=3):
 
     for trail in trails:
         trail_name = trail.get("Name")
-        sample = Sample(
-            sample_id={"trail_name": trail_name},
-            test_id=test_id
-        )
-
-        if process_sample_exclusion(test, sample, audit):
+        sample = Sample(sample_id={"trail_name": trail_name})
+        if sample.check_excluded(test, audit):
             continue
 
         status = audit.evidence_client.get_aws(
@@ -1814,10 +1508,10 @@ def test_wafv2_enabled(audit, test_id, risk_rating=2):
             "Saved the Application Load Balancers associated with the ACL (wafv2/[region]/[web_acl_name]/resources.json).",
             "Re-ran the list_resources_for_web_acl() boto3 command to get the associated API Gateways.",     
             "For each in-scope region, obtained a list of Application Load Balancers using describe_load_balancers() boto3 command.",
-            "Saved the list of load balancers in the audit evidence folder (ELBv2/[region_name]/load_balancers.json).",
+            "Saved the list of load balancers in the audit evidence folder (elbv2/[region_name]/load_balancers.json).",
             "For each load balancer, checked if Load Balancer ARN was associated with a Web ACL.",
             "For each in-scope region, obtained a list of API Gateways using get_rest_apis() boto3 command.",
-            "Saved the list of API Gateways in the audit evidence folder (APIGateway/[region_name]/rest_apis.json).",
+            "Saved the list of API Gateways in the audit evidence folder (apigateway/[region_name]/rest_apis.json).",
             "For each API gateway to check if it was associated with a Web ACL."
         ],
         test_attributes=[],
@@ -1864,7 +1558,7 @@ def test_wafv2_enabled(audit, test_id, risk_rating=2):
 
         # ALBs
         lbs = audit.evidence_client.get_aws(
-            f"ELBv2/{region}/load_balancers.json",
+            f"elbv2/{region}/load_balancers.json",
             fetch_fn=None,
             paginator_params={
                 "client": elbv2,
@@ -1882,11 +1576,9 @@ def test_wafv2_enabled(audit, test_id, risk_rating=2):
                     "region": region,
                     "resource_type": "ALB",
                     "resource_id": lb["LoadBalancerName"]
-                },
-                test_id=test_id
+                }
             )
-
-            if process_sample_exclusion(test, sample, audit):
+            if sample.check_excluded(test, audit):
                 continue
 
             lb_arn = lb.get("LoadBalancerArn")
@@ -1908,7 +1600,7 @@ def test_wafv2_enabled(audit, test_id, risk_rating=2):
 
         # API Gateway (REST APIs)
         apis = audit.evidence_client.get_aws(
-            f"APIGateway/{region}/rest_apis.json",
+            f"apigateway/{region}/rest_apis.json",
             lambda: apigw.get_rest_apis()
         )
 
@@ -1918,11 +1610,10 @@ def test_wafv2_enabled(audit, test_id, risk_rating=2):
                     "region": region,
                     "resource_type": "API Gateway",
                     "resource_id": api["id"]
-                },
-                test_id=test_id
+                }
             )
 
-            if process_sample_exclusion(test, sample, audit):
+            if sample.check_excluded(test, audit):
                 continue
             
             api_gw_arn = f"arn:aws:apigateway:{region}::/restapis/{api['id']}"
@@ -1965,12 +1656,8 @@ def test_guardduty_enabled(audit, test_id, risk_rating=3):
     for region in audit.in_scope_regions:
         gd = audit.session.client("guardduty", region_name=region)
 
-        sample = Sample(
-            sample_id={"region": region},
-            test_id=test_id
-        )
-
-        if process_sample_exclusion(test, sample, audit):
+        sample = Sample(sample_id={"region": region})
+        if sample.check_excluded(test, audit):
             continue
 
         detectors = audit.evidence_client.get_aws(

@@ -53,9 +53,46 @@ def create_session(session_name="auditops-assume-role"):
     )
 
 
-def get_aws_account_id(audit):
-    sts = audit.session.client("sts")
+def get_aws_account_id(session):
+    sts = session.client("sts")
     return sts.get_caller_identity()["Account"]
+
+
+def get_in_scope_regions(audit):
+    """Return validated in-scope AWS regions based on config or account defaults."""
+
+    ec2 = audit.session.client("ec2")
+
+    regions = audit.evidence_client.get_aws(
+        "ec2/regions.json",
+        lambda: ec2.describe_regions(
+            AllRegions=True,
+            Filters=[{
+                "Name": "opt-in-status",
+                "Values": ["opt-in-not-required", "opted-in"]
+            }]
+        )
+    )
+
+    available = {r["RegionName"] for r in regions["Regions"]}
+
+    config_regions = [
+        r.lower()
+        for r in (audit.config.get("test_config") or {}).get("in_scope_regions", [])
+    ]
+
+    # No config override → return all regions
+    if not config_regions:
+        return sorted(available)
+
+    invalid = set(config_regions) - available
+    if invalid:
+        raise ValueError(
+            f"Invalid regions in config: {sorted(invalid)}. "
+            f"Valid regions are: {sorted(available)}"
+        )
+
+    return sorted(config_regions)
 
 """
     Saves a json file to a specified path
@@ -121,31 +158,6 @@ def is_exclusion_active(exclusion):
             return False
 
     return False
-
-def process_sample_exclusion(test, sample, audit):
-    exclusions = audit.config.get("sample_exclusions", {}).get(test.test_id, [])
-    if not isinstance(exclusions, list):
-        return False  # Invalid sample exclusion structure
-
-    for e in exclusions:
-        if not is_exclusion_active(e):
-            continue
-
-        config_sample_id = e.get("sample_id", {})
-
-        if all(sample.sample_id.get(k) == v for k, v in config_sample_id.items()):
-                sample.is_excluded = True
-                sample.comments = "Sample is excluded. See config.json"
-                test.samples.append(sample)
-                return True
-
-    return False
-
-def process_test_pass_fail(sample, condition, fail_msg):
-    if condition:
-        sample.is_passing = True
-    else:
-        sample.comments = fail_msg
 
 def confirm_delete_folder(folder_path):
     if os.path.exists(folder_path):

@@ -1,7 +1,8 @@
 from datetime import datetime, timezone
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, LETTER
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, ListFlowable, ListItem, PageBreak, KeepTogether
+from reportlab.platypus import (SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, 
+ListFlowable, ListItem, PageBreak, KeepTogether, Image)
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 BASE_STYLES = getSampleStyleSheet()
@@ -43,11 +44,18 @@ def format_count_with_pct(count, total):
 """
 def render_audit_cover_page(audit, tool_name, styles, tests):
     elements = []
-    # Header and audit metadata
-    elements.append(Paragraph(f"{tool_name} Audit Report", styles["Title"]))
-    elements.append(Spacer(1, 12))
 
-    elements.append(Paragraph("Audit Summary", styles["Heading1"]))
+    # Set desired width, and scale height proportionally
+    logo = Image("src/assets/logo.png")
+    desired_width = 300
+    aspect = logo.imageHeight / float(logo.imageWidth)
+    logo.drawWidth = desired_width
+    logo.drawHeight = desired_width * aspect
+
+    elements.append(logo)
+    elements.append(Spacer(1, 24))
+
+    elements.append(Paragraph(f"{tool_name} Audit Report", styles["Title"]))
     elements.append(Spacer(1, 12))
 
     # TODO: Consider adding transparency for excluded tests from JSON file.
@@ -58,29 +66,28 @@ def render_audit_cover_page(audit, tool_name, styles, tests):
 
     audit_metadata = [
         [Paragraph("Prepared By", LABEL_STYLE), Paragraph("AJ Dehn", VALUE_STYLE)], 
-        [Paragraph("Date", LABEL_STYLE), Paragraph(str(date_str), VALUE_STYLE)],
+        [Paragraph("Report Date", LABEL_STYLE), Paragraph(str(date_str), VALUE_STYLE)],
         [Paragraph("AWS Account ID", LABEL_STYLE), Paragraph(str(audit.aws_account_id), VALUE_STYLE)],
         [Paragraph("Number of tests", LABEL_STYLE), Paragraph(str(total), VALUE_STYLE)], 
         [Paragraph("Passed", LABEL_STYLE), Paragraph(format_count_with_pct(passed, total), VALUE_STYLE)],
         [Paragraph("Failed", LABEL_STYLE), Paragraph(format_count_with_pct(failed, total), VALUE_STYLE)],
     ]
 
-    audit_metadata_table = Table(audit_metadata, colWidths=[150, 100], hAlign="LEFT")
+    audit_metadata_table = Table(audit_metadata, colWidths=[200, 150], hAlign="CENTER")
     audit_metadata_table.setStyle(TABLE_STYLE_HIGHLIGHT_COLUMN)
     elements.append(audit_metadata_table)
     elements.append(Spacer(1, 24))
 
 
     # --- Disclaimers Section ---
-    elements.append(Paragraph("Notes / Disclaimers", styles["Heading1"]))
+    elements.append(Paragraph("Disclaimers", styles["Heading1"]))
     elements.append(Spacer(1, 8))
 
     disclaimers_list = ListFlowable(
         [
-            ListItem(Paragraph("This report was generated using the AWS Audit Playbook (https://github.com/ajdehn/AWS-Audit-Playbook).", LARGE_VALUE_STYLE)),
+            ListItem(Paragraph("This report was generated using logic from the AWS Audit Playbook (https://github.com/ajdehn/AWS-Audit-Playbook).", LARGE_VALUE_STYLE)),
             ListItem(Paragraph("Evidence used to conduct the audit was gathered directly from boto3 (AWS software development kit 'SDK' for Python).", LARGE_VALUE_STYLE)),
-            ListItem(Paragraph("Please review src/aws_tests.py for additional information on how evidence was gathered and testing was performed.", LARGE_VALUE_STYLE)),
-            ListItem(Paragraph(f"Evidence used to produce this audit was gathered on {date_str}. Configurations may have changed since this report was generated.", LARGE_VALUE_STYLE))
+            ListItem(Paragraph("Evidence used to produce this audit was gathered as of the 'Report Date' above. Configurations may have changed since this report was generated.", LARGE_VALUE_STYLE))
         ],
         bulletType='bullet', bulletFontSize=11
 )    
