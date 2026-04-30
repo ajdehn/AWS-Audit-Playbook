@@ -7,7 +7,7 @@
                 "us-east-2"
             ]
         },
-        "report_date": "2026-04-29"
+        "report_date": "2026-04-30"
     },
     "test_results": [
         {
@@ -137,7 +137,7 @@
                     },
                     "is_excluded": false,
                     "is_passing": false,
-                    "comments": "Key is 1192 days old."
+                    "comments": "Key is 1193 days old."
                 }
             ]
         },
@@ -168,7 +168,7 @@
                 "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
                 "Saved the list of buckets: s3/buckets.json.",
                 "For each S3 bucket, obtained the encryption settings by calling the get_bucket_encryption() boto3 command.",
-                "For each S3 bucket, saved the encryption settings: s3/[bucket_name]/encryption.json.",
+                "For each S3 bucket, saved the encryption settings: s3/buckets/[bucket_name]/encryption.json.",
                 "For each S3 bucket, inspected the encryption settings to determine if they comply with the test attribute(s) below."
             ],
             "test_attributes": [
@@ -227,7 +227,7 @@
                 "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
                 "Saved the list of buckets: s3/buckets.json.",
                 "For each bucket, obtained the public access block settings by calling the get_public_access_block() boto3 command.",
-                "For each bucket, saved the public access block settings: s3/[bucket_name]/public_access_block.json.",
+                "For each bucket, saved the public access block settings: s3/buckets/[bucket_name]/public_access_block.json.",
                 "For each bucket, inspected the public access block settings to determine if they comply with the test attribute(s) below."
             ],
             "test_attributes": [
@@ -343,7 +343,7 @@
                 "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
                 "Saved the list of buckets: s3/buckets.json.",
                 "For each bucket, obtained its tags by calling the get_bucket_tagging() boto3 command.",
-                "For each bucket, saved the tags: s3/[bucket_name]/tags.json.",
+                "For each bucket, saved the tags: s3/buckets/[bucket_name]/tags.json.",
                 "For each bucket, inspected the tags to determine if the following tag keys exist and have non-empty values: ['owner', 'description', 'classification']"
             ],
             "test_attributes": [],
@@ -791,6 +791,10 @@
         }
     ],
     "config": {
+        "metadata": {
+            "last_approval_date": "2026-04-30",
+            "approved_by": "AJ Dehn"
+        },
         "test_config": {
             "in_scope_regions": [
                 "us-east-1",
@@ -819,10 +823,7 @@
                     },
                     "rationale": "This bucket is intentionally public for testing",
                     "permanent": false,
-                    "expiration_date": "2026-12-31",
-                    "approvers": [
-                        "john.doe@acme.com"
-                    ]
+                    "expiration_date": "2026-12-31"
                 }
             ]
         }

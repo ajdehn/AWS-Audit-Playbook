@@ -63,6 +63,10 @@ external_id = "a1b2c3d4e5f6g7h8i9"  # Update with your actual external id.
 10. Optional: Create and populate the config file (example below). Use this to define test requirements (test_config) and exclude tests and samples that aren't in-scope.
 ```
 {
+  "metadata": {
+    "approved_by": "AJ Dehn",
+    "approval_date": "2026-04-30"    
+  },
   "test_config": {
     "in_scope_regions": [],
     "iam_password_min_length": 14,
@@ -79,18 +83,12 @@ external_id = "a1b2c3d4e5f6g7h8i9"  # Update with your actual external id.
     "EXAMPLE TEST ID": {
       "rationale": "Based on discussion with DevOps, we agreed this test is not needed to mitigate risk.",
       "permanent": true,
-      "expiration_date": null,
-      "approvers": [
-        "john.doe@acme.com"
-      ]
+      "expiration_date": null
     },
     "EXAMPLE TEST ID 2": {
       "rationale": "Engineering is currently implementing this test. Pausing monitoring until December 31st, 2026.",
       "permanent": false,
-      "expiration_date": "2026-12-31",
-      "approvers": [
-        "john.doe@acme.com"
-      ]
+      "expiration_date": "2026-12-31"
     }
   },
   "sample_exclusions": {
@@ -102,10 +100,7 @@ external_id = "a1b2c3d4e5f6g7h8i9"  # Update with your actual external id.
         },
         "rationale": "This is a very old access key for demo purposes.",
         "permanent": true,
-        "expiration_date": null,
-        "approvers": [
-          "john.doe@acme.com"
-        ]
+        "expiration_date": null
       },
       {
         "sample_id": {
@@ -114,10 +109,7 @@ external_id = "a1b2c3d4e5f6g7h8i9"  # Update with your actual external id.
         },
         "rationale": "Another test key to ignore",
         "permanent": false,
-        "expiration_date": "2026-12-31",
-        "approvers": [
-          "john.doe@acme.com"
-        ]
+        "expiration_date": "2026-12-31"
       }
     ],
     "S3 Public Access": [
@@ -127,10 +119,7 @@ external_id = "a1b2c3d4e5f6g7h8i9"  # Update with your actual external id.
         },
         "rationale": "This bucket is intentionally public for testing",
         "permanent": false,
-        "expiration_date": "2026-12-31",
-        "approvers": [
-          "john.doe@acme.com"
-        ]
+        "expiration_date": "2026-12-31"
       }
     ]
   }
