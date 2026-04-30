@@ -7,7 +7,7 @@
                 "us-east-2"
             ]
         },
-        "report_date": "2026-04-29"
+        "report_date": "2026-04-30"
     },
     "test_results": [
         {
@@ -137,7 +137,7 @@
                     },
                     "is_excluded": false,
                     "is_passing": false,
-                    "comments": "Key is 1192 days old."
+                    "comments": "Key is 1193 days old."
                 }
             ]
         },
@@ -791,6 +791,10 @@
         }
     ],
     "config": {
+        "metadata": {
+            "last_approval_date": "2026-04-30",
+            "approved_by": "AJ Dehn"
+        },
         "test_config": {
             "in_scope_regions": [
                 "us-east-1",
@@ -819,10 +823,7 @@
                     },
                     "rationale": "This bucket is intentionally public for testing",
                     "permanent": false,
-                    "expiration_date": "2026-12-31",
-                    "approvers": [
-                        "john.doe@acme.com"
-                    ]
+                    "expiration_date": "2026-12-31"
                 }
             ]
         }
