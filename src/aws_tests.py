@@ -85,7 +85,7 @@ def test_s3_encryption(audit, test_id, risk_rating=2):
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
             "Saved the list of buckets: s3/buckets.json.",
             "For each S3 bucket, obtained the encryption settings by calling the get_bucket_encryption() boto3 command.",
-            "For each S3 bucket, saved the encryption settings: s3/[bucket_name]/encryption.json.",
+            "For each S3 bucket, saved the encryption settings: s3/buckets/[bucket_name]/encryption.json.",
             "For each S3 bucket, inspected the encryption settings to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=["ServerSideEncryptionConfiguration is present in encryption.json."],
@@ -127,7 +127,7 @@ def test_s3_public_access(audit, test_id, risk_rating=3):
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
             "Saved the list of buckets: s3/buckets.json.",
             "For each bucket, obtained the public access block settings by calling the get_public_access_block() boto3 command.",
-            "For each bucket, saved the public access block settings: s3/[bucket_name]/public_access_block.json.",
+            "For each bucket, saved the public access block settings: s3/buckets/[bucket_name]/public_access_block.json.",
             "For each bucket, inspected the public access block settings to determine if they comply with the test attribute(s) below."
         ],
         test_attributes=["BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets are set to true."],
@@ -198,7 +198,7 @@ def test_s3_tags(audit, test_id, risk_rating=1):
             "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
             "Saved the list of buckets: s3/buckets.json.",
             "For each bucket, obtained its tags by calling the get_bucket_tagging() boto3 command.",
-            "For each bucket, saved the tags: s3/[bucket_name]/tags.json.",
+            "For each bucket, saved the tags: s3/buckets/[bucket_name]/tags.json.",
             f"For each bucket, inspected the tags to determine if the following tag keys exist and have non-empty values: {required_tags}"
         ],
         test_attributes=[],
