@@ -365,13 +365,13 @@ def test_iam_password_policy(audit, test_id, risk_rating=2):
         risk_rating=risk_rating
     )
 
-    # Gather evidence
-    iam = audit.session.client("iam")
     policy = audit.evidence_client.get_aws(
         "iam/password_policy.json",
-        lambda: iam.get_account_password_policy(),
+        service="iam",
+        method="get_account_password_policy",
         not_found_codes=["NoSuchEntity"]
     )
+
     if not policy:
         test.is_passing = False
         test.comments = "Exceptions Noted. No password policy configured."
@@ -445,10 +445,10 @@ def test_iam_root_access_key(audit, test_id, risk_rating=3):
         risk_rating = risk_rating
     )
 
-    iam = audit.session.client("iam")
     summary = audit.evidence_client.get_aws(
         "iam/account_summary.json",
-        lambda: iam.get_account_summary()
+        service="iam",
+        method="get_account_summary"
     )
 
     account_summary = summary.get("SummaryMap", {})
@@ -478,7 +478,8 @@ def test_iam_root_mfa(audit, test_id, risk_rating=3):
     iam = audit.session.client("iam")
     summary = audit.evidence_client.get_aws(
         "iam/account_summary.json",
-        lambda: iam.get_account_summary()
+        service="iam",
+        method="get_account_summary"
     )
 
     account_summary = summary.get("SummaryMap", {})
@@ -511,37 +512,38 @@ def test_iam_users_mfa(audit, test_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    iam = audit.session.client("iam")
     users = audit.evidence_client.get_aws(
-        "iam/users.json",
-        lambda: iam.list_users()
-    ).get("Users", [])
+            "iam/users.json",
+            service="iam",
+            paginator_params={
+                "method_name": "list_users",
+                "pagination_key": "Users"
+            }
+    )
 
-    for user in users:
+    for user in users.get("Users", []):
         username = user["UserName"]
         sample = Sample(sample_id={"user": username})
         if sample.check_excluded(test, audit):
             continue
 
         # Check if user has a console password
-        try:
-            login_profile = audit.evidence_client.get_aws(
-                f"iam/users/{username}/login_profile.json",
-                lambda: iam.get_login_profile(UserName=username),
-                not_found_codes=["NoSuchEntity"]
-            )
-        except ClientError as e:
-            code = e.response["Error"]["Code"]
-            if code == "NoSuchEntity":
-                sample.is_excluded = True
-                sample.comments = "User has no console password (programmatic access only)."
-                test.samples.append(sample)
-                continue
-            else:
-                raise
+        login_profile = audit.evidence_client.get_aws(
+            f"iam/users/{username}/login_profile.json",
+            service="iam",
+            method="get_login_profile",
+            method_kwargs={"UserName": username},
+            not_found_codes=["NoSuchEntity"]
+        )
 
-        # Check if login profile in null.
-        login_profile = login_profile or {}
+        # No response or explicitly empty response
+        if not login_profile:
+            sample.is_passing = True
+            sample.comments = "User has no console password (programmatic access only)."
+            test.samples.append(sample)
+            continue
+
+        # Response exists but no login profile inside it
         if not login_profile.get("LoginProfile"):
             sample.is_passing = True
             sample.comments = "User has no console password (programmatic access only)."
@@ -549,12 +551,16 @@ def test_iam_users_mfa(audit, test_id, risk_rating=3):
             continue
 
         # Check MFA devices
-        mfa_devices = audit.evidence_client.get_aws(
-            f"iam/users/{username}/mfa_devices.json",
-            lambda: iam.list_mfa_devices(UserName=username)
+        mfa_devices = (
+            audit.evidence_client.get_aws(
+                f"iam/users/{username}/mfa_devices.json",
+                service="iam",
+                method="list_mfa_devices",
+                method_kwargs={"UserName": username}
+            ) or {}
         ).get("MFADevices", [])
 
-        if mfa_devices:
+        if len(mfa_devices) > 0:
             sample.is_passing = True
         else:
             sample.comments = "No MFA device enabled for this user."
@@ -591,10 +597,13 @@ def test_iam_user_access_key_age(audit, test_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    iam = audit.session.client("iam")
     users = audit.evidence_client.get_aws(
-        "iam/users.json",
-        lambda: iam.list_users()
+            "iam/users.json",
+            service="iam",
+            paginator_params={
+                "method_name": "list_users",
+                "pagination_key": "Users"
+            }
     )
 
     now = datetime.now(timezone.utc)
@@ -604,8 +613,10 @@ def test_iam_user_access_key_age(audit, test_id, risk_rating=3):
 
         keys = audit.evidence_client.get_aws(
             f"iam/users/{username}/access_keys.json",
-            lambda: iam.list_access_keys(UserName=username)
-        )
+            service="iam",
+            method="list_access_keys",
+            method_kwargs={"UserName": username}
+        ) 
 
         for key in keys.get("AccessKeyMetadata", []):
             sample = Sample(
@@ -660,17 +671,15 @@ def test_rds_encryption(audit, test_id, risk_rating=2):
     )
 
     for region in audit.in_scope_regions:
-        rds = audit.session.client("rds", region_name=region)
-
         instances = audit.evidence_client.get_aws(
-                f"rds/{region}/db_instances.json",
-                fetch_fn=None,  # fetch_fn is not used when using paginator_params
-                paginator_params={
-                    "client": rds,
-                    "method_name": "describe_db_instances",
-                    "pagination_key": "DBInstances"
-                }
-            )
+            f"rds/{region}/db_instances.json",
+            service="rds",
+            region=region,
+            paginator_params={
+                "method_name": "describe_db_instances",
+                "pagination_key": "DBInstances"
+            }
+        )
 
         for db in instances.get("DBInstances", []):
             sample = Sample(sample_id={"region": region, "db_instance": db["DBInstanceIdentifier"]})
@@ -704,11 +713,14 @@ def test_rds_public_access(audit, test_id, risk_rating=3):
     )
 
     for region in audit.in_scope_regions:
-        rds = audit.session.client("rds", region_name=region)
-
         instances = audit.evidence_client.get_aws(
             f"rds/{region}/db_instances.json",
-            lambda: rds.describe_db_instances()
+            service="rds",
+            region=region,
+            paginator_params={
+                "method_name": "describe_db_instances",
+                "pagination_key": "DBInstances"
+            }
         )
 
         for db in instances.get("DBInstances", []):
@@ -753,13 +765,11 @@ def test_rds_tags(audit, test_id, risk_rating=1):
     )
 
     for region in audit.in_scope_regions:
-        rds = audit.session.client("rds", region_name=region)
-
         instances = audit.evidence_client.get_aws(
             f"rds/{region}/db_instances.json",
-            fetch_fn=None,
+            service="rds",
+            region=region,
             paginator_params={
-                "client": rds,
                 "method_name": "describe_db_instances",
                 "pagination_key": "DBInstances"
             }
@@ -803,7 +813,12 @@ def test_rds_backup_retention(audit, test_id, risk_rating=1):
 
         instances = audit.evidence_client.get_aws(
             f"rds/{region}/db_instances.json",
-            lambda: rds.describe_db_instances()
+            service="rds",
+            region=region,
+            paginator_params={
+                "method_name": "describe_db_instances",
+                "pagination_key": "DBInstances"
+            }
         )
 
         for db in instances.get("DBInstances", []):
@@ -845,9 +860,9 @@ def test_rds_auto_minor_version_upgrade(audit, test_id, risk_rating=1):
 
         instances = audit.evidence_client.get_aws(
             f"rds/{region}/db_instances.json",
-            fetch_fn=None,
+            service="rds",
+            region=region,
             paginator_params={
-                "client": rds,
                 "method_name": "describe_db_instances",
                 "pagination_key": "DBInstances"
             }
@@ -888,25 +903,23 @@ def test_rds_deletion_protection(audit, test_id, risk_rating=2):
     )
 
     for region in audit.in_scope_regions:
-        rds = audit.session.client("rds", region_name=region)
-
         # Get DB instances
         instances = audit.evidence_client.get_aws(
             f"rds/{region}/db_instances.json",
-            fetch_fn=None,
+            service="rds",
+            region=region,
             paginator_params={
-                "client": rds,
                 "method_name": "describe_db_instances",
                 "pagination_key": "DBInstances"
             }
         )
 
         # Get DB clusters
-        clusters = audit.evidence_client.get_aws(
+        instances = audit.evidence_client.get_aws(
             f"rds/{region}/db_clusters.json",
-            fetch_fn=None,
+            service="rds",
+            region=region,
             paginator_params={
-                "client": rds,
                 "method_name": "describe_db_clusters",
                 "pagination_key": "DBClusters"
             }
