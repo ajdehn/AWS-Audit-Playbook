@@ -983,17 +983,15 @@ def test_ec2_security_group_tags(audit, test_id, risk_rating=1):
     )
 
     for region in audit.in_scope_regions:
-        ec2 = audit.session.client("ec2", region_name=region)
-
         security_groups = audit.evidence_client.get_aws(
             f"ec2/{region}/security_groups.json",
-            fetch_fn=None,
+            service="ec2",
+            region=region,
             paginator_params={
-                "client": ec2,
                 "method_name": "describe_security_groups",
                 "pagination_key": "SecurityGroups"
             }
-        )
+        )  
 
         for sg in security_groups.get("SecurityGroups", []):
             sample = Sample(sample_id={"region": region, "security_group_id": sg["GroupId"]})
@@ -1045,9 +1043,9 @@ def test_ec2_tags(audit, test_id, risk_rating=1):
 
         instances = audit.evidence_client.get_aws(
             f"ec2/{region}/instances.json",
-            fetch_fn=None,
+            service="ec2",
+            region=region,
             paginator_params={
-                "client": ec2,
                 "method_name": "describe_instances",
                 "pagination_key": "Reservations"
             }
@@ -1095,9 +1093,9 @@ def test_ebs_volume_encryption(audit, test_id, risk_rating=2):
 
         volumes = audit.evidence_client.get_aws(
             f"ec2/{region}/volumes.json",
-            fetch_fn=None,
+            service="ec2",
+            region=region,
             paginator_params={
-                "client": ec2,
                 "method_name": "describe_volumes",
                 "pagination_key": "Volumes"
             }
@@ -1148,13 +1146,11 @@ def test_ebs_tags(audit, test_id, risk_rating=1):
     )
 
     for region in audit.in_scope_regions:
-        ec2 = audit.session.client("ec2", region_name=region)
-
         volumes = audit.evidence_client.get_aws(
             f"ec2/{region}/volumes.json",
-            fetch_fn=None,
+            service="ec2",
+            region=region,
             paginator_params={
-                "client": ec2,
                 "method_name": "describe_volumes",
                 "pagination_key": "Volumes"
             }
@@ -1197,12 +1193,12 @@ def test_ebs_default_encryption(audit, test_id, risk_rating=0):
     )
 
     for region in audit.in_scope_regions:
-        ec2 = audit.session.client("ec2", region_name=region)
-
         default_encryption = audit.evidence_client.get_aws(
             f"ec2/{region}/default_ebs_encryption.json",
-            lambda: ec2.get_ebs_encryption_by_default()
-        )
+            service="ec2",
+            region=region,
+            method="get_ebs_encryption_by_default"
+        )   
 
         sample = Sample(sample_id={"region": region})
         if sample.check_excluded(test, audit):
@@ -1249,28 +1245,30 @@ def test_lambda_tags(audit, test_id, risk_rating=1):
     )
 
     for region in audit.in_scope_regions:
-        lambda_client = audit.session.client("lambda", region_name=region)
-
         functions = audit.evidence_client.get_aws(
             f"lambda/{region}/functions.json",
-            fetch_fn=None,
+            service="lambda",
+            region=region,
             paginator_params={
-                "client": lambda_client,
                 "method_name": "list_functions",
                 "pagination_key": "Functions"
             }
         )
 
         for fn in functions.get("Functions", []):
-            sample = Sample(sample_id={"region": region, "function_name": fn["FunctionName"]})
+            function_name = fn["FunctionName"]
+            sample = Sample(sample_id={"region": region, "function_name": function_name})
             if sample.check_excluded(test, audit):
                 continue
 
             # Fetch tags via ARN
             arn = fn.get("FunctionArn")
             tags_response = audit.evidence_client.get_aws(
-                f"lambda/{region}/functions/{fn['FunctionName']}/tags.json",
-                lambda: lambda_client.list_tags(Resource=arn)
+                f"lambda/{region}/functions/{function_name}/tags.json",
+                service="lambda",
+                region=region,
+                method="list_tags",
+                method_kwargs={"Resource": arn}
             )
 
             lambda_tags = tags_response.get("Tags", {})
