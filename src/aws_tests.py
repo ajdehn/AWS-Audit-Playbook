@@ -93,9 +93,13 @@ def test_s3_encryption(audit, test_id, risk_rating=2):
         risk_rating=risk_rating
     )
     
-    s3 = audit.session.client("s3")
     # Obtain and save list of buckets.
-    buckets = audit.evidence_client.get("s3/buckets.json", lambda: s3.list_buckets())
+    buckets = audit.evidence_client.get_aws(
+        "s3/buckets.json",
+        service="s3",
+        method="list_buckets"
+    )
+
     # Loop through each bucket
     for bucket in buckets.get("Buckets", []):
         sample = Sample(sample_id={"bucket_name": bucket['Name']})
@@ -103,8 +107,11 @@ def test_s3_encryption(audit, test_id, risk_rating=2):
             continue
 
         # Obtain and save bucket's encryption settings.
-        enc = audit.evidence_client.get_aws(f"s3/buckets/{bucket['Name']}/encryption.json",
-            lambda: s3.get_bucket_encryption(Bucket=bucket['Name']),
+        enc = audit.evidence_client.get_aws(
+            f"s3/buckets/{bucket_name}/encryption.json",
+            service="s3",
+            method="get_bucket_encryption",
+            method_kwargs={"Bucket": bucket_name},
             not_found_codes=["ServerSideEncryptionConfigurationNotFoundError"]
         )
         if enc.get("ServerSideEncryptionConfiguration"):
@@ -135,21 +142,27 @@ def test_s3_public_access(audit, test_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    s3 = audit.session.client("s3")
     # Obtain and save list of buckets.
-    buckets = audit.evidence_client.get("s3/buckets.json", lambda: s3.list_buckets())
-    # Evaluate each bucket
+    buckets = audit.evidence_client.get_aws(
+        "s3/buckets.json",
+        service="s3",
+        method="list_buckets"
+    )
+
     for bucket in buckets.get("Buckets", []):
-        sample = Sample(sample_id={"bucket_name": bucket["Name"]})
+        bucket_name = bucket["Name"]
+        sample = Sample(sample_id={"bucket_name": bucket_name})
         if sample.check_excluded(test, audit):
             continue
         
         # Fetch public access block
         public_access_block = audit.evidence_client.get_aws(
-            f"s3/buckets/{bucket['Name']}/public_access_block.json",
-            lambda: s3.get_public_access_block(Bucket=bucket["Name"]),
+            f"s3/buckets/{bucket_name}/public_access_block.json",
+            service="s3",
+            method="get_public_access_block",
+            method_kwargs={"Bucket": bucket_name},
             not_found_codes=["NoSuchPublicAccessBlockConfiguration"]
-        )
+        )        
         if not public_access_block:
             sample.comments = "No Public Access Block configuration found."
             test.samples.append(sample)
@@ -166,7 +179,7 @@ def test_s3_public_access(audit, test_id, risk_rating=3):
         if is_blocking_public_access:
             sample.is_passing = True
         else:
-            sample.comments = "One or more public access settings are disabled"
+            sample.comments = "One or more public access settings are disabled."
         test.samples.append(sample)
 
     test.evaluate_samples()
@@ -206,20 +219,27 @@ def test_s3_tags(audit, test_id, risk_rating=1):
         risk_rating=risk_rating
     )
 
-    s3 = audit.session.client("s3")
-    buckets = audit.evidence_client.get("s3/buckets.json", lambda: s3.list_buckets())
+    buckets = audit.evidence_client.get_aws(
+        "s3/buckets.json",
+        service="s3",
+        method="list_buckets"
+    )
 
     for bucket in buckets.get("Buckets", []):
-        sample = Sample(sample_id={"bucket_name": bucket["Name"]})
+        bucket_name = bucket["Name"]
+        sample = Sample(sample_id={"bucket_name": bucket_name})
         if sample.check_excluded(test, audit):
             continue
 
         # Fetch bucket tags
         tags_response = audit.evidence_client.get_aws(
-            f"s3/buckets/{bucket['Name']}/tags.json",
-            lambda: s3.get_bucket_tagging(Bucket=bucket["Name"]),
+            f"s3/buckets/{bucket_name}/tags.json",
+            service="s3",
+            method="get_bucket_tagging",
+            method_kwargs={"Bucket": bucket_name},
             not_found_codes=["NoSuchTagSet"]
         )
+
         if not tags_response:
             sample.comments = "Tags not found on this bucket."
             test.samples.append(sample)
@@ -253,12 +273,11 @@ def test_s3_secure_transport(audit, test_id, risk_rating=0):
         risk_rating=risk_rating
     )
 
-    s3 = audit.session.client("s3")
-
     # Obtain and save list of buckets
-    buckets = audit.evidence_client.get(
+    buckets = audit.evidence_client.get_aws(
         "s3/buckets.json",
-        lambda: s3.list_buckets()
+        service="s3",
+        method="list_buckets"
     )
 
     for bucket in buckets.get("Buckets", []):
@@ -270,7 +289,9 @@ def test_s3_secure_transport(audit, test_id, risk_rating=0):
         # Fetch bucket policy
         policy = audit.evidence_client.get_aws(
             f"s3/buckets/{bucket_name}/bucket_policy.json",
-            lambda: s3.get_bucket_policy(Bucket=bucket_name),
+            service="s3",
+            method="get_bucket_policy",
+            method_kwargs={"Bucket": bucket_name},
             not_found_codes=["NoSuchBucketPolicy"]
         )
 
