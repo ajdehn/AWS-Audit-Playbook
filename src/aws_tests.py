@@ -102,7 +102,8 @@ def test_s3_encryption(audit, test_id, risk_rating=2):
 
     # Loop through each bucket
     for bucket in buckets.get("Buckets", []):
-        sample = Sample(sample_id={"bucket_name": bucket['Name']})
+        bucket_name = bucket['Name']
+        sample = Sample(sample_id={"bucket_name": bucket_name})
         if sample.check_excluded(test, audit):
             continue
 
@@ -475,7 +476,6 @@ def test_iam_root_mfa(audit, test_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    iam = audit.session.client("iam")
     summary = audit.evidence_client.get_aws(
         "iam/account_summary.json",
         service="iam",
@@ -809,8 +809,6 @@ def test_rds_backup_retention(audit, test_id, risk_rating=1):
     )
 
     for region in audit.in_scope_regions:
-        rds = audit.session.client("rds", region_name=region)
-
         instances = audit.evidence_client.get_aws(
             f"rds/{region}/db_instances.json",
             service="rds",
@@ -856,8 +854,6 @@ def test_rds_auto_minor_version_upgrade(audit, test_id, risk_rating=1):
     )
 
     for region in audit.in_scope_regions:
-        rds = audit.session.client("rds", region_name=region)
-
         instances = audit.evidence_client.get_aws(
             f"rds/{region}/db_instances.json",
             service="rds",
@@ -915,7 +911,7 @@ def test_rds_deletion_protection(audit, test_id, risk_rating=2):
         )
 
         # Get DB clusters
-        instances = audit.evidence_client.get_aws(
+        clusters = audit.evidence_client.get_aws(
             f"rds/{region}/db_clusters.json",
             service="rds",
             region=region,
@@ -1039,8 +1035,6 @@ def test_ec2_tags(audit, test_id, risk_rating=1):
     )
 
     for region in audit.in_scope_regions:
-        ec2 = audit.session.client("ec2", region_name=region)
-
         instances = audit.evidence_client.get_aws(
             f"ec2/{region}/instances.json",
             service="ec2",
@@ -1089,8 +1083,6 @@ def test_ebs_volume_encryption(audit, test_id, risk_rating=2):
     )
 
     for region in audit.in_scope_regions:
-        ec2 = audit.session.client("ec2", region_name=region)
-
         volumes = audit.evidence_client.get_aws(
             f"ec2/{region}/volumes.json",
             service="ec2",
@@ -1494,7 +1486,7 @@ def test_cloudtrail_logging_recent_stops(audit, test_id, risk_rating=3):
     now = datetime.now(timezone.utc)
     lookback_threshold = now - timedelta(days=lookback_days)
 
-    for trail in trails.get("trailList", []):
+    for trail in resp.get("trailList", []):
         trail_name = trail.get("Name")
         sample = Sample(sample_id={"trail_name": trail_name})
         if sample.check_excluded(test, audit):
@@ -1561,14 +1553,13 @@ def test_wafv2_enabled(audit, test_id, risk_rating=2):
     )
 
     for region in audit.in_scope_regions:
-        waf = audit.session.client("wafv2", region_name=region)
-        elbv2 = audit.session.client("elbv2", region_name=region)
-        apigw = audit.session.client("apigateway", region_name=region)
-
         # Get list of Web ACLs (REGIONAL scope for ALB + API Gateway)
         web_acls = audit.evidence_client.get_aws(
             f"wafv2/{region}/web_acls.json",
-            lambda: waf.list_web_acls(Scope="REGIONAL")
+            service="wafv2",
+            region=region,
+            method="list_web_acls",
+            method_kwargs={"Scope": "REGIONAL"}
         )
 
         # Preload WAF information
@@ -1577,32 +1568,41 @@ def test_wafv2_enabled(audit, test_id, risk_rating=2):
 
         for acl in web_acls.get("WebACLs", []):
             web_acl_arn = acl["ARN"]
-            # ALBs
+
+            # ALB associations
             alb_resources = audit.evidence_client.get_aws(
                 f"wafv2/{region}/{acl['Name']}/resources_alb.json",
-                lambda: waf.list_resources_for_web_acl(
-                    WebACLArn=web_acl_arn,
-                    ResourceType="APPLICATION_LOAD_BALANCER"
-                )
+                service="wafv2",
+                region=region,
+                method="list_resources_for_web_acl",
+                method_kwargs={
+                    "WebACLArn": web_acl_arn,
+                    "ResourceType": "APPLICATION_LOAD_BALANCER"
+                }
             )
             acl_to_alb_resources[web_acl_arn] = set(alb_resources.get("ResourceArns", []))
 
-            # API Gateway
+            # API Gateway associations
             api_resources = audit.evidence_client.get_aws(
                 f"wafv2/{region}/{acl['Name']}/resources_apigw.json",
-                lambda: waf.list_resources_for_web_acl(
-                    WebACLArn=web_acl_arn,
-                    ResourceType="API_GATEWAY"
-                )
-            )
-            acl_to_api_resources[web_acl_arn] = set(api_resources.get("ResourceArns", []))        
+                service="wafv2",
+                region=region,
+                method="list_resources_for_web_acl",
+                method_kwargs={
+                    "WebACLArn": web_acl_arn,
+                    "ResourceType": "API_GATEWAY"
+                }
+            ) or {}
 
-        # ALBs
+            acl_to_api_resources[web_acl_arn] = set(api_resources.get("ResourceArns", []))
+
+
+        # ELBv2 (ALBs)
         lbs = audit.evidence_client.get_aws(
             f"elbv2/{region}/load_balancers.json",
-            fetch_fn=None,
+            service="elbv2",
+            region=region,
             paginator_params={
-                "client": elbv2,
                 "method_name": "describe_load_balancers",
                 "pagination_key": "LoadBalancers"
             }
@@ -1610,7 +1610,7 @@ def test_wafv2_enabled(audit, test_id, risk_rating=2):
 
         for lb in lbs.get("LoadBalancers", []):
             if lb.get("Type") != "application":
-                continue  # Only ALBs
+                continue # Only handle ALBs
 
             sample = Sample(
                 sample_id={
@@ -1619,13 +1619,13 @@ def test_wafv2_enabled(audit, test_id, risk_rating=2):
                     "resource_id": lb["LoadBalancerName"]
                 }
             )
+
             if sample.check_excluded(test, audit):
                 continue
 
             lb_arn = lb.get("LoadBalancerArn")
             if not lb_arn:
                 continue
-            alb_attached = False
 
             alb_attached = any(
                 lb_arn in resource_set
@@ -1639,10 +1639,12 @@ def test_wafv2_enabled(audit, test_id, risk_rating=2):
 
             test.samples.append(sample)
 
-        # API Gateway (REST APIs)
+        # API Gateway
         apis = audit.evidence_client.get_aws(
             f"apigateway/{region}/rest_apis.json",
-            lambda: apigw.get_rest_apis()
+            service="apigateway",
+            region=region,
+            method="get_rest_apis"
         )
 
         for api in apis.get("items", []):
@@ -1656,8 +1658,9 @@ def test_wafv2_enabled(audit, test_id, risk_rating=2):
 
             if sample.check_excluded(test, audit):
                 continue
-            
+
             api_gw_arn = f"arn:aws:apigateway:{region}::/restapis/{api['id']}"
+
             api_gw_attached = any(
                 any(r.startswith(api_gw_arn) for r in resource_set)
                 for resource_set in acl_to_api_resources.values()
@@ -1695,15 +1698,17 @@ def test_guardduty_enabled(audit, test_id, risk_rating=3):
     )
 
     for region in audit.in_scope_regions:
-        gd = audit.session.client("guardduty", region_name=region)
-
         sample = Sample(sample_id={"region": region})
         if sample.check_excluded(test, audit):
             continue
 
-        detectors = audit.evidence_client.get_aws(
-            f"guardduty/{region}/detectors.json",
-            lambda: gd.list_detectors()
+        detectors = (
+            audit.evidence_client.get_aws(
+                f"guardduty/{region}/detectors.json",
+                service="guardduty",
+                region=region,
+                method="list_detectors"
+            ) or {}
         ).get("DetectorIds", [])
 
         if not detectors:
@@ -1717,7 +1722,10 @@ def test_guardduty_enabled(audit, test_id, risk_rating=3):
         for detector_id in detectors:
             config = audit.evidence_client.get_aws(
                 f"guardduty/{region}/{detector_id}/config.json",
-                lambda: gd.get_detector(DetectorId=detector_id)
+                service="guardduty",
+                region=region,
+                method="get_detector",
+                method_kwargs={"DetectorId": detector_id}
             )
 
             if config.get("Status") == "ENABLED":
