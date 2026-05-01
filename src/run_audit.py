@@ -13,13 +13,15 @@ if __name__ == "__main__":
 
     audit = Audit(tmp_folder=tmp_folder_name)
     audit.session = create_session()
+    # TODO: Fully transfer audit.session to EvidenceClient.
+    audit.evidence_client.session = audit.session
     audit.config = load_config("config.json")
     audit.aws_account_id = get_aws_account_id(audit.session)
     audit.in_scope_regions = get_in_scope_regions(audit)
 
     audit.test_results = run_all_tests(audit)
 
-    # Save audit report (JSON and PDF version).
+    # Save audit reports (JSON and PDF version).
     save_json(audit.to_dict(), f"{tmp_folder_name}/aws_audit_report.json")
     print(f"Report generated: {tmp_folder_name}/aws_audit_report.json")
     generate_pdf_report(audit, audit.test_results, "AWS", file_name=f"{tmp_folder_name}/aws_audit_report.pdf")

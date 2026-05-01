@@ -61,17 +61,19 @@ def get_aws_account_id(session):
 def get_in_scope_regions(audit):
     """Return validated in-scope AWS regions based on config or account defaults."""
 
-    ec2 = audit.session.client("ec2")
-
     regions = audit.evidence_client.get_aws(
         "ec2/regions.json",
-        lambda: ec2.describe_regions(
-            AllRegions=True,
-            Filters=[{
-                "Name": "opt-in-status",
-                "Values": ["opt-in-not-required", "opted-in"]
-            }]
-        )
+        service="ec2",
+        method="describe_regions",
+        method_kwargs={
+            "AllRegions": True,
+            "Filters": [
+                {
+                    "Name": "opt-in-status",
+                    "Values": ["opt-in-not-required", "opted-in"]
+                }
+            ]
+        }
     )
 
     available = {r["RegionName"] for r in regions["Regions"]}
@@ -108,7 +110,7 @@ def save_json(extract, file_path):
     with open(file_path, 'w') as f:
         json.dump(extract, f, indent=4, default=str)
 
-def load_json_if_exists(file_path):
+def load_json(file_path):
     if os.path.exists(file_path):
         try:
             with open(file_path, "r") as f:
