@@ -93,9 +93,13 @@ def test_s3_encryption(audit, test_id, risk_rating=2):
         risk_rating=risk_rating
     )
     
-    s3 = audit.session.client("s3")
     # Obtain and save list of buckets.
-    buckets = audit.evidence_client.get("s3/buckets.json", lambda: s3.list_buckets())
+    buckets = audit.evidence_client.get_aws(
+        "s3/buckets.json",
+        service="s3",
+        method="list_buckets"
+    )
+
     # Loop through each bucket
     for bucket in buckets.get("Buckets", []):
         sample = Sample(sample_id={"bucket_name": bucket['Name']})
@@ -103,8 +107,11 @@ def test_s3_encryption(audit, test_id, risk_rating=2):
             continue
 
         # Obtain and save bucket's encryption settings.
-        enc = audit.evidence_client.get_aws(f"s3/buckets/{bucket['Name']}/encryption.json",
-            lambda: s3.get_bucket_encryption(Bucket=bucket['Name']),
+        enc = audit.evidence_client.get_aws(
+            f"s3/buckets/{bucket_name}/encryption.json",
+            service="s3",
+            method="get_bucket_encryption",
+            method_kwargs={"Bucket": bucket_name},
             not_found_codes=["ServerSideEncryptionConfigurationNotFoundError"]
         )
         if enc.get("ServerSideEncryptionConfiguration"):
@@ -135,21 +142,27 @@ def test_s3_public_access(audit, test_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    s3 = audit.session.client("s3")
     # Obtain and save list of buckets.
-    buckets = audit.evidence_client.get("s3/buckets.json", lambda: s3.list_buckets())
-    # Evaluate each bucket
+    buckets = audit.evidence_client.get_aws(
+        "s3/buckets.json",
+        service="s3",
+        method="list_buckets"
+    )
+
     for bucket in buckets.get("Buckets", []):
-        sample = Sample(sample_id={"bucket_name": bucket["Name"]})
+        bucket_name = bucket["Name"]
+        sample = Sample(sample_id={"bucket_name": bucket_name})
         if sample.check_excluded(test, audit):
             continue
         
         # Fetch public access block
         public_access_block = audit.evidence_client.get_aws(
-            f"s3/buckets/{bucket['Name']}/public_access_block.json",
-            lambda: s3.get_public_access_block(Bucket=bucket["Name"]),
+            f"s3/buckets/{bucket_name}/public_access_block.json",
+            service="s3",
+            method="get_public_access_block",
+            method_kwargs={"Bucket": bucket_name},
             not_found_codes=["NoSuchPublicAccessBlockConfiguration"]
-        )
+        )   
         if not public_access_block:
             sample.comments = "No Public Access Block configuration found."
             test.samples.append(sample)
@@ -166,7 +179,7 @@ def test_s3_public_access(audit, test_id, risk_rating=3):
         if is_blocking_public_access:
             sample.is_passing = True
         else:
-            sample.comments = "One or more public access settings are disabled"
+            sample.comments = "One or more public access settings are disabled."
         test.samples.append(sample)
 
     test.evaluate_samples()
@@ -206,20 +219,27 @@ def test_s3_tags(audit, test_id, risk_rating=1):
         risk_rating=risk_rating
     )
 
-    s3 = audit.session.client("s3")
-    buckets = audit.evidence_client.get("s3/buckets.json", lambda: s3.list_buckets())
+    buckets = audit.evidence_client.get_aws(
+        "s3/buckets.json",
+        service="s3",
+        method="list_buckets"
+    )
 
     for bucket in buckets.get("Buckets", []):
-        sample = Sample(sample_id={"bucket_name": bucket["Name"]})
+        bucket_name = bucket["Name"]
+        sample = Sample(sample_id={"bucket_name": bucket_name})
         if sample.check_excluded(test, audit):
             continue
 
         # Fetch bucket tags
         tags_response = audit.evidence_client.get_aws(
-            f"s3/buckets/{bucket['Name']}/tags.json",
-            lambda: s3.get_bucket_tagging(Bucket=bucket["Name"]),
+            f"s3/buckets/{bucket_name}/tags.json",
+            service="s3",
+            method="get_bucket_tagging",
+            method_kwargs={"Bucket": bucket_name},
             not_found_codes=["NoSuchTagSet"]
         )
+
         if not tags_response:
             sample.comments = "Tags not found on this bucket."
             test.samples.append(sample)
@@ -253,12 +273,11 @@ def test_s3_secure_transport(audit, test_id, risk_rating=0):
         risk_rating=risk_rating
     )
 
-    s3 = audit.session.client("s3")
-
     # Obtain and save list of buckets
-    buckets = audit.evidence_client.get(
+    buckets = audit.evidence_client.get_aws(
         "s3/buckets.json",
-        lambda: s3.list_buckets()
+        service="s3",
+        method="list_buckets"
     )
 
     for bucket in buckets.get("Buckets", []):
@@ -270,7 +289,9 @@ def test_s3_secure_transport(audit, test_id, risk_rating=0):
         # Fetch bucket policy
         policy = audit.evidence_client.get_aws(
             f"s3/buckets/{bucket_name}/bucket_policy.json",
-            lambda: s3.get_bucket_policy(Bucket=bucket_name),
+            service="s3",
+            method="get_bucket_policy",
+            method_kwargs={"Bucket": bucket_name},
             not_found_codes=["NoSuchBucketPolicy"]
         )
 
@@ -344,13 +365,13 @@ def test_iam_password_policy(audit, test_id, risk_rating=2):
         risk_rating=risk_rating
     )
 
-    # Gather evidence
-    iam = audit.session.client("iam")
     policy = audit.evidence_client.get_aws(
         "iam/password_policy.json",
-        lambda: iam.get_account_password_policy(),
+        service="iam",
+        method="get_account_password_policy",
         not_found_codes=["NoSuchEntity"]
     )
+
     if not policy:
         test.is_passing = False
         test.comments = "Exceptions Noted. No password policy configured."
@@ -424,10 +445,10 @@ def test_iam_root_access_key(audit, test_id, risk_rating=3):
         risk_rating = risk_rating
     )
 
-    iam = audit.session.client("iam")
     summary = audit.evidence_client.get_aws(
         "iam/account_summary.json",
-        lambda: iam.get_account_summary()
+        service="iam",
+        method="get_account_summary"
     )
 
     account_summary = summary.get("SummaryMap", {})
@@ -457,7 +478,8 @@ def test_iam_root_mfa(audit, test_id, risk_rating=3):
     iam = audit.session.client("iam")
     summary = audit.evidence_client.get_aws(
         "iam/account_summary.json",
-        lambda: iam.get_account_summary()
+        service="iam",
+        method="get_account_summary"
     )
 
     account_summary = summary.get("SummaryMap", {})
@@ -490,37 +512,38 @@ def test_iam_users_mfa(audit, test_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    iam = audit.session.client("iam")
     users = audit.evidence_client.get_aws(
-        "iam/users.json",
-        lambda: iam.list_users()
-    ).get("Users", [])
+            "iam/users.json",
+            service="iam",
+            paginator_params={
+                "method_name": "list_users",
+                "pagination_key": "Users"
+            }
+    )
 
-    for user in users:
+    for user in users.get("Users", []):
         username = user["UserName"]
         sample = Sample(sample_id={"user": username})
         if sample.check_excluded(test, audit):
             continue
 
         # Check if user has a console password
-        try:
-            login_profile = audit.evidence_client.get_aws(
-                f"iam/users/{username}/login_profile.json",
-                lambda: iam.get_login_profile(UserName=username),
-                not_found_codes=["NoSuchEntity"]
-            )
-        except ClientError as e:
-            code = e.response["Error"]["Code"]
-            if code == "NoSuchEntity":
-                sample.is_excluded = True
-                sample.comments = "User has no console password (programmatic access only)."
-                test.samples.append(sample)
-                continue
-            else:
-                raise
+        login_profile = audit.evidence_client.get_aws(
+            f"iam/users/{username}/login_profile.json",
+            service="iam",
+            method="get_login_profile",
+            method_kwargs={"UserName": username},
+            not_found_codes=["NoSuchEntity"]
+        )
 
-        # Check if login profile in null.
-        login_profile = login_profile or {}
+        # No response or explicitly empty response
+        if not login_profile:
+            sample.is_passing = True
+            sample.comments = "User has no console password (programmatic access only)."
+            test.samples.append(sample)
+            continue
+
+        # Response exists but no login profile inside it
         if not login_profile.get("LoginProfile"):
             sample.is_passing = True
             sample.comments = "User has no console password (programmatic access only)."
@@ -528,12 +551,16 @@ def test_iam_users_mfa(audit, test_id, risk_rating=3):
             continue
 
         # Check MFA devices
-        mfa_devices = audit.evidence_client.get_aws(
-            f"iam/users/{username}/mfa_devices.json",
-            lambda: iam.list_mfa_devices(UserName=username)
+        mfa_devices = (
+            audit.evidence_client.get_aws(
+                f"iam/users/{username}/mfa_devices.json",
+                service="iam",
+                method="list_mfa_devices",
+                method_kwargs={"UserName": username}
+            ) or {}
         ).get("MFADevices", [])
 
-        if mfa_devices:
+        if len(mfa_devices) > 0:
             sample.is_passing = True
         else:
             sample.comments = "No MFA device enabled for this user."
@@ -570,10 +597,13 @@ def test_iam_user_access_key_age(audit, test_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    iam = audit.session.client("iam")
     users = audit.evidence_client.get_aws(
-        "iam/users.json",
-        lambda: iam.list_users()
+            "iam/users.json",
+            service="iam",
+            paginator_params={
+                "method_name": "list_users",
+                "pagination_key": "Users"
+            }
     )
 
     now = datetime.now(timezone.utc)
@@ -583,8 +613,10 @@ def test_iam_user_access_key_age(audit, test_id, risk_rating=3):
 
         keys = audit.evidence_client.get_aws(
             f"iam/users/{username}/access_keys.json",
-            lambda: iam.list_access_keys(UserName=username)
-        )
+            service="iam",
+            method="list_access_keys",
+            method_kwargs={"UserName": username}
+        ) 
 
         for key in keys.get("AccessKeyMetadata", []):
             sample = Sample(
@@ -639,17 +671,15 @@ def test_rds_encryption(audit, test_id, risk_rating=2):
     )
 
     for region in audit.in_scope_regions:
-        rds = audit.session.client("rds", region_name=region)
-
         instances = audit.evidence_client.get_aws(
-                f"rds/{region}/db_instances.json",
-                fetch_fn=None,  # fetch_fn is not used when using paginator_params
-                paginator_params={
-                    "client": rds,
-                    "method_name": "describe_db_instances",
-                    "pagination_key": "DBInstances"
-                }
-            )
+            f"rds/{region}/db_instances.json",
+            service="rds",
+            region=region,
+            paginator_params={
+                "method_name": "describe_db_instances",
+                "pagination_key": "DBInstances"
+            }
+        )
 
         for db in instances.get("DBInstances", []):
             sample = Sample(sample_id={"region": region, "db_instance": db["DBInstanceIdentifier"]})
@@ -683,11 +713,14 @@ def test_rds_public_access(audit, test_id, risk_rating=3):
     )
 
     for region in audit.in_scope_regions:
-        rds = audit.session.client("rds", region_name=region)
-
         instances = audit.evidence_client.get_aws(
             f"rds/{region}/db_instances.json",
-            lambda: rds.describe_db_instances()
+            service="rds",
+            region=region,
+            paginator_params={
+                "method_name": "describe_db_instances",
+                "pagination_key": "DBInstances"
+            }
         )
 
         for db in instances.get("DBInstances", []):
@@ -732,13 +765,11 @@ def test_rds_tags(audit, test_id, risk_rating=1):
     )
 
     for region in audit.in_scope_regions:
-        rds = audit.session.client("rds", region_name=region)
-
         instances = audit.evidence_client.get_aws(
             f"rds/{region}/db_instances.json",
-            fetch_fn=None,
+            service="rds",
+            region=region,
             paginator_params={
-                "client": rds,
                 "method_name": "describe_db_instances",
                 "pagination_key": "DBInstances"
             }
@@ -782,7 +813,12 @@ def test_rds_backup_retention(audit, test_id, risk_rating=1):
 
         instances = audit.evidence_client.get_aws(
             f"rds/{region}/db_instances.json",
-            lambda: rds.describe_db_instances()
+            service="rds",
+            region=region,
+            paginator_params={
+                "method_name": "describe_db_instances",
+                "pagination_key": "DBInstances"
+            }
         )
 
         for db in instances.get("DBInstances", []):
@@ -824,9 +860,9 @@ def test_rds_auto_minor_version_upgrade(audit, test_id, risk_rating=1):
 
         instances = audit.evidence_client.get_aws(
             f"rds/{region}/db_instances.json",
-            fetch_fn=None,
+            service="rds",
+            region=region,
             paginator_params={
-                "client": rds,
                 "method_name": "describe_db_instances",
                 "pagination_key": "DBInstances"
             }
@@ -867,25 +903,23 @@ def test_rds_deletion_protection(audit, test_id, risk_rating=2):
     )
 
     for region in audit.in_scope_regions:
-        rds = audit.session.client("rds", region_name=region)
-
         # Get DB instances
         instances = audit.evidence_client.get_aws(
             f"rds/{region}/db_instances.json",
-            fetch_fn=None,
+            service="rds",
+            region=region,
             paginator_params={
-                "client": rds,
                 "method_name": "describe_db_instances",
                 "pagination_key": "DBInstances"
             }
         )
 
         # Get DB clusters
-        clusters = audit.evidence_client.get_aws(
+        instances = audit.evidence_client.get_aws(
             f"rds/{region}/db_clusters.json",
-            fetch_fn=None,
+            service="rds",
+            region=region,
             paginator_params={
-                "client": rds,
                 "method_name": "describe_db_clusters",
                 "pagination_key": "DBClusters"
             }
@@ -949,17 +983,15 @@ def test_ec2_security_group_tags(audit, test_id, risk_rating=1):
     )
 
     for region in audit.in_scope_regions:
-        ec2 = audit.session.client("ec2", region_name=region)
-
         security_groups = audit.evidence_client.get_aws(
             f"ec2/{region}/security_groups.json",
-            fetch_fn=None,
+            service="ec2",
+            region=region,
             paginator_params={
-                "client": ec2,
                 "method_name": "describe_security_groups",
                 "pagination_key": "SecurityGroups"
             }
-        )
+        )  
 
         for sg in security_groups.get("SecurityGroups", []):
             sample = Sample(sample_id={"region": region, "security_group_id": sg["GroupId"]})
@@ -1011,9 +1043,9 @@ def test_ec2_tags(audit, test_id, risk_rating=1):
 
         instances = audit.evidence_client.get_aws(
             f"ec2/{region}/instances.json",
-            fetch_fn=None,
+            service="ec2",
+            region=region,
             paginator_params={
-                "client": ec2,
                 "method_name": "describe_instances",
                 "pagination_key": "Reservations"
             }
@@ -1061,9 +1093,9 @@ def test_ebs_volume_encryption(audit, test_id, risk_rating=2):
 
         volumes = audit.evidence_client.get_aws(
             f"ec2/{region}/volumes.json",
-            fetch_fn=None,
+            service="ec2",
+            region=region,
             paginator_params={
-                "client": ec2,
                 "method_name": "describe_volumes",
                 "pagination_key": "Volumes"
             }
@@ -1114,13 +1146,11 @@ def test_ebs_tags(audit, test_id, risk_rating=1):
     )
 
     for region in audit.in_scope_regions:
-        ec2 = audit.session.client("ec2", region_name=region)
-
         volumes = audit.evidence_client.get_aws(
             f"ec2/{region}/volumes.json",
-            fetch_fn=None,
+            service="ec2",
+            region=region,
             paginator_params={
-                "client": ec2,
                 "method_name": "describe_volumes",
                 "pagination_key": "Volumes"
             }
@@ -1163,12 +1193,12 @@ def test_ebs_default_encryption(audit, test_id, risk_rating=0):
     )
 
     for region in audit.in_scope_regions:
-        ec2 = audit.session.client("ec2", region_name=region)
-
         default_encryption = audit.evidence_client.get_aws(
             f"ec2/{region}/default_ebs_encryption.json",
-            lambda: ec2.get_ebs_encryption_by_default()
-        )
+            service="ec2",
+            region=region,
+            method="get_ebs_encryption_by_default"
+        )   
 
         sample = Sample(sample_id={"region": region})
         if sample.check_excluded(test, audit):
@@ -1215,28 +1245,30 @@ def test_lambda_tags(audit, test_id, risk_rating=1):
     )
 
     for region in audit.in_scope_regions:
-        lambda_client = audit.session.client("lambda", region_name=region)
-
         functions = audit.evidence_client.get_aws(
             f"lambda/{region}/functions.json",
-            fetch_fn=None,
+            service="lambda",
+            region=region,
             paginator_params={
-                "client": lambda_client,
                 "method_name": "list_functions",
                 "pagination_key": "Functions"
             }
         )
 
         for fn in functions.get("Functions", []):
-            sample = Sample(sample_id={"region": region, "function_name": fn["FunctionName"]})
+            function_name = fn["FunctionName"]
+            sample = Sample(sample_id={"region": region, "function_name": function_name})
             if sample.check_excluded(test, audit):
                 continue
 
             # Fetch tags via ARN
             arn = fn.get("FunctionArn")
             tags_response = audit.evidence_client.get_aws(
-                f"lambda/{region}/functions/{fn['FunctionName']}/tags.json",
-                lambda: lambda_client.list_tags(Resource=arn)
+                f"lambda/{region}/functions/{function_name}/tags.json",
+                service="lambda",
+                region=region,
+                method="list_tags",
+                method_kwargs={"Resource": arn}
             )
 
             lambda_tags = tags_response.get("Tags", {})
@@ -1269,10 +1301,11 @@ def test_cloudtrail_multi_region(audit, test_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
         "cloudtrail/trails.json",
-        lambda: ct.describe_trails(includeShadowTrails=False)
+        service="cloudtrail",
+        method="describe_trails",
+        method_kwargs={"includeShadowTrails": False}
     ).get("trailList", [])
 
     if not trails:
@@ -1286,7 +1319,9 @@ def test_cloudtrail_multi_region(audit, test_id, risk_rating=3):
             continue
         status = audit.evidence_client.get_aws(
             f"cloudtrail/trails/{trail['Name']}/trail_status.json",
-            lambda: ct.get_trail_status(Name=trail["TrailARN"])
+            service="cloudtrail",
+            method="get_trail_status",
+            method_kwargs={"Name": trail["TrailARN"]}
         )
         if status.get("IsLogging", False):
             found_valid_trail = True
@@ -1316,18 +1351,19 @@ def test_cloudtrail_log_file_validation(audit, test_id, risk_rating=2):
         risk_rating=risk_rating
     )
 
-    ct = audit.session.client("cloudtrail")
-    trails = audit.evidence_client.get_aws(
+    resp = audit.evidence_client.get_aws(
         "cloudtrail/trails.json",
-        lambda: ct.describe_trails(includeShadowTrails=False)
-    ).get("trailList", [])
+        service="cloudtrail",
+        method="describe_trails",
+        method_kwargs={"includeShadowTrails": False}
+    ) 
 
-    if not trails:
+    if not resp:
         test.is_passing = False
         test.comments = "Exceptions Noted. No CloudTrail trails are configured."
         return test
 
-    for trail in trails:
+    for trail in resp.get("trailList", []):
         trail_name = trail["Name"]
         sample = Sample(sample_id={"trail_name": trail_name})
         if sample.check_excluded(test, audit):
@@ -1366,13 +1402,14 @@ def test_cloudtrail_s3_bucket_protection(audit, test_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    ct = audit.session.client("cloudtrail")
-    trails = audit.evidence_client.get_aws(
+    resp = audit.evidence_client.get_aws(
         "cloudtrail/trails.json",
-        lambda: ct.describe_trails()
-    ).get("trailList", [])
+        service="cloudtrail",
+        method="describe_trails",
+        method_kwargs={"includeShadowTrails": False}
+    )
 
-    for trail in trails:
+    for trail in resp.get("trailList", []):
         trail_name = trail.get("Name")
         bucket_name = trail.get("S3BucketName")
 
@@ -1384,11 +1421,12 @@ def test_cloudtrail_s3_bucket_protection(audit, test_id, risk_rating=3):
             sample.comments = "Trail does not have an associated S3 bucket."
             test.samples.append(sample)
             continue
-
         # Fetch public access block
         public_access_block = audit.evidence_client.get_aws(
             f"s3/buckets/{bucket_name}/public_access_block.json",
-            lambda: audit.session.client("s3").get_public_access_block(Bucket=bucket_name),
+            service="s3",
+            method="get_public_access_block",
+            method_kwargs={"Bucket": bucket_name},
             not_found_codes=["NoSuchPublicAccessBlockConfiguration"]
         )
 
@@ -1446,16 +1484,17 @@ def test_cloudtrail_logging_recent_stops(audit, test_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    ct = audit.session.client("cloudtrail")
-    trails = audit.evidence_client.get_aws(
+    resp = audit.evidence_client.get_aws(
         "cloudtrail/trails.json",
-        lambda: ct.describe_trails()
-    ).get("trailList", [])
+        service="cloudtrail",
+        method="describe_trails",
+        method_kwargs={"includeShadowTrails": False}
+    )
 
     now = datetime.now(timezone.utc)
     lookback_threshold = now - timedelta(days=lookback_days)
 
-    for trail in trails:
+    for trail in trails.get("trailList", []):
         trail_name = trail.get("Name")
         sample = Sample(sample_id={"trail_name": trail_name})
         if sample.check_excluded(test, audit):
@@ -1463,7 +1502,9 @@ def test_cloudtrail_logging_recent_stops(audit, test_id, risk_rating=3):
 
         status = audit.evidence_client.get_aws(
             f"cloudtrail/trails/{trail_name}/trail_status.json",
-            lambda: ct.get_trail_status(Name=trail_name)
+            service="cloudtrail",
+            method="get_trail_status",
+            method_kwargs={"Name": trail["TrailARN"]}
         )
 
         is_logging = status.get("IsLogging", False)
