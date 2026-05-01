@@ -162,7 +162,7 @@ def test_s3_public_access(audit, test_id, risk_rating=3):
             method="get_public_access_block",
             method_kwargs={"Bucket": bucket_name},
             not_found_codes=["NoSuchPublicAccessBlockConfiguration"]
-        )        
+        )   
         if not public_access_block:
             sample.comments = "No Public Access Block configuration found."
             test.samples.append(sample)
@@ -1301,10 +1301,11 @@ def test_cloudtrail_multi_region(audit, test_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    ct = audit.session.client("cloudtrail")
     trails = audit.evidence_client.get_aws(
         "cloudtrail/trails.json",
-        lambda: ct.describe_trails(includeShadowTrails=False)
+        service="cloudtrail",
+        method="describe_trails",
+        method_kwargs={"includeShadowTrails": False}
     ).get("trailList", [])
 
     if not trails:
@@ -1318,7 +1319,9 @@ def test_cloudtrail_multi_region(audit, test_id, risk_rating=3):
             continue
         status = audit.evidence_client.get_aws(
             f"cloudtrail/trails/{trail['Name']}/trail_status.json",
-            lambda: ct.get_trail_status(Name=trail["TrailARN"])
+            service="cloudtrail",
+            method="get_trail_status",
+            method_kwargs={"Name": trail["TrailARN"]}
         )
         if status.get("IsLogging", False):
             found_valid_trail = True
@@ -1348,18 +1351,19 @@ def test_cloudtrail_log_file_validation(audit, test_id, risk_rating=2):
         risk_rating=risk_rating
     )
 
-    ct = audit.session.client("cloudtrail")
-    trails = audit.evidence_client.get_aws(
+    resp = audit.evidence_client.get_aws(
         "cloudtrail/trails.json",
-        lambda: ct.describe_trails(includeShadowTrails=False)
-    ).get("trailList", [])
+        service="cloudtrail",
+        method="describe_trails",
+        method_kwargs={"includeShadowTrails": False}
+    ) 
 
-    if not trails:
+    if not resp:
         test.is_passing = False
         test.comments = "Exceptions Noted. No CloudTrail trails are configured."
         return test
 
-    for trail in trails:
+    for trail in resp.get("trailList", []):
         trail_name = trail["Name"]
         sample = Sample(sample_id={"trail_name": trail_name})
         if sample.check_excluded(test, audit):
@@ -1398,13 +1402,14 @@ def test_cloudtrail_s3_bucket_protection(audit, test_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    ct = audit.session.client("cloudtrail")
-    trails = audit.evidence_client.get_aws(
+    resp = audit.evidence_client.get_aws(
         "cloudtrail/trails.json",
-        lambda: ct.describe_trails()
-    ).get("trailList", [])
+        service="cloudtrail",
+        method="describe_trails",
+        method_kwargs={"includeShadowTrails": False}
+    )
 
-    for trail in trails:
+    for trail in resp.get("trailList", []):
         trail_name = trail.get("Name")
         bucket_name = trail.get("S3BucketName")
 
@@ -1416,11 +1421,12 @@ def test_cloudtrail_s3_bucket_protection(audit, test_id, risk_rating=3):
             sample.comments = "Trail does not have an associated S3 bucket."
             test.samples.append(sample)
             continue
-
         # Fetch public access block
         public_access_block = audit.evidence_client.get_aws(
             f"s3/buckets/{bucket_name}/public_access_block.json",
-            lambda: audit.session.client("s3").get_public_access_block(Bucket=bucket_name),
+            service="s3",
+            method="get_public_access_block",
+            method_kwargs={"Bucket": bucket_name},
             not_found_codes=["NoSuchPublicAccessBlockConfiguration"]
         )
 
@@ -1478,16 +1484,17 @@ def test_cloudtrail_logging_recent_stops(audit, test_id, risk_rating=3):
         risk_rating=risk_rating
     )
 
-    ct = audit.session.client("cloudtrail")
-    trails = audit.evidence_client.get_aws(
+    resp = audit.evidence_client.get_aws(
         "cloudtrail/trails.json",
-        lambda: ct.describe_trails()
-    ).get("trailList", [])
+        service="cloudtrail",
+        method="describe_trails",
+        method_kwargs={"includeShadowTrails": False}
+    )
 
     now = datetime.now(timezone.utc)
     lookback_threshold = now - timedelta(days=lookback_days)
 
-    for trail in trails:
+    for trail in trails.get("trailList", []):
         trail_name = trail.get("Name")
         sample = Sample(sample_id={"trail_name": trail_name})
         if sample.check_excluded(test, audit):
@@ -1495,7 +1502,9 @@ def test_cloudtrail_logging_recent_stops(audit, test_id, risk_rating=3):
 
         status = audit.evidence_client.get_aws(
             f"cloudtrail/trails/{trail_name}/trail_status.json",
-            lambda: ct.get_trail_status(Name=trail_name)
+            service="cloudtrail",
+            method="get_trail_status",
+            method_kwargs={"Name": trail["TrailARN"]}
         )
 
         is_logging = status.get("IsLogging", False)
