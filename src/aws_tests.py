@@ -30,6 +30,7 @@ def run_test_safely(audit, test_fn, test_id):
         return test
 
 def run_all_tests(audit):
+    print('Running all AWS tests')
     # TODO: Add IAM tests (IAM User Stale Access Keys)
     # TODO: Add S3 object owner check
     # TODO: Add EC2 Public Ports (22, RDS, all ports, etc)
@@ -1702,14 +1703,12 @@ def test_guardduty_enabled(audit, test_id, risk_rating=3):
         if sample.check_excluded(test, audit):
             continue
 
-        detectors = (
-            audit.evidence_client.get_aws(
-                f"guardduty/{region}/detectors.json",
-                service="guardduty",
-                region=region,
-                method="list_detectors"
-            ) or {}
-        ).get("DetectorIds", [])
+        detectors = audit.evidence_client.get_aws(
+            f"guardduty/{region}/detectors.json",
+            service="guardduty",
+            region=region,
+            method="list_detectors"
+        )
 
         if not detectors:
             sample.is_passing = False
@@ -1719,7 +1718,7 @@ def test_guardduty_enabled(audit, test_id, risk_rating=3):
 
         enabled_detector_found = False
 
-        for detector_id in detectors:
+        for detector_id in detectors.get("DetectorIds"):
             config = audit.evidence_client.get_aws(
                 f"guardduty/{region}/{detector_id}/config.json",
                 service="guardduty",

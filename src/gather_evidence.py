@@ -103,7 +103,7 @@ def save_iam_evidence(evidence_client):
     save_json(credentialReport, f"{evidence_client.base_path}/iam/credentials_report.json")
     # Convert credentials report to a CSV
     decodedCredentialReport = credentialReport['Content'].decode("utf-8")
-    with open("iam/credentials_report.csv", "w") as file:
+    with open(f"{evidence_client.base_path}/iam/credentials_report.csv", "w") as file:
         file.write(decodedCredentialReport)
     
     # Collect IAM administrative access evidence
@@ -319,7 +319,6 @@ def save_iam_evidence(evidence_client):
 def save_guardduty_evidence(evidence_client, in_scope_regions):
     print('Gathering GuardDuty evidence')
     for region in in_scope_regions:
-        print(region)
         guardduty_client = evidence_client.session.client('guardduty', region_name=region)
 
         detectors = evidence_client.get_aws(
