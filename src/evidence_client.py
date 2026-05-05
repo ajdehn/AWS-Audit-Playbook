@@ -78,13 +78,14 @@ class EvidenceClient:
             "ResponseMetadata": last_metadata
         }
 
-    def get_aws(self, relative_path, service=None, region=None, method=None, method_kwargs=None, not_found_codes=None, paginator_params=None):
+    def get_aws(self, relative_path, client=None, service=None, region=None, method=None, method_kwargs=None, not_found_codes=None, paginator_params=None):
         """
             AWS-safe fetch wrapper with optional pagination support.
             Returns requested evidence.
             NOTE: When paginating evidence, the ResponseMetadata is flattened (from the last page).
 
             relative_path: file path describing where evidence should be saved (e.g., s3/buckets.json)
+            client: AWS client. If client is set, service is not required.
             service: AWS service name (e.g., 's3')
             method: AWS method name (e.g., 'list_buckets', 'get_bucket_encryption')
             method_kwargs: dict (arguments to pass to the AWS method). E.g. {"Bucket": "my-bucket"}
@@ -103,11 +104,12 @@ class EvidenceClient:
                 raise RuntimeError("Attempted AWS fetch in cache_only mode")
 
             try:
-                # Create client internally
-                if service:
-                    client = self._get_client(service, region=region)
-                else:
-                    raise ValueError("Service is required when calling get_aws()")
+                resolved_client = client
+
+                if resolved_client is None:
+                    if service is None:
+                        raise ValueError("Service is required when client is not provided")
+                    resolved_client = self._get_client(service, region=region)
 
                 # Option 1: Handle pagination
                 if paginator_params:
@@ -121,18 +123,18 @@ class EvidenceClient:
                         )
 
                     return self._paginate(
-                        client=client,
+                        client=resolved_client,
                         method_name=paginator_params["method_name"],
                         pagination_key=paginator_params["pagination_key"],
                         params=paginator_params.get("params")
                     )
 
                 # Option 2: Direct method call
-                if service and method:
-                    fn = getattr(client, method)
+                if method:
+                    fn = getattr(resolved_client, method)
                     return fn(**(method_kwargs or {}))
 
-                raise ValueError("Must provide either paginator_params or service+method")
+                raise ValueError("Must provide either paginator_params or method")
 
             except botocore.exceptions.ClientError as e:
                 code = e.response.get("Error", {}).get("Code")
