@@ -3,6 +3,7 @@ from utils import (confirm_delete_folder, save_json, create_session, load_config
 get_aws_account_id, get_in_scope_regions)
 from build_report import generate_pdf_report
 from audit import Audit
+from gather_evidence import save_audit_evidence
 
 if __name__ == "__main__":
     print("\nRunning the AWS Audit Playbook (maintained by AJ Dehn - AuditOps.io)\n")
@@ -13,11 +14,16 @@ if __name__ == "__main__":
 
     audit = Audit(tmp_folder=tmp_folder_name)
     audit.session = create_session()
-    # TODO: Fully transfer audit.session to EvidenceClient.
+
+    # TODO: Transfer audit.session to EvidenceClient.
     audit.evidence_client.session = audit.session
     audit.config = load_config("config.json")
     audit.aws_account_id = get_aws_account_id(audit.session)
     audit.in_scope_regions = get_in_scope_regions(audit)
+
+    # NOTE: Slightly more efficient because it doesn't create a client each time it calls get_aws().
+    # NOTE: Also used to collect evidence that isn't associated with a test (e.g. iam structure)
+    save_audit_evidence(audit.evidence_client, audit.in_scope_regions)
 
     audit.test_results = run_all_tests(audit)
 
