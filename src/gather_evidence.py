@@ -93,7 +93,7 @@ def save_iam_evidence(evidence_client):
         try:
             credentialReport = iam_client.get_credential_report()
             break  # success = report is ready
-        except botocore.exceptions.ClientError as e:
+        except ClientError as e:
             if e.response["Error"]["Code"] == "CredentialReportNotReady":
                 time.sleep(2)
                 continue
