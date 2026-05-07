@@ -8,8 +8,8 @@ This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) foun
 
 ## Project Overview
 - Documentation:
+   - [Test Library](./test_library/): Documentation for how to perform audit tests on various AWS services. Each test includes a test description, an example risk, and detailed test procedures with links to the [boto3](https://docs.aws.amazon.com/boto3/latest/) documentation.
    - [Evidence Library](./evidence_library/): Example audit evidence generated and saved in a consistent format.
-   - [Test Library](./tests/): Documentation for how to perform audit tests on various AWS services. Each test includes a test description, an example risk, and detailed test procedures with links to the [boto3](https://docs.aws.amazon.com/boto3/latest/) documentation.
 - Logic / Python Scripts:
    - [run_audit.py](./src/run_audit.py): Builds config file, defines scope, and runs aws_tests.py.
    - [aws_tests.py](./src/aws_tests.py): Gathers evidence from boto3 (no screenshots required) and performs audit testing.
