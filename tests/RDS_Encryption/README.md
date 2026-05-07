@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 RDS instances in the AWS account are encrypted.
 
 ## Example Risk

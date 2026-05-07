@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 RDS instances in the AWS account have tags applied.
 
 ## Example Risk

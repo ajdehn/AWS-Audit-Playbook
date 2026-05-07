@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 AWS administrative access is appropriately restricted.
 
 ## Required Evidence

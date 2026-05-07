@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 GuardDuty is configured to send alerts to relevant personnel, for each in-scope region.
 
 ## Example Risk

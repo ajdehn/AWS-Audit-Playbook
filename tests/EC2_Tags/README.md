@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 EC2 instances have appropriate tags applied.
 
 ## Example Risk

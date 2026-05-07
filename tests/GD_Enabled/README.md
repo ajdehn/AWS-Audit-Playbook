@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 GuardDuty is enabled for in-scope regions.
 
 ## Example Risk

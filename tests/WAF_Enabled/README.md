@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 Web Application Firewall (WAF) is configured to protect Application Load Balancers and API Gateways.
 
 ## Example Risk

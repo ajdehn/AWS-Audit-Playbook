@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 EBS volumes are encrypted.
 
 ## Example Risk

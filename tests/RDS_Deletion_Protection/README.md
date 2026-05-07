@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 RDS instances have deletion protection enabled at the cluster or instance level.
 
 ## Example Risk

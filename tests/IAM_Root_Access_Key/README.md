@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 The AWS root account does not have any active access keys.
 
 ## Example Risk

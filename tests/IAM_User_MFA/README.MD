@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 IAM users with an active password must have MFA enabled.
 
 ## Example Risk

@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 The AWS root account has MFA enabled.
 
 ## Example Risk

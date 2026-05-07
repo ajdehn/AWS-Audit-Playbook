@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 AWS passwords must comply with the organization's password complexity requirements.
 
 ## Example Risk

@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 Security group rules open to the internet are appropriately restricted.
 
 ## Example Risk

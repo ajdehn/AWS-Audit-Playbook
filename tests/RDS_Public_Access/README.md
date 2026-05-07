@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 RDS instances are configured to block public access.
 
 ## Example Risk

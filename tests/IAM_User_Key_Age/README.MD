@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 IAM access keys are rotated at least every 90 days.
 
 ## Example Risk

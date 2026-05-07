@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 RDS backups are retained for at least 14 days.
 - **NOTE:** Number of days should be updated to reflect the client's retention period.
 

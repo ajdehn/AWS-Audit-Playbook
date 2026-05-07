@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 S3 buckets in the AWS account have appropriate tags applied.
 
 ## Example Risk

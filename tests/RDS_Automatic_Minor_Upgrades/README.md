@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 RDS instances have automatic minor version upgrades enabled.
 
 ## Example Risk

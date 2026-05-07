@@ -1,4 +1,4 @@
-## Control Description
+## Test Description
 Management conducts a user access review on at least a quarterly basis.
 
 ## Example Risk
