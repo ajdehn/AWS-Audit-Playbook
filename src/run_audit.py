@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     # TODO: Transfer audit.session to EvidenceClient.
     audit.evidence_client.session = audit.session
-    audit.config = load_config("config.json")
+    audit.config = load_config("config.json", audit)
     audit.aws_account_id = get_aws_account_id(audit.session)
     audit.in_scope_regions = get_in_scope_regions(audit)
 

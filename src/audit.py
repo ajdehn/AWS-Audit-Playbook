@@ -10,8 +10,10 @@ class Audit:
         self.config = None
         self.session = None
         self.aws_account_id = None
-        self.test_results = None        
+        self.test_results = None
         self.in_scope_regions = None
+        self.sample_exclusion_index = None
+        self.test_exclusion_index = None
 
     def to_dict(self):
         return {

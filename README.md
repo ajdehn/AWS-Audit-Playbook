@@ -79,49 +79,50 @@ external_id = "a1b2c3d4e5f6g7h8i9"  # Update with your actual external id.
     "rds_backup_retention_days": 14,
     "base_required_tags": ["owner", "description", "classification"]
   },
-  "test_exclusions": {
-    "EXAMPLE TEST ID": {
+  "test_exclusions": [
+    {
+      "test_id": "test_id_1",
       "rationale": "Based on discussion with DevOps, we agreed this test is not needed to mitigate risk.",
       "permanent": true,
       "expiration_date": null
     },
-    "EXAMPLE TEST ID 2": {
+    {
+      "test_id": "test_id_2",
       "rationale": "Engineering is currently implementing this test. Pausing monitoring until December 31st, 2026.",
       "permanent": false,
       "expiration_date": "2026-12-31"
     }
-  },
-  "sample_exclusions": {
-    "IAM User Key Age": [
-      {
-        "sample_id": {
-          "user": "itauditguy",
-          "access_key_id": "AKIA3TURCXF5GCAELVHX"
-        },
-        "rationale": "This is a very old access key for demo purposes.",
-        "permanent": true,
-        "expiration_date": null
+  ],
+  "sample_exclusions": [
+    {
+      "test_id": "iam_user_key_age",
+      "sample_id": {
+        "user": "user1",
+        "access_key_id": "AKIA3TURCXF5GCAELVHX"
       },
-      {
-        "sample_id": {
-          "user": "anotheruser",
-          "access_key_id": "AKIAEXAMPLE123"
-        },
-        "rationale": "Another test key to ignore",
-        "permanent": false,
-        "expiration_date": "2026-12-31"
-      }
-    ],
-    "S3 Public Access": [
-      {
-        "sample_id": {
-          "bucket_name": "demo-bucket"
-        },
-        "rationale": "This bucket is intentionally public for testing",
-        "permanent": false,
-        "expiration_date": "2026-12-31"
-      }
-    ]
-  }
+      "rationale": "This is a very old access key for demo purposes.",
+      "permanent": true,
+      "expiration_date": null
+    },
+    {
+      "test_id": "iam_user_key_age",
+      "sample_id": {
+        "user": "user2",
+        "access_key_id": "AKIAEXAMPLE123"
+      },
+      "rationale": "Another test key to ignore",
+      "permanent": false,
+      "expiration_date": "2026-12-31"
+    },
+    {
+      "test_id": "s3_public_access",
+      "sample_id": {
+        "bucket_name": "demo-bucket"
+      },
+      "rationale": "This bucket is intentionally public for testing",
+      "permanent": false,
+      "expiration_date": "2026-12-31"
+    }
+  ]
 }
 ```

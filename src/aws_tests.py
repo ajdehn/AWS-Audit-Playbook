@@ -70,7 +70,7 @@ def run_all_tests(audit):
 
     tests = []
     for test_id, test_fn in test_definitions:
-        if is_test_excluded(test_id, audit.config):
+        if is_test_excluded(test_id, audit):
             # Move to next test.
             continue
         else:

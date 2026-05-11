@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Dict, Any
-
-from utils import is_exclusion_active
+from datetime import date
 
 # NOTE: Samples default to "is_passing: False" until logic determines sample passes the testing criteria.
 @dataclass
@@ -29,20 +28,30 @@ class Sample:
     
     def check_excluded(self, test, audit):
         # Returns true if when sample is excluded in the config file.
-        exclusions = audit.config.get("sample_exclusions", {}).get(test.test_id, [])
-        if not isinstance(exclusions, list):
-            return False  # Invalid sample exclusion structure
+        sample_key = tuple(sorted(self.sample_id.items()))
 
-        for e in exclusions:
-            if not is_exclusion_active(e):
-                continue
+        exclusion = audit.sample_exclusion_index.get((test.test_id, sample_key))
 
-            config_sample_id = e.get("sample_id", {})
+        if not exclusion:
+            return False
 
-            if all(self.sample_id.get(k) == v for k, v in config_sample_id.items()):
-                    self.is_excluded = True
-                    self.comments = "Sample is excluded. See config.json"
-                    # Add excluded sample to tests.
-                    test.samples.append(self)
-                    return True
-        return False
+        is_excluded = False
+        # Permanent exclusions
+        if exclusion["permanent"]:
+            is_excluded = True
+
+        # Check if exclusion is current
+        exp = exclusion["expiration_date"]
+        if exp and date.fromisoformat(exp) >= date.today():
+            is_excluded = True
+
+        # Document result
+        if is_excluded:
+            self.is_excluded = True
+            self.comments = "Sample is excluded. See config.json"
+            # Add excluded sample to tests.
+            test.samples.append(self)
+            return True
+        else:
+            # Exclusion was expired or invalid date format.
+            return False

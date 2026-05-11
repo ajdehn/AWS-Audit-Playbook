@@ -1,7 +1,7 @@
 import json
 import os
 import shutil
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 import boto3
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
@@ -120,10 +120,27 @@ def load_json(file_path):
             return None
     return None
 
-def load_config(file_path):
+def load_config(file_path, audit):
     try:
         with open(file_path, "r") as f:
-            return json.load(f)
+            data = json.load(f)
+            # Build sample exclusion index
+            sample_exclusion_index = {}
+            for item in data["sample_exclusions"]:
+                test_id = item["test_id"]
+                # Convert sample_id dict into a hashable tuple
+                sample_key = tuple(sorted(item["sample_id"].items()))
+                sample_exclusion_index[(test_id, sample_key)] = item
+            audit.sample_exclusion_index = sample_exclusion_index
+
+            # Build test exclusion index
+            test_exclusion_index = {}
+            for item in data["test_exclusions"]:
+                test_exclusion_index[item["test_id"]] = item
+            audit.test_exclusion_index = test_exclusion_index
+
+            return data
+
     except FileNotFoundError:
         # Handle empty config file.
         print(f"Warning: Config file not found: {file_path}")
@@ -131,33 +148,20 @@ def load_config(file_path):
     except json.JSONDecodeError:
         raise ValueError(f"Invalid JSON in config: {file_path}")
 
-"""
-Returns True if the test is excluded.
-"""
-def is_test_excluded(test_id, config):
-    exclusion = config.get("test_exclusions", {}).get(test_id, {})
+def is_test_excluded(test_id, audit):
+     # Returns true if test is excluded in the config file.
+    exclusion = audit.test_exclusion_index.get(test_id)
+
     if not exclusion:
-        return False     
-    return is_exclusion_active(exclusion)
+        return False
 
-"""
-Returns True if exclusion is active and valid.
-"""
-def is_exclusion_active(exclusion):
-    if not isinstance(exclusion, dict):
-        return False  # Invalid exclusion configurations.
-
-    today = datetime.now(timezone.utc).date()
-    if exclusion.get("permanent"):
+    if exclusion["permanent"]:
         return True
-    exp_date = exclusion.get("expiration_date")
-    if exp_date:
-        try:
-            exp_date = datetime.strptime(exp_date, "%Y-%m-%d").date()
-            return exp_date >= today
-        except ValueError:
-            print(f"Invalid Exclusion Date Format: {exclusion}")
-            return False
+
+    # Check if exclusion is current
+    exp = exclusion["expiration_date"]
+    if exp and date.fromisoformat(exp) >= date.today():
+        return True
 
     return False
 
