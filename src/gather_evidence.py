@@ -87,25 +87,6 @@ def save_iam_evidence(evidence_client):
         }
     )
 
-    # Save IAM credentials report (json and csv version). NOTE: This will time out after 30 seconds
-    iam_client.generate_credential_report()
-    for _ in range(30):
-        try:
-            credentialReport = iam_client.get_credential_report()
-            break  # success = report is ready
-        except ClientError as e:
-            if e.response["Error"]["Code"] == "CredentialReportNotReady":
-                time.sleep(2)
-                continue
-            raise
-    else:
-        raise TimeoutError("IAM credential report timed out after 30 seconds.")
-    save_json(credentialReport, f"{evidence_client.base_path}/iam/credentials_report.json")
-    # Convert credentials report to a CSV
-    decodedCredentialReport = credentialReport['Content'].decode("utf-8")
-    with open(f"{evidence_client.base_path}/iam/credentials_report.csv", "w") as file:
-        file.write(decodedCredentialReport)
-    
     # Collect IAM administrative access evidence
     policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
     users = evidence_client.get_aws(
