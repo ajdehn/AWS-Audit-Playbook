@@ -663,7 +663,7 @@ def test_rds_encryption(audit, test_id, risk_rating=2):
         test_description="RDS instances are encrypted at rest.",
         test_procedures=[
             "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
-            "For each in-scope region, saved the list of RDS instances: rds/region_name/db_instances.json.",
+            "For each in-scope region, saved the list of RDS instances: rds/[region_name]/db_instances.json.",
             "For each RDS instance, inspected the `StorageEncrypted` setting to determine if it was set to `true`."
         ],
         test_attributes=[],
