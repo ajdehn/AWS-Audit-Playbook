@@ -1,0 +1,38 @@
+{
+    "Role": {
+        "Path": "/aws-service-role/trustedadvisor.amazonaws.com/",
+        "RoleName": "AWSServiceRoleForTrustedAdvisor",
+        "RoleId": "AROA3TURCXF5NK7MZ4FVH",
+        "Arn": "arn:aws:iam::798094440826:role/aws-service-role/trustedadvisor.amazonaws.com/AWSServiceRoleForTrustedAdvisor",
+        "CreateDate": "2022-08-12 02:09:07+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "trustedadvisor.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        },
+        "Description": "Access for the AWS Trusted Advisor Service to help reduce cost, increase performance, and improve security of your AWS environment.",
+        "MaxSessionDuration": 3600,
+        "RoleLastUsed": {
+            "LastUsedDate": "2023-01-22 16:19:13+00:00",
+            "Region": "us-east-1"
+        }
+    },
+    "ResponseMetadata": {
+        "RequestId": "8aa077f8-eece-4ac8-b629-f87083523236",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:03:02 GMT",
+            "x-amzn-requestid": "8aa077f8-eece-4ac8-b629-f87083523236",
+            "content-type": "text/xml",
+            "content-length": "1230"
+        },
+        "RetryAttempts": 0
+    }
+}

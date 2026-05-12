@@ -1,0 +1,34 @@
+{
+    "Role": {
+        "Path": "/aws-service-role/auditmanager.amazonaws.com/",
+        "RoleName": "AWSServiceRoleForAuditManager",
+        "RoleId": "AROA3TURCXF5KQP4HVRFL",
+        "Arn": "arn:aws:iam::798094440826:role/aws-service-role/auditmanager.amazonaws.com/AWSServiceRoleForAuditManager",
+        "CreateDate": "2025-11-03 19:27:26+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "auditmanager.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        },
+        "MaxSessionDuration": 3600,
+        "RoleLastUsed": {}
+    },
+    "ResponseMetadata": {
+        "RequestId": "e6a9556e-2b82-4f83-91d1-48c891e256a0",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:03:00 GMT",
+            "x-amzn-requestid": "e6a9556e-2b82-4f83-91d1-48c891e256a0",
+            "content-type": "text/xml",
+            "content-length": "941"
+        },
+        "RetryAttempts": 0
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "AccessKeyMetadata": [
+        {
+            "UserName": "student1",
+            "AccessKeyId": "AKIA3TURCXF5K4HRB55Z",
+            "Status": "Active",
+            "CreateDate": "2026-04-30 19:13:09+00:00"
+        }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "82764bf3-e8b3-4eba-9df4-70d60da9610d",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:03:09 GMT",
+            "x-amzn-requestid": "82764bf3-e8b3-4eba-9df4-70d60da9610d",
+            "content-type": "text/xml",
+            "content-length": "556"
+        },
+        "RetryAttempts": 0
+    }
+}

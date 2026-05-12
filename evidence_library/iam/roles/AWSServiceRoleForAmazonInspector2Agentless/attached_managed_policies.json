@@ -1,0 +1,19 @@
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "AmazonInspector2AgentlessServiceRolePolicy",
+            "PolicyArn": "arn:aws:iam::aws:policy/aws-service-role/AmazonInspector2AgentlessServiceRolePolicy"
+        }
+    ],
+    "ResponseMetadata": {
+        "RequestId": "35b57cf6-012e-46fc-901a-6b47535ae02f",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:03:00 GMT",
+            "x-amzn-requestid": "35b57cf6-012e-46fc-901a-6b47535ae02f",
+            "content-type": "text/xml",
+            "content-length": "605"
+        },
+        "RetryAttempts": 0
+    }
+}

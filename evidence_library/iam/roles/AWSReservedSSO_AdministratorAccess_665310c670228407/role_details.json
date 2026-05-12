@@ -1,0 +1,45 @@
+{
+    "Role": {
+        "Path": "/aws-reserved/sso.amazonaws.com/us-east-2/",
+        "RoleName": "AWSReservedSSO_AdministratorAccess_665310c670228407",
+        "RoleId": "AROA3TURCXF5DFY5JBCRY",
+        "Arn": "arn:aws:iam::798094440826:role/aws-reserved/sso.amazonaws.com/us-east-2/AWSReservedSSO_AdministratorAccess_665310c670228407",
+        "CreateDate": "2026-04-11 21:16:38+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Federated": "arn:aws:iam::798094440826:saml-provider/AWSSSO_422d0509b89c5f10_DO_NOT_DELETE"
+                    },
+                    "Action": [
+                        "sts:AssumeRoleWithSAML",
+                        "sts:TagSession"
+                    ],
+                    "Condition": {
+                        "StringEquals": {
+                            "SAML:aud": "https://signin.aws.amazon.com/saml"
+                        }
+                    }
+                }
+            ]
+        },
+        "MaxSessionDuration": 43200,
+        "RoleLastUsed": {
+            "LastUsedDate": "2026-05-06 20:47:01+00:00",
+            "Region": "us-east-1"
+        }
+    },
+    "ResponseMetadata": {
+        "RequestId": "07e99895-a5d6-498c-acb8-48a28e6f94a6",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:02:59 GMT",
+            "x-amzn-requestid": "07e99895-a5d6-498c-acb8-48a28e6f94a6",
+            "content-type": "text/xml",
+            "content-length": "1319"
+        },
+        "RetryAttempts": 0
+    }
+}

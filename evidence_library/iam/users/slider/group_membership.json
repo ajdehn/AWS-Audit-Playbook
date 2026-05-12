@@ -4,17 +4,16 @@
             "Path": "/",
             "GroupName": "Admin-Group",
             "GroupId": "AGPA3TURCXF5BRURZGNO6",
-            "Arn": "arn:aws:iam::111111111111:group/Admin-Group",
+            "Arn": "arn:aws:iam::798094440826:group/Admin-Group",
             "CreateDate": "2022-08-12 22:26:44+00:00"
         }
     ],
-    "IsTruncated": false,
     "ResponseMetadata": {
-        "RequestId": "77eeb470-9090-407c-956a-806ec60f8424",
+        "RequestId": "f6f54fcb-1c7d-4f88-beb0-ff653676a57a",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "date": "Fri, 06 Feb 2026 16:24:44 GMT",
-            "x-amzn-requestid": "77eeb470-9090-407c-956a-806ec60f8424",
+            "date": "Mon, 11 May 2026 21:02:58 GMT",
+            "x-amzn-requestid": "f6f54fcb-1c7d-4f88-beb0-ff653676a57a",
             "content-type": "text/xml",
             "content-length": "598"
         },

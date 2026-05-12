@@ -1,0 +1,37 @@
+{
+    "Role": {
+        "Path": "/aws-service-role/resource-explorer-2.amazonaws.com/",
+        "RoleName": "AWSServiceRoleForResourceExplorer",
+        "RoleId": "AROA3TURCXF5LC7KDPOJ4",
+        "Arn": "arn:aws:iam::798094440826:role/aws-service-role/resource-explorer-2.amazonaws.com/AWSServiceRoleForResourceExplorer",
+        "CreateDate": "2025-11-02 22:53:36+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "resource-explorer-2.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        },
+        "MaxSessionDuration": 3600,
+        "RoleLastUsed": {
+            "LastUsedDate": "2026-05-11 19:01:45+00:00",
+            "Region": "us-east-2"
+        }
+    },
+    "ResponseMetadata": {
+        "RequestId": "d6fdef9a-36bf-4dcf-bc01-e64397f3bfa3",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:03:01 GMT",
+            "x-amzn-requestid": "d6fdef9a-36bf-4dcf-bc01-e64397f3bfa3",
+            "content-type": "text/xml",
+            "content-length": "1084"
+        },
+        "RetryAttempts": 0
+    }
+}

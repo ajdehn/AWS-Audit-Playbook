@@ -1,0 +1,40 @@
+{
+    "Role": {
+        "Path": "/",
+        "RoleName": "AuditOps",
+        "RoleId": "AROA3TURCXF5IDAWBYCE4",
+        "Arn": "arn:aws:iam::798094440826:role/AuditOps",
+        "CreateDate": "2026-03-19 13:37:35+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "AWS": "arn:aws:iam::918184721625:root"
+                    },
+                    "Action": "sts:AssumeRole",
+                    "Condition": {
+                        "StringEquals": {
+                            "sts:ExternalId": "u5WRCEkJZ3KMW2Rzvr7P"
+                        }
+                    }
+                }
+            ]
+        },
+        "Description": "Grant AuditOps access to perform a gap assessment.",
+        "MaxSessionDuration": 3600,
+        "RoleLastUsed": {}
+    },
+    "ResponseMetadata": {
+        "RequestId": "3812c67a-fb92-4835-af3f-e86232bbac89",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:02:59 GMT",
+            "x-amzn-requestid": "3812c67a-fb92-4835-af3f-e86232bbac89",
+            "content-type": "text/xml",
+            "content-length": "1010"
+        },
+        "RetryAttempts": 0
+    }
+}

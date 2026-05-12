@@ -5,13 +5,12 @@
             "PolicyArn": "arn:aws:iam::aws:policy/IAMUserChangePassword"
         }
     ],
-    "IsTruncated": false,
     "ResponseMetadata": {
-        "RequestId": "4022e459-40dc-47f9-b569-40c06fe92410",
+        "RequestId": "5295f7a5-71b9-4265-a0fd-b58f2df892e4",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "date": "Fri, 06 Feb 2026 16:24:43 GMT",
-            "x-amzn-requestid": "4022e459-40dc-47f9-b569-40c06fe92410",
+            "date": "Mon, 11 May 2026 21:02:57 GMT",
+            "x-amzn-requestid": "5295f7a5-71b9-4265-a0fd-b58f2df892e4",
             "content-type": "text/xml",
             "content-length": "546"
         },

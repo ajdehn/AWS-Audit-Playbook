@@ -1,86 +1,62 @@
 {
     "Events": [
         {
-            "EventId": "c477b540-5bd7-47dd-bc49-793905464130",
+            "EventId": "fc72a4a6-a89e-4352-92e8-7782ab1575d8",
             "EventName": "CreateUser",
             "ReadOnly": "false",
-            "AccessKeyId": "ASIA3TURCXF5C4ZPQ2X7",
-            "EventTime": "2025-11-19 20:17:38-06:00",
+            "AccessKeyId": "ASIA3TURCXF5DDYJWRQK",
+            "EventTime": "2026-04-30 14:06:08-05:00",
             "EventSource": "iam.amazonaws.com",
-            "Username": "itauditguy",
+            "Username": "aj.dehn",
             "Resources": [
                 {
                     "ResourceType": "AWS::IAM::User",
-                    "ResourceName": "audit-user"
+                    "ResourceName": "student1"
                 },
                 {
                     "ResourceType": "AWS::IAM::User",
-                    "ResourceName": "AIDA3TURCXF5E5SNJH4AA"
+                    "ResourceName": "arn:aws:iam::798094440826:user/student1"
                 },
                 {
                     "ResourceType": "AWS::IAM::User",
-                    "ResourceName": "arn:aws:iam::111111111111:user/audit-user"
+                    "ResourceName": "AIDA3TURCXF5NTC4AKKET"
                 }
             ],
-            "CloudTrailEvent": "{\"eventVersion\":\"1.11\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"AIDA3TURCXF5MUI5NKMTI\",\"arn\":\"arn:aws:iam::111111111111:user/itauditguy\",\"accountId\":\"111111111111\",\"accessKeyId\":\"ASIA3TURCXF5C4ZPQ2X7\",\"userName\":\"itauditguy\",\"sessionContext\":{\"attributes\":{\"creationDate\":\"2025-11-20T01:49:58Z\",\"mfaAuthenticated\":\"true\"}}},\"eventTime\":\"2025-11-20T02:17:38Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"CreateUser\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"65.128.118.149\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36\",\"requestParameters\":{\"userName\":\"audit-user\"},\"responseElements\":{\"user\":{\"path\":\"/\",\"userName\":\"audit-user\",\"userId\":\"AIDA3TURCXF5E5SNJH4AA\",\"arn\":\"arn:aws:iam::111111111111:user/audit-user\",\"createDate\":\"Nov 20, 2025, 2:17:38\u202fAM\"}},\"requestID\":\"8015725b-ad9b-4237-a635-cb15c195d9dc\",\"eventID\":\"c477b540-5bd7-47dd-bc49-793905464130\",\"readOnly\":false,\"eventType\":\"AwsApiCall\",\"managementEvent\":true,\"recipientAccountId\":\"111111111111\",\"eventCategory\":\"Management\",\"tlsDetails\":{\"tlsVersion\":\"TLSv1.3\",\"cipherSuite\":\"TLS_AES_128_GCM_SHA256\",\"clientProvidedHostHeader\":\"iam.amazonaws.com\"},\"sessionCredentialFromConsole\":\"true\"}"
+            "CloudTrailEvent": "{\"eventVersion\":\"1.11\",\"userIdentity\":{\"type\":\"AssumedRole\",\"principalId\":\"AROA3TURCXF5DFY5JBCRY:aj.dehn\",\"arn\":\"arn:aws:sts::798094440826:assumed-role/AWSReservedSSO_AdministratorAccess_665310c670228407/aj.dehn\",\"accountId\":\"798094440826\",\"accessKeyId\":\"ASIA3TURCXF5DDYJWRQK\",\"sessionContext\":{\"sessionIssuer\":{\"type\":\"Role\",\"principalId\":\"AROA3TURCXF5DFY5JBCRY\",\"arn\":\"arn:aws:iam::798094440826:role/aws-reserved/sso.amazonaws.com/us-east-2/AWSReservedSSO_AdministratorAccess_665310c670228407\",\"accountId\":\"798094440826\",\"userName\":\"AWSReservedSSO_AdministratorAccess_665310c670228407\"},\"attributes\":{\"creationDate\":\"2026-04-30T18:58:00Z\",\"mfaAuthenticated\":\"false\"}}},\"eventTime\":\"2026-04-30T19:06:08Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"CreateUser\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"65.128.118.149\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\",\"requestParameters\":{\"userName\":\"student1\"},\"responseElements\":{\"user\":{\"path\":\"/\",\"userName\":\"student1\",\"userId\":\"AIDA3TURCXF5NTC4AKKET\",\"arn\":\"arn:aws:iam::798094440826:user/student1\",\"createDate\":\"Apr 30, 2026, 7:06:08\u202fPM\"}},\"requestID\":\"b5f99a30-1835-4992-869a-8fb45837e2fc\",\"eventID\":\"fc72a4a6-a89e-4352-92e8-7782ab1575d8\",\"readOnly\":false,\"eventType\":\"AwsApiCall\",\"managementEvent\":true,\"recipientAccountId\":\"798094440826\",\"eventCategory\":\"Management\",\"tlsDetails\":{\"tlsVersion\":\"TLSv1.3\",\"cipherSuite\":\"TLS_AES_128_GCM_SHA256\",\"clientProvidedHostHeader\":\"iam.amazonaws.com\"},\"sessionCredentialFromConsole\":\"true\"}"
         },
         {
-            "EventId": "4dc2a118-a76c-4a69-9e87-e9f7efc83488",
+            "EventId": "42a2042e-74dc-4229-aab7-c70f9300b168",
             "EventName": "CreateUser",
             "ReadOnly": "false",
-            "AccessKeyId": "ASIA3TURCXF5C43S3C7F",
-            "EventTime": "2025-11-19 20:14:34-06:00",
+            "AccessKeyId": "ASIA3TURCXF5I5ZZFNDU",
+            "EventTime": "2026-04-10 10:15:56-05:00",
             "EventSource": "iam.amazonaws.com",
             "Username": "itauditguy",
             "Resources": [
+                {
+                    "ResourceType": "AWS::IAM::User",
+                    "ResourceName": "AIDA3TURCXF5H5HTX6BT3"
+                },
                 {
                     "ResourceType": "AWS::IAM::User",
                     "ResourceName": "audit-user"
                 },
                 {
                     "ResourceType": "AWS::IAM::User",
-                    "ResourceName": "arn:aws:iam::111111111111:user/audit-user"
-                },
-                {
-                    "ResourceType": "AWS::IAM::User",
-                    "ResourceName": "AIDA3TURCXF5BOIBUE6CC"
+                    "ResourceName": "arn:aws:iam::798094440826:user/audit-user"
                 }
             ],
-            "CloudTrailEvent": "{\"eventVersion\":\"1.11\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"AIDA3TURCXF5MUI5NKMTI\",\"arn\":\"arn:aws:iam::111111111111:user/itauditguy\",\"accountId\":\"111111111111\",\"accessKeyId\":\"ASIA3TURCXF5C43S3C7F\",\"userName\":\"itauditguy\",\"sessionContext\":{\"attributes\":{\"creationDate\":\"2025-11-20T01:49:58Z\",\"mfaAuthenticated\":\"true\"}}},\"eventTime\":\"2025-11-20T02:14:34Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"CreateUser\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"65.128.118.149\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36\",\"requestParameters\":{\"userName\":\"audit-user\"},\"responseElements\":{\"user\":{\"path\":\"/\",\"userName\":\"audit-user\",\"userId\":\"AIDA3TURCXF5BOIBUE6CC\",\"arn\":\"arn:aws:iam::111111111111:user/audit-user\",\"createDate\":\"Nov 20, 2025, 2:14:34\u202fAM\"}},\"requestID\":\"e4bfa1e4-1460-4728-978f-868d68e506ae\",\"eventID\":\"4dc2a118-a76c-4a69-9e87-e9f7efc83488\",\"readOnly\":false,\"eventType\":\"AwsApiCall\",\"managementEvent\":true,\"recipientAccountId\":\"111111111111\",\"eventCategory\":\"Management\",\"tlsDetails\":{\"tlsVersion\":\"TLSv1.3\",\"cipherSuite\":\"TLS_AES_128_GCM_SHA256\",\"clientProvidedHostHeader\":\"iam.amazonaws.com\"},\"sessionCredentialFromConsole\":\"true\"}"
-        },
-        {
-            "EventId": "91bec020-91f7-45e3-bb62-4ad903cbe109",
-            "EventName": "CreateUser",
-            "ReadOnly": "false",
-            "AccessKeyId": "ASIA3TURCXF5LT4RCDAX",
-            "EventTime": "2025-11-17 11:41:49-06:00",
-            "EventSource": "iam.amazonaws.com",
-            "Username": "itauditguy",
-            "Resources": [
-                {
-                    "ResourceType": "AWS::IAM::User",
-                    "ResourceName": "audit-user"
-                },
-                {
-                    "ResourceType": "AWS::IAM::User",
-                    "ResourceName": "AIDA3TURCXF5FIPUDP4Y6"
-                },
-                {
-                    "ResourceType": "AWS::IAM::User",
-                    "ResourceName": "arn:aws:iam::111111111111:user/audit-user"
-                }
-            ],
-            "CloudTrailEvent": "{\"eventVersion\":\"1.11\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"AIDA3TURCXF5MUI5NKMTI\",\"arn\":\"arn:aws:iam::111111111111:user/itauditguy\",\"accountId\":\"111111111111\",\"accessKeyId\":\"ASIA3TURCXF5LT4RCDAX\",\"userName\":\"itauditguy\",\"sessionContext\":{\"attributes\":{\"creationDate\":\"2025-11-17T17:40:46Z\",\"mfaAuthenticated\":\"true\"}}},\"eventTime\":\"2025-11-17T17:41:49Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"CreateUser\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"65.128.118.149\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36\",\"requestParameters\":{\"userName\":\"audit-user\"},\"responseElements\":{\"user\":{\"path\":\"/\",\"userName\":\"audit-user\",\"userId\":\"AIDA3TURCXF5FIPUDP4Y6\",\"arn\":\"arn:aws:iam::111111111111:user/audit-user\",\"createDate\":\"Nov 17, 2025, 5:41:49\u202fPM\"}},\"requestID\":\"985a72e2-fec8-44dc-a1b9-c5be11909716\",\"eventID\":\"91bec020-91f7-45e3-bb62-4ad903cbe109\",\"readOnly\":false,\"eventType\":\"AwsApiCall\",\"managementEvent\":true,\"recipientAccountId\":\"111111111111\",\"eventCategory\":\"Management\",\"tlsDetails\":{\"tlsVersion\":\"TLSv1.3\",\"cipherSuite\":\"TLS_AES_128_GCM_SHA256\",\"clientProvidedHostHeader\":\"iam.amazonaws.com\"},\"sessionCredentialFromConsole\":\"true\"}"
+            "CloudTrailEvent": "{\"eventVersion\":\"1.11\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"AIDA3TURCXF5MUI5NKMTI\",\"arn\":\"arn:aws:iam::798094440826:user/itauditguy\",\"accountId\":\"798094440826\",\"accessKeyId\":\"ASIA3TURCXF5I5ZZFNDU\",\"userName\":\"itauditguy\",\"sessionContext\":{\"attributes\":{\"creationDate\":\"2026-04-10T15:14:37Z\",\"mfaAuthenticated\":\"true\"}}},\"eventTime\":\"2026-04-10T15:15:56Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"CreateUser\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"65.128.118.149\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\",\"requestParameters\":{\"userName\":\"audit-user\"},\"responseElements\":{\"user\":{\"path\":\"/\",\"userName\":\"audit-user\",\"userId\":\"AIDA3TURCXF5H5HTX6BT3\",\"arn\":\"arn:aws:iam::798094440826:user/audit-user\",\"createDate\":\"Apr 10, 2026, 3:15:56\u202fPM\"}},\"requestID\":\"93e0e97c-8294-4a17-b399-39cfe9a7aa74\",\"eventID\":\"42a2042e-74dc-4229-aab7-c70f9300b168\",\"readOnly\":false,\"eventType\":\"AwsApiCall\",\"managementEvent\":true,\"recipientAccountId\":\"798094440826\",\"eventCategory\":\"Management\",\"tlsDetails\":{\"tlsVersion\":\"TLSv1.3\",\"cipherSuite\":\"TLS_AES_128_GCM_SHA256\",\"clientProvidedHostHeader\":\"iam.amazonaws.com\"},\"sessionCredentialFromConsole\":\"true\"}"
         }
     ],
     "ResponseMetadata": {
-        "RequestId": "6a263570-4e8f-4fa8-8144-c66835ca84c8",
+        "RequestId": "bebe658e-ad54-47a3-944e-2ed339f9cb87",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "x-amzn-requestid": "6a263570-4e8f-4fa8-8144-c66835ca84c8",
+            "x-amzn-requestid": "bebe658e-ad54-47a3-944e-2ed339f9cb87",
             "content-type": "application/x-amz-json-1.1",
-            "content-length": "5577",
-            "date": "Fri, 06 Feb 2026 16:24:36 GMT"
+            "content-length": "4079",
+            "date": "Mon, 11 May 2026 21:02:56 GMT"
         },
         "RetryAttempts": 0
     }

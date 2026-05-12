@@ -1,0 +1,43 @@
+{
+    "Role": {
+        "Path": "/",
+        "RoleName": "aws_audit_playbook",
+        "RoleId": "AROA3TURCXF5HAQSDO2KX",
+        "Arn": "arn:aws:iam::798094440826:role/aws_audit_playbook",
+        "CreateDate": "2026-04-04 22:58:40+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "AWS": "arn:aws:iam::918184721625:root"
+                    },
+                    "Action": "sts:AssumeRole",
+                    "Condition": {
+                        "StringEquals": {
+                            "sts:ExternalId": "u5WRCEkJZ3KMW2Rzvr7P"
+                        }
+                    }
+                }
+            ]
+        },
+        "Description": "",
+        "MaxSessionDuration": 3600,
+        "RoleLastUsed": {
+            "LastUsedDate": "2026-05-11 12:00:06+00:00",
+            "Region": "us-east-1"
+        }
+    },
+    "ResponseMetadata": {
+        "RequestId": "9812e784-b96f-4ef4-8924-d70dd12cfeec",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:03:02 GMT",
+            "x-amzn-requestid": "9812e784-b96f-4ef4-8924-d70dd12cfeec",
+            "content-type": "text/xml",
+            "content-length": "1081"
+        },
+        "RetryAttempts": 0
+    }
+}

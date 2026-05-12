@@ -1,0 +1,19 @@
+{
+    "PolicyUsers": [
+        {
+            "UserName": "maverick",
+            "UserId": "AIDA3TURCXF5LJC66ABNT"
+        }
+    ],
+    "ResponseMetadata": {
+        "RequestId": "b6f31b55-33ab-42e8-a054-1321b559506b",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:02:56 GMT",
+            "x-amzn-requestid": "b6f31b55-33ab-42e8-a054-1321b559506b",
+            "content-type": "text/xml",
+            "content-length": "966"
+        },
+        "RetryAttempts": 0
+    }
+}

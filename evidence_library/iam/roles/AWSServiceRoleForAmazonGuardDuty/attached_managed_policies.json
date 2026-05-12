@@ -1,0 +1,19 @@
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "AmazonGuardDutyServiceRolePolicy",
+            "PolicyArn": "arn:aws:iam::aws:policy/aws-service-role/AmazonGuardDutyServiceRolePolicy"
+        }
+    ],
+    "ResponseMetadata": {
+        "RequestId": "ea809fa4-fa5e-4275-8dab-8113645a297c",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:02:59 GMT",
+            "x-amzn-requestid": "ea809fa4-fa5e-4275-8dab-8113645a297c",
+            "content-type": "text/xml",
+            "content-length": "585"
+        },
+        "RetryAttempts": 0
+    }
+}

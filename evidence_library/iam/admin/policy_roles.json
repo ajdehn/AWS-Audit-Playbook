@@ -1,0 +1,23 @@
+{
+    "PolicyRoles": [
+        {
+            "RoleName": "AWSReservedSSO_AdministratorAccess_665310c670228407",
+            "RoleId": "AROA3TURCXF5DFY5JBCRY"
+        },
+        {
+            "RoleName": "Goose_temp_admin_access",
+            "RoleId": "AROA3TURCXF5LJSI2ERVM"
+        }
+    ],
+    "ResponseMetadata": {
+        "RequestId": "5d43c78d-226f-437f-818a-33a917a72537",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:02:56 GMT",
+            "x-amzn-requestid": "5d43c78d-226f-437f-818a-33a917a72537",
+            "content-type": "text/xml",
+            "content-length": "966"
+        },
+        "RetryAttempts": 0
+    }
+}

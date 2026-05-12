@@ -1,0 +1,38 @@
+{
+    "Role": {
+        "Path": "/aws-service-role/agentless.inspector2.amazonaws.com/",
+        "RoleName": "AWSServiceRoleForAmazonInspector2Agentless",
+        "RoleId": "AROA3TURCXF5H2BB6D5B5",
+        "Arn": "arn:aws:iam::798094440826:role/aws-service-role/agentless.inspector2.amazonaws.com/AWSServiceRoleForAmazonInspector2Agentless",
+        "CreateDate": "2025-12-10 20:05:58+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "agentless.inspector2.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        },
+        "Description": "Allowing Inspector to call AWS services on behalf of customers",
+        "MaxSessionDuration": 3600,
+        "RoleLastUsed": {
+            "LastUsedDate": "2026-05-11 12:06:42+00:00",
+            "Region": "us-east-1"
+        }
+    },
+    "ResponseMetadata": {
+        "RequestId": "eb96277b-0797-4186-b5d5-00af743ab950",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:03:00 GMT",
+            "x-amzn-requestid": "eb96277b-0797-4186-b5d5-00af743ab950",
+            "content-type": "text/xml",
+            "content-length": "1201"
+        },
+        "RetryAttempts": 0
+    }
+}

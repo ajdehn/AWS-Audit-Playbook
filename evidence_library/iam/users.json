@@ -3,9 +3,9 @@
         {
             "Path": "/",
             "UserName": "audit-user",
-            "UserId": "AIDA3TURCXF5E5SNJH4AA",
+            "UserId": "AIDA3TURCXF5H5HTX6BT3",
             "Arn": "arn:aws:iam::798094440826:user/audit-user",
-            "CreateDate": "2025-11-20 02:17:38+00:00"
+            "CreateDate": "2026-04-10 15:15:56+00:00"
         },
         {
             "Path": "/",
@@ -27,7 +27,7 @@
             "UserId": "AIDA3TURCXF5MUI5NKMTI",
             "Arn": "arn:aws:iam::798094440826:user/itauditguy",
             "CreateDate": "2022-11-11 23:41:41+00:00",
-            "PasswordLastUsed": "2026-04-05 22:59:13+00:00"
+            "PasswordLastUsed": "2026-04-11 21:13:05+00:00"
         },
         {
             "Path": "/",
@@ -42,17 +42,23 @@
             "UserId": "AIDA3TURCXF5LJGCKJSJ2",
             "Arn": "arn:aws:iam::798094440826:user/slider",
             "CreateDate": "2025-11-03 00:54:42+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "student1",
+            "UserId": "AIDA3TURCXF5NTC4AKKET",
+            "Arn": "arn:aws:iam::798094440826:user/student1",
+            "CreateDate": "2026-04-30 19:06:08+00:00"
         }
     ],
-    "IsTruncated": false,
     "ResponseMetadata": {
-        "RequestId": "5c4ddffd-745b-4e16-a039-77af5cec2468",
+        "RequestId": "7728a5ad-681e-4293-b922-facfc4bb8aac",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "date": "Thu, 09 Apr 2026 14:44:58 GMT",
-            "x-amzn-requestid": "5c4ddffd-745b-4e16-a039-77af5cec2468",
+            "date": "Mon, 11 May 2026 21:02:57 GMT",
+            "x-amzn-requestid": "7728a5ad-681e-4293-b922-facfc4bb8aac",
             "content-type": "text/xml",
-            "content-length": "1873"
+            "content-length": "2125"
         },
         "RetryAttempts": 0
     }

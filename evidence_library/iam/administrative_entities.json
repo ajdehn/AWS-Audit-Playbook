@@ -1,35 +1,34 @@
 {
-    "PolicyGroups": [
-        {
-            "GroupName": "Admin-Group",
-            "GroupId": "AGPA3TURCXF5BRURZGNO6"
-        }
-    ],
     "PolicyUsers": [
         {
             "UserName": "maverick",
             "UserId": "AIDA3TURCXF5LJC66ABNT"
         }
     ],
+    "PolicyGroups": [
+        {
+            "GroupName": "Admin-Group",
+            "GroupId": "AGPA3TURCXF5BRURZGNO6"
+        }
+    ],
     "PolicyRoles": [
         {
-            "RoleName": "AuditOps",
-            "RoleId": "AROA3TURCXF5DSB7KL27G"
+            "RoleName": "AWSReservedSSO_AdministratorAccess_665310c670228407",
+            "RoleId": "AROA3TURCXF5DFY5JBCRY"
         },
         {
             "RoleName": "Goose_temp_admin_access",
             "RoleId": "AROA3TURCXF5LJSI2ERVM"
         }
     ],
-    "IsTruncated": false,
     "ResponseMetadata": {
-        "RequestId": "cc4e0e1c-08df-4884-923f-e2efcd59f1cb",
+        "RequestId": "5d43c78d-226f-437f-818a-33a917a72537",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "date": "Fri, 06 Feb 2026 16:24:42 GMT",
-            "x-amzn-requestid": "cc4e0e1c-08df-4884-923f-e2efcd59f1cb",
+            "date": "Mon, 11 May 2026 21:02:56 GMT",
+            "x-amzn-requestid": "5d43c78d-226f-437f-818a-33a917a72537",
             "content-type": "text/xml",
-            "content-length": "923"
+            "content-length": "966"
         },
         "RetryAttempts": 0
     }

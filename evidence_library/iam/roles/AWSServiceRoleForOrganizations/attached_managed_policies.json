@@ -1,0 +1,19 @@
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "AWSOrganizationsServiceTrustPolicy",
+            "PolicyArn": "arn:aws:iam::aws:policy/aws-service-role/AWSOrganizationsServiceTrustPolicy"
+        }
+    ],
+    "ResponseMetadata": {
+        "RequestId": "e503ffd6-658c-4fe8-badc-4afe7da2d4d1",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:03:01 GMT",
+            "x-amzn-requestid": "e503ffd6-658c-4fe8-badc-4afe7da2d4d1",
+            "content-type": "text/xml",
+            "content-length": "589"
+        },
+        "RetryAttempts": 0
+    }
+}
