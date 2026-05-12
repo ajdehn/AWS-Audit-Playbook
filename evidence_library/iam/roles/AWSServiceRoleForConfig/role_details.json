@@ -1,0 +1,37 @@
+{
+    "Role": {
+        "Path": "/aws-service-role/config.amazonaws.com/",
+        "RoleName": "AWSServiceRoleForConfig",
+        "RoleId": "AROA3TURCXF5PRMP6E3A5",
+        "Arn": "arn:aws:iam::798094440826:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig",
+        "CreateDate": "2026-04-18 12:05:09+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "config.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        },
+        "MaxSessionDuration": 3600,
+        "RoleLastUsed": {
+            "LastUsedDate": "2026-05-11 20:46:30+00:00",
+            "Region": "us-east-1"
+        }
+    },
+    "ResponseMetadata": {
+        "RequestId": "c53f587d-ac59-4d9c-afb1-b942bc90bddd",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:03:00 GMT",
+            "x-amzn-requestid": "c53f587d-ac59-4d9c-afb1-b942bc90bddd",
+            "content-type": "text/xml",
+            "content-length": "1025"
+        },
+        "RetryAttempts": 0
+    }
+}

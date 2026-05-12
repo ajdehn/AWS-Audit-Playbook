@@ -1,0 +1,14 @@
+{
+    "PolicyNames": [],
+    "ResponseMetadata": {
+        "RequestId": "cee7afae-cf3d-4ad5-af3f-9bf60ef9ef90",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:03:02 GMT",
+            "x-amzn-requestid": "cee7afae-cf3d-4ad5-af3f-9bf60ef9ef90",
+            "content-type": "text/xml",
+            "content-length": "323"
+        },
+        "RetryAttempts": 0
+    }
+}

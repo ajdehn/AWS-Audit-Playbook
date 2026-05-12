@@ -7,7 +7,7 @@
                 "us-east-2"
             ]
         },
-        "report_date": "2026-04-30"
+        "report_date": "2026-05-12"
     },
     "test_results": [
         {
@@ -101,6 +101,14 @@
                     "is_excluded": false,
                     "is_passing": false,
                     "comments": "No MFA device enabled for this user."
+                },
+                {
+                    "sample_id": {
+                        "user": "student1"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": "User has no console password (programmatic access only)."
                 }
             ]
         },
@@ -137,7 +145,16 @@
                     },
                     "is_excluded": false,
                     "is_passing": false,
-                    "comments": "Key is 1193 days old."
+                    "comments": "Key is 1205 days old."
+                },
+                {
+                    "sample_id": {
+                        "user": "student1",
+                        "access_key_id": "AKIA3TURCXF5K4HRB55Z"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
                 }
             ]
         },
@@ -145,15 +162,15 @@
             "test_id": "iam_password_policy",
             "test_description": "IAM passwords must comply with the organizations password complexity requirements.",
             "risk_rating": 2,
-            "is_passing": false,
-            "comments": "Exceptions Noted. Minimum password length too short (current=14, required>=20)",
+            "is_passing": true,
+            "comments": "",
             "test_procedures": [
                 "Obtained the IAM password configuration by calling the get_account_password_policy() boto3 command.",
                 "Saved the AWS password policy: iam/password_policy.json.",
                 "Inspected the password configuration to determine if they comply with the test attribute(s) defined below."
             ],
             "test_attributes": [
-                "MinimumPasswordLength must be >= 20.",
+                "MinimumPasswordLength must be >= 12.",
                 "At least 4 complexity types (RequireSymbols, RequireNumbers, RequireUppercaseCharacters, and RequireLowercaseCharacters) are set to True.",
                 "PasswordReusePrevention must be >= 24."
             ]
@@ -221,8 +238,8 @@
             "test_id": "s3_public_access",
             "test_description": "S3 buckets are configured to block public access.",
             "risk_rating": 3,
-            "is_passing": false,
-            "comments": "Exceptions Noted. 2 S3 buckets are not blocking public access.",
+            "is_passing": true,
+            "comments": "",
             "test_procedures": [
                 "Obtained a list of S3 buckets by calling the list_buckets() boto3 command.",
                 "Saved the list of buckets: s3/buckets.json.",
@@ -262,17 +279,17 @@
                     "sample_id": {
                         "bucket_name": "itauditguy"
                     },
-                    "is_excluded": false,
+                    "is_excluded": true,
                     "is_passing": false,
-                    "comments": "One or more public access settings are disabled"
+                    "comments": "Sample is excluded. See config.json"
                 },
                 {
                     "sample_id": {
                         "bucket_name": "taylor-swift-secret-vault"
                     },
-                    "is_excluded": false,
+                    "is_excluded": true,
                     "is_passing": false,
-                    "comments": "One or more public access settings are disabled"
+                    "comments": "Sample is excluded. See config.json"
                 }
             ]
         },
@@ -394,14 +411,25 @@
             "test_id": "rds_backup_retention",
             "test_description": "RDS backups are retained for at least 14 days.",
             "risk_rating": 1,
-            "is_passing": true,
-            "comments": "",
+            "is_passing": false,
+            "comments": "Exceptions Noted. 1 RDS instance(s) do not retain backups for at least 14 days.",
             "test_procedures": [
                 "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
                 "For each in-scope region, saved the list of RDS instances: rds/[region_name]/db_instances.json.",
                 "For each RDS instance, inspected the `BackupRetentionPeriod` to determine if it is greater than or equal to 14 days."
             ],
-            "test_attributes": []
+            "test_attributes": [],
+            "samples": [
+                {
+                    "sample_id": {
+                        "region": "us-east-1",
+                        "db_instance": "prod-db-1"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "Retention is 7 days"
+                }
+            ]
         },
         {
             "test_id": "rds_encryption",
@@ -411,10 +439,21 @@
             "comments": "",
             "test_procedures": [
                 "For each in-scope region, obtained a list of RDS instances by calling the describe_db_instances() boto3 command.",
-                "For each in-scope region, saved the list of RDS instances: rds/region_name/db_instances.json.",
+                "For each in-scope region, saved the list of RDS instances: rds/[region_name]/db_instances.json.",
                 "For each RDS instance, inspected the `StorageEncrypted` setting to determine if it was set to `true`."
             ],
-            "test_attributes": []
+            "test_attributes": [],
+            "samples": [
+                {
+                    "sample_id": {
+                        "region": "us-east-1",
+                        "db_instance": "prod-db-1"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                }
+            ]
         },
         {
             "test_id": "rds_public_access",
@@ -427,7 +466,18 @@
                 "For each in-scope region, saved the list of RDS instances: rds/[region_name]/db_instances.json)",
                 "For each RDS instance, inspected the 'PubliclyAccessible' setting to determine if it was set to 'false'."
             ],
-            "test_attributes": []
+            "test_attributes": [],
+            "samples": [
+                {
+                    "sample_id": {
+                        "region": "us-east-1",
+                        "db_instance": "prod-db-1"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                }
+            ]
         },
         {
             "test_id": "rds_auto_minor_version_upgrade",
@@ -440,7 +490,18 @@
                 "For each in-scope region, saved the list of RDS instances: rds/[region_name]/db_instances.json.",
                 "For each RDS instance, inspected the 'AutoMinorVersionUpgrade' setting to determine if it was set to 'true'."
             ],
-            "test_attributes": []
+            "test_attributes": [],
+            "samples": [
+                {
+                    "sample_id": {
+                        "region": "us-east-1",
+                        "db_instance": "prod-db-1"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                }
+            ]
         },
         {
             "test_id": "rds_deletion_protection",
@@ -453,7 +514,18 @@
                 "Saved the list of RDS instances: rds/[region_name]/db_instances.json and DB clusters: rds/[region_name]/db_clusters.json.",
                 "Inspected each RDS instance to determine if 'DeletionProtection' was set to 'true' at the instance or cluster level."
             ],
-            "test_attributes": []
+            "test_attributes": [],
+            "samples": [
+                {
+                    "sample_id": {
+                        "region": "us-east-1",
+                        "db_instance": "prod-db-1"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                }
+            ]
         },
         {
             "test_id": "rds_tags",
@@ -466,7 +538,18 @@
                 "For each in-scope region, saved the list of RDS instances: rds/[region_name]/db_instances.json).",
                 "For each RDS instance, reviewed the `TagList` to determine if the following tag keys exist and have non-empty values: ['owner', 'description', 'classification']"
             ],
-            "test_attributes": []
+            "test_attributes": [],
+            "samples": [
+                {
+                    "sample_id": {
+                        "region": "us-east-1",
+                        "db_instance": "prod-db-1"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": ""
+                }
+            ]
         },
         {
             "test_id": "ebs_volume_encryption",
@@ -785,14 +868,14 @@
                     },
                     "is_excluded": false,
                     "is_passing": false,
-                    "comments": "No GuardDuty detectors in region."
+                    "comments": "Detector(s) found but none are enabled."
                 }
             ]
         }
     ],
     "config": {
         "metadata": {
-            "last_approval_date": "2026-04-30",
+            "last_approval_date": "2026-05-11",
             "approved_by": "AJ Dehn"
         },
         "test_config": {
@@ -800,7 +883,7 @@
                 "us-east-1",
                 "us-east-2"
             ],
-            "iam_password_min_length": 20,
+            "iam_password_min_length": 12,
             "iam_password_min_complexity_types": 4,
             "iam_password_require_expiration": false,
             "iam_password_max_password_age": null,
@@ -814,18 +897,35 @@
                 "classification"
             ]
         },
-        "test_exclusions": {},
-        "sample_exclusions": {
-            "s3_public_access": [
-                {
-                    "sample_id": {
-                        "bucket_name": "bad-bucket-54321"
-                    },
-                    "rationale": "This bucket is intentionally public for testing",
-                    "permanent": false,
-                    "expiration_date": "2026-12-31"
-                }
-            ]
-        }
+        "test_exclusions": [],
+        "sample_exclusions": [
+            {
+                "test_id": "s3_public_access",
+                "sample_id": {
+                    "bucket_name": "bad-bucket-54321"
+                },
+                "rationale": "This bucket is intended for public access.",
+                "permanent": true,
+                "expiration_date": null
+            },
+            {
+                "test_id": "s3_public_access",
+                "sample_id": {
+                    "bucket_name": "itauditguy"
+                },
+                "rationale": "This bucket is intended for public access.",
+                "permanent": false,
+                "expiration_date": "2026-12-31"
+            },
+            {
+                "test_id": "s3_public_access",
+                "sample_id": {
+                    "bucket_name": "taylor-swift-secret-vault"
+                },
+                "rationale": "Engineering is working on this.",
+                "permanent": false,
+                "expiration_date": "2026-06-01"
+            }
+        ]
     }
 }

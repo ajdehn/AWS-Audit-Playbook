@@ -1,0 +1,19 @@
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "ConfigConformsServiceRolePolicy",
+            "PolicyArn": "arn:aws:iam::aws:policy/aws-service-role/ConfigConformsServiceRolePolicy"
+        }
+    ],
+    "ResponseMetadata": {
+        "RequestId": "cae99559-6045-41cc-87ae-b1c39a390e22",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:03:01 GMT",
+            "x-amzn-requestid": "cae99559-6045-41cc-87ae-b1c39a390e22",
+            "content-type": "text/xml",
+            "content-length": "583"
+        },
+        "RetryAttempts": 0
+    }
+}

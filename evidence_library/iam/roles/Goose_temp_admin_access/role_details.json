@@ -1,0 +1,35 @@
+{
+    "Role": {
+        "Path": "/",
+        "RoleName": "Goose_temp_admin_access",
+        "RoleId": "AROA3TURCXF5LJSI2ERVM",
+        "Arn": "arn:aws:iam::798094440826:role/Goose_temp_admin_access",
+        "CreateDate": "2025-11-11 23:05:12+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "AWS": "arn:aws:iam::798094440826:user/goose"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        },
+        "Description": "This role allows Goose to \"checkout\" Administrator access.",
+        "MaxSessionDuration": 3600,
+        "RoleLastUsed": {}
+    },
+    "ResponseMetadata": {
+        "RequestId": "cb6cb8ef-600e-43e3-80ae-c653ea0cd4a0",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:03:02 GMT",
+            "x-amzn-requestid": "cb6cb8ef-600e-43e3-80ae-c653ea0cd4a0",
+            "content-type": "text/xml",
+            "content-length": "961"
+        },
+        "RetryAttempts": 0
+    }
+}

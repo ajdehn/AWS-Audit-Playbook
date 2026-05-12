@@ -1,0 +1,26 @@
+{
+    "RoleName": "AWSReservedSSO_AdministratorAccess_665310c670228407",
+    "PolicyName": "AwsSSOInlinePolicy",
+    "PolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "AssumeAllRoles",
+                "Effect": "Allow",
+                "Action": "sts:AssumeRole",
+                "Resource": "*"
+            }
+        ]
+    },
+    "ResponseMetadata": {
+        "RequestId": "86c8b04a-844f-4748-baeb-5f4ad7f4b909",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:02:59 GMT",
+            "x-amzn-requestid": "86c8b04a-844f-4748-baeb-5f4ad7f4b909",
+            "content-type": "text/xml",
+            "content-length": "619"
+        },
+        "RetryAttempts": 0
+    }
+}

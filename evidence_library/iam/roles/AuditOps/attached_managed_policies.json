@@ -1,0 +1,19 @@
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "SecurityAudit",
+            "PolicyArn": "arn:aws:iam::aws:policy/SecurityAudit"
+        }
+    ],
+    "ResponseMetadata": {
+        "RequestId": "6805385f-6992-4c5c-bea7-674a13dc291f",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:02:59 GMT",
+            "x-amzn-requestid": "6805385f-6992-4c5c-bea7-674a13dc291f",
+            "content-type": "text/xml",
+            "content-length": "530"
+        },
+        "RetryAttempts": 0
+    }
+}

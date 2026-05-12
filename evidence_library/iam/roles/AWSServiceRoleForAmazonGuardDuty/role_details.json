@@ -1,0 +1,38 @@
+{
+    "Role": {
+        "Path": "/aws-service-role/guardduty.amazonaws.com/",
+        "RoleName": "AWSServiceRoleForAmazonGuardDuty",
+        "RoleId": "AROA3TURCXF5LQXRDADG6",
+        "Arn": "arn:aws:iam::798094440826:role/aws-service-role/guardduty.amazonaws.com/AWSServiceRoleForAmazonGuardDuty",
+        "CreateDate": "2022-11-12 16:26:26+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "guardduty.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        },
+        "Description": "A service-linked role required for Amazon GuardDuty to access your resources. ",
+        "MaxSessionDuration": 3600,
+        "RoleLastUsed": {
+            "LastUsedDate": "2026-03-23 14:40:35+00:00",
+            "Region": "us-east-1"
+        }
+    },
+    "ResponseMetadata": {
+        "RequestId": "04f61589-f141-4370-9a84-8bdbcdbafc17",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:02:59 GMT",
+            "x-amzn-requestid": "04f61589-f141-4370-9a84-8bdbcdbafc17",
+            "content-type": "text/xml",
+            "content-length": "1164"
+        },
+        "RetryAttempts": 0
+    }
+}

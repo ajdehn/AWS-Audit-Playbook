@@ -2,26 +2,20 @@
     "AccessKeyMetadata": [
         {
             "UserName": "audit-user",
-            "AccessKeyId": "AKIA3TURCXF5KMTNV7X2",
+            "AccessKeyId": "AKIA3TURCXF5OWBHPICR",
             "Status": "Active",
-            "CreateDate": "2025-11-24 19:22:31+00:00"
-        },
-        {
-            "UserName": "audit-user",
-            "AccessKeyId": "AKIA3TURCXF5MUNB567Q",
-            "Status": "Active",
-            "CreateDate": "2026-03-30 19:48:38+00:00"
+            "CreateDate": "2026-04-17 20:05:03+00:00"
         }
     ],
     "IsTruncated": false,
     "ResponseMetadata": {
-        "RequestId": "7e0bb0c0-c4ff-4d3d-a1bc-b09a3aa3ee93",
+        "RequestId": "d9d5258a-d9fa-49d0-8cfb-096b6b5fa669",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "date": "Thu, 09 Apr 2026 14:44:59 GMT",
-            "x-amzn-requestid": "7e0bb0c0-c4ff-4d3d-a1bc-b09a3aa3ee93",
+            "date": "Mon, 11 May 2026 21:03:07 GMT",
+            "x-amzn-requestid": "d9d5258a-d9fa-49d0-8cfb-096b6b5fa669",
             "content-type": "text/xml",
-            "content-length": "771"
+            "content-length": "558"
         },
         "RetryAttempts": 0
     }

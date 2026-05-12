@@ -1,0 +1,19 @@
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "AWSTrustedAdvisorServiceRolePolicy",
+            "PolicyArn": "arn:aws:iam::aws:policy/aws-service-role/AWSTrustedAdvisorServiceRolePolicy"
+        }
+    ],
+    "ResponseMetadata": {
+        "RequestId": "d4a6f133-f090-4b8a-a449-5183c203a998",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Mon, 11 May 2026 21:03:02 GMT",
+            "x-amzn-requestid": "d4a6f133-f090-4b8a-a449-5183c203a998",
+            "content-type": "text/xml",
+            "content-length": "589"
+        },
+        "RetryAttempts": 0
+    }
+}
