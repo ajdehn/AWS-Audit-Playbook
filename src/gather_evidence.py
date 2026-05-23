@@ -2,13 +2,14 @@ import json
 import time
 from datetime import datetime, timedelta, timezone
 from botocore.exceptions import ClientError
-# TODO: Integrate save_json into evidence_client
 from utils import save_json
 
 def save_audit_evidence(evidence_client, in_scope_regions):
     save_s3_evidence(evidence_client)
     save_iam_evidence(evidence_client)
     save_guardduty_evidence(evidence_client, in_scope_regions)
+    save_eventbridge_evidence(evidence_client, in_scope_regions)
+    save_ec2_evidence(evidence_client, in_scope_regions)
 
 # NOTE: Consider making these calls concurrently to speed up the evidence collection
 def save_s3_evidence(evidence_client):
@@ -296,6 +297,166 @@ def save_iam_evidence(evidence_client):
                 trust_doc,
                 f"{evidence_client.base_path}/iam/roles/{role_name}/trust_policy.json"
             )
+
+def save_ec2_evidence(evidence_client, in_scope_regions):
+    print("Gathering EC2 evidence")
+
+    for region in in_scope_regions:
+        elbv2_client = evidence_client.session.client("elbv2", region_name=region)
+        autoscaling_client = evidence_client.session.client("autoscaling", region_name=region)
+
+        load_balancers = evidence_client.get_aws(
+            f"elbv2/{region}/load_balancers.json",
+            client=elbv2_client,
+            paginator_params={
+                "method_name": "describe_load_balancers",
+                "pagination_key": "LoadBalancers",
+            }
+        )
+
+        for lb in load_balancers.get("LoadBalancers", []):
+            lb_arn = lb["LoadBalancerArn"]
+            lb_name = lb["LoadBalancerName"]
+
+            # Save load balancer attributes.
+            evidence_client.get_aws(
+                f"elbv2/{region}/load_balancers/{lb_name}/attributes.json",
+                client=elbv2_client,
+                method="describe_load_balancer_attributes",
+                method_kwargs={
+                    "LoadBalancerArn": lb_arn
+                }
+            )
+
+            # Save listeners.
+            evidence_client.get_aws(
+                f"elbv2/{region}/load_balancers/{lb_name}/listeners.json",
+                client=elbv2_client,
+                method="describe_listeners",
+                method_kwargs={
+                    "LoadBalancerArn": lb_arn
+                }
+            )
+
+            # Save tags.
+            evidence_client.get_aws(
+                f"elbv2/{region}/load_balancers/{lb_name}/tags.json",
+                client=elbv2_client,
+                method="describe_tags",
+                method_kwargs={
+                    "ResourceArns": [lb_arn]
+                }
+            )
+
+        auto_scaling_groups = evidence_client.get_aws(
+            f"autoscaling/{region}/groups.json",
+            client=autoscaling_client,
+            paginator_params={
+                "method_name": "describe_auto_scaling_groups",
+                "pagination_key": "AutoScalingGroups",
+            }
+        )
+
+        for asg in auto_scaling_groups.get("AutoScalingGroups", []):
+            asg_name = asg["AutoScalingGroupName"]
+
+            # Save ASG configuration/details.
+            evidence_client.get_aws(
+                f"autoscaling/{region}/groups/{asg_name}/details.json",
+                client=autoscaling_client,
+                method="describe_auto_scaling_groups",
+                method_kwargs={
+                    "AutoScalingGroupNames": [asg_name]
+                }
+            )
+
+            # Save scaling policies.
+            evidence_client.get_aws(
+                f"autoscaling/{region}/groups/{asg_name}/policies.json",
+                client=autoscaling_client,
+                method="describe_policies",
+                method_kwargs={
+                    "AutoScalingGroupName": asg_name
+                }
+            )
+
+            # Save tags.
+            evidence_client.get_aws(
+                f"autoscaling/{region}/groups/{asg_name}/tags.json",
+                client=autoscaling_client,
+                method="describe_tags",
+                method_kwargs={
+                    "Filters": [
+                        {
+                            "Name": "auto-scaling-group",
+                            "Values": [asg_name]
+                        }
+                    ]
+                }
+            )
+
+def save_eventbridge_evidence(evidence_client, in_scope_regions):
+    print("Gathering EventBridge evidence")
+
+    for region in in_scope_regions:
+        events_client = evidence_client.session.client("events", region_name=region)
+
+        # Obtain all event buses in the region.
+        event_buses = evidence_client.get_aws(
+            f"eventbridge/{region}/event_buses.json",
+            client=events_client,
+            method="list_event_buses"
+        )
+
+        # Save evidence related to each event bus.
+        for event_bus in event_buses.get("EventBuses", []):
+            bus_name = event_bus["Name"]
+
+            # Save event bus details.
+            evidence_client.get_aws(
+                f"eventbridge/{region}/{bus_name}/details.json",
+                service="events",
+                region=region,
+                method="describe_event_bus",
+                method_kwargs={"Name": bus_name}
+            )
+
+            # Obtain rules for the event bus.
+            rules = evidence_client.get_aws(
+                f"eventbridge/{region}/{bus_name}/rules.json",
+                service="events",
+                region=region,
+                method="list_rules",
+                method_kwargs={"EventBusName": bus_name}
+            )
+
+            # Save evidence related to each rule.
+            for rule in rules.get("Rules", []):
+                rule_name = rule["Name"]
+
+                # Save rule details.
+                evidence_client.get_aws(
+                    f"eventbridge/{region}/{bus_name}/rules/{rule_name}/details.json",
+                    service="events",
+                    region=region,
+                    method="describe_rule",
+                    method_kwargs={
+                        "Name": rule_name,
+                        "EventBusName": bus_name
+                    }
+                )
+
+                # Save targets.
+                evidence_client.get_aws(
+                    f"eventbridge/{region}/{bus_name}/rules/{rule_name}/targets.json",
+                    service="events",
+                    region=region,
+                    method="list_targets_by_rule",
+                    method_kwargs={
+                        "Rule": rule_name,
+                        "EventBusName": bus_name
+                    }
+                )
 
 def save_guardduty_evidence(evidence_client, in_scope_regions):
     print('Gathering GuardDuty evidence')
