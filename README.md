@@ -68,7 +68,7 @@ external_id = "a1b2c3d4e5f6g7h8i9"  # Update with your actual external id.
     "approval_date": "2026-04-30"    
   },
   "test_config": {
-    "in_scope_regions": [],
+    "in_scope_regions": ["us-east-1"],
     "iam_password_min_length": 14,
     "iam_password_min_complexity_types": 4,
     "iam_password_require_expiration": false,
