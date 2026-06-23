@@ -150,20 +150,20 @@ def load_config(file_path, audit):
 
 def is_test_excluded(test_id, audit):
      # Returns true if test is excluded in the config file.
-    exclusion = audit.test_exclusion_index.get(test_id)
-
-    if not exclusion:
+    if audit.test_exclusion_index:
+        exclusion = audit.test_exclusion_index.get(test_id)
+        if exclusion is not None:
+            if exclusion["permanent"]:
+                return True
+            else:
+                # Check if exclusion is current
+                exp = exclusion["expiration_date"]
+                if exp and date.fromisoformat(exp) >= date.today():
+                    return True
+                else:
+                    return False
+    else:
         return False
-
-    if exclusion["permanent"]:
-        return True
-
-    # Check if exclusion is current
-    exp = exclusion["expiration_date"]
-    if exp and date.fromisoformat(exp) >= date.today():
-        return True
-
-    return False
 
 def confirm_delete_folder(folder_path):
     if os.path.exists(folder_path):
