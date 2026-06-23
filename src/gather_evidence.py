@@ -5,6 +5,8 @@ from botocore.exceptions import ClientError
 from utils import save_json
 
 def save_audit_evidence(evidence_client, in_scope_regions):
+    # NOTE: Save evidence that isn't associated with automated tests (e.g. EventBridge, IAM Groups, etc.)
+    # NOTE: This is slightly more efficient because it doesn't create a new client each time it calls get_aws(). 
     save_s3_evidence(evidence_client)
     save_iam_evidence(evidence_client)
     save_guardduty_evidence(evidence_client, in_scope_regions)
@@ -19,37 +21,27 @@ def save_s3_evidence(evidence_client):
     s3_client = evidence_client.session.client("s3")
 
     # Obtain a list of buckets.
-    buckets = evidence_client.get_aws(
-        "s3/buckets.json",
-        client=s3_client,
-        method="list_buckets"
-    )
+    buckets = evidence_client.get_aws("s3/buckets.json", client=s3_client, method="list_buckets")
 
     # Save evidence related to each S3 bucket.
     for bucket in buckets.get("Buckets", []):
         bucket_name = bucket['Name']
-        # Save encryption settings.
+        # Save each bucket's encryption settings.
         evidence_client.get_aws(
-            f"s3/buckets/{bucket_name}/encryption.json",
-            client=s3_client,
-            method="get_bucket_encryption",
-            method_kwargs={"Bucket": bucket_name},
+            f"s3/buckets/{bucket_name}/encryption.json", client=s3_client,
+            method="get_bucket_encryption", method_kwargs={"Bucket": bucket_name},
             not_found_codes=["ServerSideEncryptionConfigurationNotFoundError"]
         )
-        # Save public access block.
+        # Save bucket's public access block settings.
         evidence_client.get_aws(
-            f"s3/buckets/{bucket_name}/public_access_block.json",
-            client=s3_client,
-            method="get_public_access_block",
-            method_kwargs={"Bucket": bucket_name},
+            f"s3/buckets/{bucket_name}/public_access_block.json", client=s3_client,
+            method="get_public_access_block", method_kwargs={"Bucket": bucket_name},
             not_found_codes=["NoSuchPublicAccessBlockConfiguration"]
         )
-        # Save tags.
+        # Save bucket's tags.
         evidence_client.get_aws(
-            f"s3/buckets/{bucket_name}/tags.json",
-            client=s3_client,
-            method="get_bucket_tagging",
-            method_kwargs={"Bucket": bucket_name},
+            f"s3/buckets/{bucket_name}/tags.json", client=s3_client,
+            method="get_bucket_tagging", method_kwargs={"Bucket": bucket_name},
             not_found_codes=["NoSuchTagSet"]
         )
         # Save bucket policy
