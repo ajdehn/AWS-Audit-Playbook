@@ -4,54 +4,76 @@ import shutil
 from datetime import datetime, timezone, date
 import boto3
 from botocore.exceptions import ClientError
+import requests
+from pathlib import Path
 from dotenv import load_dotenv
 
 def create_session(session_name="auditops-assume-role"):
     load_dotenv()
 
-    role_arn = os.getenv("role_arn")
-    external_id = os.getenv("external_id")
+    role_arn = os.getenv("role_arn", "").strip()
+    external_id = os.getenv("external_id", "").strip()
 
     # Normalize empty strings → None
     role_arn = role_arn.strip() if role_arn else None
     external_id = external_id.strip() if external_id else None
 
-    # No role provided, use default credentials.
+    # No role provided, use local credentials.
     if not role_arn and not external_id:
         return boto3.Session()
 
     # Check if role_arn and external_id are set.
-    if not role_arn or not external_id:
-        raise ValueError(
-            "Both 'role_arn' and 'external_id' must be set in the environment to assume a role."
-        )
-
-    # Assume role
-    try:
-        sts = boto3.client("sts")
-        response = sts.assume_role(
-            RoleArn=role_arn,
-            ExternalId=external_id,
-            RoleSessionName=session_name
-        )
-    except ClientError as e:
-        error_code = e.response["Error"]["Code"]
-        error_msg = e.response["Error"]["Message"]
-
-        raise RuntimeError(
-            f"Failed to assume IAM role.\n"
-            f"RoleArn: {role_arn}\n"
-            f"ErrorCode: {error_code}\n"
-            f"Message: {error_msg}"
-        ) from e
-
-    creds = response["Credentials"]
+    if not (role_arn and external_id):
+        raise ValueError("Both 'role_arn' and 'external_id' must be set in the environment to assume a role.")
+    
+    creds = assume_role(role_arn, external_id, session_name)
     return boto3.Session(
         aws_access_key_id=creds["AccessKeyId"],
         aws_secret_access_key=creds["SecretAccessKey"],
         aws_session_token=creds["SessionToken"]
     )
 
+
+def assume_role(role_arn, external_id, session_name):
+    sts = boto3.client("sts")
+    try:
+        response = sts.assume_role(
+            RoleArn=role_arn,
+            ExternalId=external_id,
+            RoleSessionName=session_name
+        )
+    except ClientError as e:
+        raise RuntimeError(
+            f"Failed to assume role {role_arn}: "
+            f"{e.response['Error']['Message']}"
+        ) from e
+
+    return response["Credentials"]
+
+def upload_to_audit_portal(client_email: str, auditor_email: str, upload_portal_link: str):
+
+    # Step 1: Zip audit evidence folder
+    zip_file = shutil.make_archive("tmp/audit_evidence", "zip", "tmp/audit_evidence")
+
+    # Step 2: Upload evidence to auditor's portal
+    with open(zip_file, "rb") as f:
+        response = requests.post(
+            upload_portal_link,
+            data={"client_email": client_email, "auditor_email": auditor_email},
+            files={"file": ("audit_evidence.zip", f, "application/zip")},
+            timeout=60
+        )
+    
+    try:
+        response.raise_for_status()
+    except requests.RequestException as e:
+        raise RuntimeError(f"Failed to upload evidence to {upload_portal_link}") from e
+    finally:
+        # Delete zip file after it's been uploaded.
+        if os.path.exists(zip_file):
+            os.remove(zip_file)
+     
+    return response.json() 
 
 def get_aws_account_id(session):
     sts = session.client("sts")
@@ -99,26 +121,23 @@ def get_in_scope_regions(audit):
 """
     Saves a json file to a specified path
 """
-def save_json(extract, file_path):
-    # isolating out the directory path to the file and creating the directory
-    brokenUpPath = file_path.split('/')
-    dirPathToFile = '/'.join(brokenUpPath[:len(brokenUpPath) - 1])
-    # Create file path if it doesn't already exist.
-    if not os.path.exists(dirPathToFile):
-        os.makedirs(dirPathToFile)
+def save_json(data, file_path):
+    path = Path(file_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(file_path, 'w') as f:
-        json.dump(extract, f, indent=4, default=str)
+    with path.open("w") as f:
+        json.dump(data, f, indent=4, default=str)
 
 def load_json(file_path):
-    if os.path.exists(file_path):
-        try:
-            with open(file_path, "r") as f:
-                return json.load(f)
-        except json.JSONDecodeError:
-            print(f"Invalid JSON file. File path {file_path}")
-            return None
-    return None
+    path = Path(file_path)
+    if not path.exists():
+        return None
+    try:
+        with path.open() as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        print(f"Invalid JSON file: File path {file_path}")
+        return None
 
 def load_config(file_path, audit):
     try:
@@ -166,16 +185,18 @@ def is_test_excluded(test_id, audit):
         return False
 
 def confirm_delete_folder(folder_path):
-    if os.path.exists(folder_path):
-        confirm = input(f"Folder '{folder_path}' exists. Do you want to delete it? (y/N): ").strip().lower()
-        
-        if confirm == "y":
-            shutil.rmtree(folder_path)
-            print("Deleting old evidence folder.")
-        elif confirm == "n":
-            print("Using cached evidence.")
-        else:
-            print("Invalid character. Folder not deleted.")
+    if not os.path.exists(folder_path):
+        return
+    
+    confirm = input(f"Folder '{folder_path}' exists. Do you want to delete it? (y/N): ").strip().lower()
+
+    if confirm == "y":
+        shutil.rmtree(folder_path)
+        print(f"Deleted '{folder_path}' folder.")
+    elif confirm == "n":
+        print("Using cached evidence.")
+    else:
+        print(f"Invalid character. Did not delete '{folder_path}' folder.")
 
 """
 Evaluates required tags against resource tags (S3, RDS, EC2, etc).
