@@ -4,6 +4,14 @@ from reportlab.lib.pagesizes import letter, LETTER
 from reportlab.platypus import (SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, 
 ListFlowable, ListItem, PageBreak, KeepTogether, Image)
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from pyhanko.sign import sign_pdf
+from pyhanko.pdf.signer import \
+    PdfSigner
+from pyhanko.pdf.constants import \
+    PdfSignerConst
+from pyhanko.sign.constants import \
+    SignerConst
+
 
 BASE_STYLES = getSampleStyleSheet()
 
@@ -259,6 +267,22 @@ def generate_pdf_report(audit, tests, tool_name, file_name="tmp/audit_report.pdf
 
     doc.build(elements)
     print(f"Report generated: {file_name}")
+
+    # --- Digital Signature ---
+    cert_path = "src/assets/certificate.pem"
+    key_path = "src/assets/private_key.pem"
+    signed_file_name = file_name.replace(".pdf", "_signed.pdf")
+
+    try:
+        sign_pdf(
+            input_filename=file_name,
+            output_filename=signed_file_name,
+            key=key_path,
+            cert=cert_path,
+        )
+        print(f"Signed report saved as: {signed_file_name}")
+    except Exception as e:
+        print(f"Failed to sign report: {e}")
 
 
 def parse_dt(dt_str):
