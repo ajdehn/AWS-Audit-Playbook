@@ -284,7 +284,6 @@ def generate_pdf_report(audit, tests, tool_name, file_name="tmp/audit_report.pdf
     except Exception as e:
         print(f"Failed to sign report: {e}")
 
-
 def parse_dt(dt_str):
     if not dt_str:
         return None
