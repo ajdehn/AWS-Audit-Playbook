@@ -1,5 +1,6 @@
 import json
 import os
+import platform
 import shutil
 from datetime import datetime, timezone, date
 import boto3
@@ -122,10 +123,23 @@ def get_in_scope_regions(audit):
     Saves a json file to a specified path
 """
 def save_json(data, file_path):
-    path = Path(file_path)
-    path.parent.mkdir(parents=True, exist_ok=True)
+    path = Path(file_path).resolve()
 
-    with path.open("w") as f:
+    #Bypass Windows MAX_PATH limit, if needed
+    if platform.system() == "Windows":
+        path_str = str(path)
+        if not str(path).startswith("\\\\?\\"):
+            win_path = f"\\\\?\\{path}"
+            os.makedirs(os.path.dirname(win_path), exist_ok=True)
+
+            # Open the file using the string path
+            with open(win_path, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=4, default=str)
+            return
+
+    #Standard workflow if short path name, or on Mac or Linux    
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as f:
         json.dump(data, f, indent=4, default=str)
 
 def load_json(file_path):

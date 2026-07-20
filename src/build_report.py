@@ -5,13 +5,9 @@ from reportlab.platypus import (SimpleDocTemplate, Table, TableStyle, Paragraph,
 ListFlowable, ListItem, PageBreak, KeepTogether, Image)
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from pyhanko.sign import sign_pdf
-from pyhanko.pdf.signer import \
-    PdfSigner
-from pyhanko.pdf.constants import \
-    PdfSignerConst
-from pyhanko.sign.constants import \
-    SignerConst
-
+from pyhanko.pdf_utils.incremental_writer import IncrementalPdfFileWriter
+from pyhanko.sign import signers
+from pathlib import Path
 
 BASE_STYLES = getSampleStyleSheet()
 
@@ -268,21 +264,39 @@ def generate_pdf_report(audit, tests, tool_name, file_name="tmp/audit_report.pdf
     doc.build(elements)
     print(f"Report generated: {file_name}")
 
-    # --- Digital Signature ---
-    cert_path = "src/assets/certificate.pem"
-    key_path = "src/assets/private_key.pem"
-    signed_file_name = file_name.replace(".pdf", "_signed.pdf")
+    # --- Digital Signature (Optional) ---
+    cert_path = Path("src/assets/certificate.pem")
+    key_path = Path("src/assets/private_key.key")
 
-    try:
-        sign_pdf(
-            input_filename=file_name,
-            output_filename=signed_file_name,
-            key=key_path,
-            cert=cert_path,
-        )
-        print(f"Signed report saved as: {signed_file_name}")
-    except Exception as e:
-        print(f"Failed to sign report: {e}")
+    # Only attempt signing if both certificate and private key exist
+    if cert_path.exists() and key_path.exists():
+        # Generate a new filename for the signed version
+        input_path = Path(file_name)
+        signed_file_name = input_path.with_name(f"{input_path.stem}_signed.pdf")
+
+        try:
+            # Initialize signer with the provided paths
+            signer = signers.SimpleSigner.load(key_path, cert_path)
+            with open(input_path, 'rb') as inf:
+                writer = IncrementalPdfFileWriter(inf)
+                pdf_out = signers.sign_pdf(
+                    writer,
+                    signers.PdfSignatureMetadata(field_name='Signature1'),
+                    signer=signer,
+                    )
+            pdf_out.seek(0)
+            with open(signed_file_name, "wb") as outf:
+                outf.write(pdf_out.read())
+            print(f"Signed report saved as: {signed_file_name}")
+        except Exception as e:
+            # Log the error but don't crash the build process if signing fails
+            print(f"Failed to sign report: {e}")
+            print("Warning: Signing failed, but an unsigned copy of the report "
+                  "was still generated successfully.")
+    else:
+        # If files are missing, we skip signing and the original file_name 
+        # is treated as the final output.
+        print(f"Signature keys not found in src/assets/. Skipping signature.")
 
 def parse_dt(dt_str):
     if not dt_str:
