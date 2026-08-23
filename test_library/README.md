@@ -1,5 +1,5 @@
 # Test Library
-| Priority | Test Description | Evidence Type | Test Documentation | ISO 27001 Mapping|
+| Priority | Example Control Description | Evidence Type | Test Documentation | ISO 27001 Mapping|
 | ------------- | ------------- | ------------- | ------------- | ------------- |
 | 1 | Multi-factor authentication is configured for all users of critical systems. | Automated | [IAM Root MFA](IAM_Root_MFA)<br>[IAM User MFA](IAM_User_MFA) |A.5.18, A.8.5|
 | 2 | Infrastructure service account credentials are rotated at least once per year. | Automated | [IAM Root Access Key](IAM_Root_Access_Key)<br>[IAM User Key Age](IAM_User_Key_Age) |A.5.18, A.8.5|
