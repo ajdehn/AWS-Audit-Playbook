@@ -1,6 +1,6 @@
 /tmp
 /controls/_TEMPLATE
 .env
-config.json
+example.py
 .DS_Store
 src/__pycache__/
