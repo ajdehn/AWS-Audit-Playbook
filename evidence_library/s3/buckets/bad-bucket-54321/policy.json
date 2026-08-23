@@ -1,0 +1,17 @@
+{
+    "ResponseMetadata": {
+        "RequestId": "R0EQ83DYSXGKR2SH",
+        "HostId": "bijZR+QDGfOnFN5nypLCIg+nVuGiWHF6fzW7Tm6HQUP6d5hs2luwra47CvxjCkyHieD9DxnZ32k=",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amz-id-2": "bijZR+QDGfOnFN5nypLCIg+nVuGiWHF6fzW7Tm6HQUP6d5hs2luwra47CvxjCkyHieD9DxnZ32k=",
+            "x-amz-request-id": "R0EQ83DYSXGKR2SH",
+            "date": "Sun, 23 Aug 2026 13:02:14 GMT",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "server": "AmazonS3"
+        },
+        "RetryAttempts": 0
+    },
+    "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::bad-bucket-54321/*\"},{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::798094440826:user/audit-user\"},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::bad-bucket-54321/*\"}]}"
+}
