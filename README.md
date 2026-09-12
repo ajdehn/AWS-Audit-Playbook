@@ -37,8 +37,9 @@ This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) foun
    pip install -U auditops
    ```
 5. Create an IAM user:
-  * Create an IAM user in the AWS management console.
+  * Option 1: Create an IAM user in your AWS Account:
     * The user needs [Security Audit](https://docs.aws.amazon.com/aws-managed-policy/latest/reference/SecurityAudit.html) permissions.
+  * Option 2: If you don't have an AWS account, enter your email into the form on [training.itauditguy.com](https://training.itauditguy.com/). This will send you credentials to an IAM user in a Sandbox AWS environment.
 6. Configure the AWS CLI
   * Create an access key for the IAM user created in the previous step: [AWS Docs](https://docs.aws.amazon.com/keyspaces/latest/devguide/create.keypair.html)
     * NOTE: Configure the access key on your local machine using the 'aws configure' command [Video Tutorial](https://youtu.be/RLx5qVZSTyE?si=7fqyxFzThDaB-mGQ).
