@@ -7,7 +7,7 @@ The AWS Audit Playbook is written and maintained by [AJ Dehn](https://www.linked
 3. Improve standardization and cloud security outcomes through high-quality audits.
 
 ## Project Overview
-- [Test Library](./test_library/): Explanation of how to perform audit tests on various AWS services. Each test includes a test description, an example risk, and detailed test procedures with links to the [boto3](https://docs.aws.amazon.com/boto3/latest/) documentation.
+- [Test Library](./test_library/): Explanation of how to perform audit testing on various AWS services. Each test includes a test description, an example risk, and detailed test procedures with links to the [boto3](https://docs.aws.amazon.com/boto3/latest/) documentation.
 - [Evidence Library](./evidence_library/): Example audit evidence generated and saved from the [AuditOps Python Library](https://pypi.org/project/auditops/).
 - Project Outputs:
    - [aws_audit_report.pdf](./evidence_library/aws_audit_report.pdf): Report generated from the  can easily be shared with auditors, regulators, and customers (as long as the audit is done in "summary_mode").
