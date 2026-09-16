@@ -1,4 +1,4 @@
-## Test Description:
+## Test Description
 EC2 security groups have required tags applied and tag values are not empty.
 
 ## Example Risk

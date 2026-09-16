@@ -1,4 +1,4 @@
-## Test Description:
+## Test Description
 At least one multi-region CloudTrail trail has logging enabled.
 
 ## Example Risk

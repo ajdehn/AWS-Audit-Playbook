@@ -1,4 +1,4 @@
-## Test Description:
+## Test Description
 EBS volumes are encrypted at rest.
 
 ## Example Risk
