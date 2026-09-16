@@ -2,23 +2,19 @@
 The AWS-Audit-Playbook is written and maintained by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) founder of [AuditOps.io](https://www.auditops.io/).
 
 ## Project Goals
-- Define and provide examples of the evidence **required** to audit an AWS environment.
-- Document the testing procedures to perform a thorough audit of AWS.
-- Share an easy to use script (<25 lines of Python code) to automatically collect the required evidence.
-   - See the open-source [AuditOps Python Library](https://pypi.org/project/auditops/) for more information.
-
-## Why use this project
-- Auditors deserve consistent, high-quality evidence directly from AWS. Using this project, you will be able to share the required evidence via JSON files gathered from [boto3](https://docs.aws.amazon.com/boto3/latest/).
-- Screenshots are a waste of time for everyone, auditors included. This script takes **minutes** to gather the required evidence and generate the report.
-- Consistent, automated evidence collection is the biggest roadblock preventing us from achieving continuous assurance. Once we achieve this, GRC teams will be able to have honest, risk-driven conversations with your Engineering teams.
+1. Improve audit quality by documenting audit procedures, and sharing example evidence and audit reports.
+2. Save **both** auditors and engineers currently spent on manual evidence collection.
+3. Improve standardization and cloud security outcomes through high-quality audits.
 
 ## Project Overview
-- Documentation:
-   - [Test Library](./test_library/): Explanation of how to perform audit tests on various AWS services. Each test includes a test description, an example risk, and detailed test procedures with links to the [boto3](https://docs.aws.amazon.com/boto3/latest/) documentation.
-   - [Evidence Library](./evidence_library/): Example audit evidence generated and saved in a consistent format.
+- [Test Library](./test_library/): Explanation of how to perform audit tests on various AWS services. Each test includes a test description, an example risk, and detailed test procedures with links to the [boto3](https://docs.aws.amazon.com/boto3/latest/) documentation.
+- [Evidence Library](./evidence_library/): Example audit evidence generated and saved from the [AuditOps Python Library](https://pypi.org/project/auditops/).
 - Project Outputs:
+   - [aws_audit_report.pdf](./evidence_library/aws_audit_report.pdf): Report generated from the  can easily be shared with auditors, regulators, and customers (as long as the audit is done in "summary_mode").
    - [aws_audit_report.json](./evidence_library/aws_audit_report.json): Machine readable audit report that clearly displays the scope, test results, and configuration.
-   - [aws_audit_report.pdf](./evidence_library/aws_audit_report.pdf): Easy to read report that can easily be shared with auditors, regulators, and customers (as long as the audit is done in "summary_mode").
+- [training.itauditguy.com](https://training.itauditguy.com/): Free web app that emails you credentials to login to an AWS sandbox.
+- [AuditOps Python Library](https://pypi.org/project/auditops/): Open-source Python script that helps you automatically collect the required evidence in ~25 lines of code.
+
 
 ## Setup Instructions
 1. Install pre-requisites:
