@@ -1,12 +1,12 @@
 {
     "ResponseMetadata": {
-        "RequestId": "XK38GN38B167X2TM",
-        "HostId": "2qg62YaW6jEVBaPUYgb5FFiApYZf7xk9YhGr/Z+1YAXaAcFc6wwEw5nkjggrO38V3QnLGbMRHN0=",
+        "RequestId": "AFCTQWJV3XQBY7NR",
+        "HostId": "E+bi0WCK4KTs/9c9W2ZMsS8lfFpsB2qE1uGFVxzJ1sVsHhBzKy5NGk1LnSTqIYGjJIb1mTONo5hU7hi68UWEXx7IT/gfhXWN",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "x-amz-id-2": "2qg62YaW6jEVBaPUYgb5FFiApYZf7xk9YhGr/Z+1YAXaAcFc6wwEw5nkjggrO38V3QnLGbMRHN0=",
-            "x-amz-request-id": "XK38GN38B167X2TM",
-            "date": "Tue, 28 Apr 2026 21:28:44 GMT",
+            "x-amz-id-2": "E+bi0WCK4KTs/9c9W2ZMsS8lfFpsB2qE1uGFVxzJ1sVsHhBzKy5NGk1LnSTqIYGjJIb1mTONo5hU7hi68UWEXx7IT/gfhXWN",
+            "x-amz-request-id": "AFCTQWJV3XQBY7NR",
+            "date": "Sun, 23 Aug 2026 13:02:15 GMT",
             "transfer-encoding": "chunked",
             "server": "AmazonS3"
         },
@@ -21,7 +21,7 @@
                 "BucketKeyEnabled": true,
                 "BlockedEncryptionTypes": {
                     "EncryptionType": [
-                        "NONE"
+                        "SSE-C"
                     ]
                 }
             }

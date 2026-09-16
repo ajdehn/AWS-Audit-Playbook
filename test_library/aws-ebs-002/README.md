@@ -1,5 +1,5 @@
 ## Test Description
-EBS volumes are encrypted.
+EBS volumes are encrypted at rest.
 
 ## Example Risk
 An EBS volume is created without encryption and contains sensitive data. The volume is later accessed through a snapshot, backup process, or underlying infrastructure issue, resulting in loss of unencrypted data.

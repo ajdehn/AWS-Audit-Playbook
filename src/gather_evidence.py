@@ -13,45 +13,6 @@ def save_audit_evidence(evidence_client, in_scope_regions):
     save_eventbridge_evidence(evidence_client, in_scope_regions)
     save_ec2_evidence(evidence_client, in_scope_regions)
 
-# NOTE: Consider making these calls concurrently to speed up the evidence collection
-def save_s3_evidence(evidence_client):
-    print("Saving S3 evidence.")
-
-    # NOTE: s3_client is used to avoid creating multiple AWS clients.
-    s3_client = evidence_client.session.client("s3")
-
-    # Obtain a list of buckets.
-    buckets = evidence_client.get_aws("s3/buckets.json", client=s3_client, method="list_buckets")
-
-    # Save evidence related to each S3 bucket.
-    for bucket in buckets.get("Buckets", []):
-        bucket_name = bucket['Name']
-        # Save each bucket's encryption settings.
-        evidence_client.get_aws(
-            f"s3/buckets/{bucket_name}/encryption.json", client=s3_client,
-            method="get_bucket_encryption", method_kwargs={"Bucket": bucket_name},
-            not_found_codes=["ServerSideEncryptionConfigurationNotFoundError"]
-        )
-        # Save bucket's public access block settings.
-        evidence_client.get_aws(
-            f"s3/buckets/{bucket_name}/public_access_block.json", client=s3_client,
-            method="get_public_access_block", method_kwargs={"Bucket": bucket_name},
-            not_found_codes=["NoSuchPublicAccessBlockConfiguration"]
-        )
-        # Save bucket's tags.
-        evidence_client.get_aws(
-            f"s3/buckets/{bucket_name}/tags.json", client=s3_client,
-            method="get_bucket_tagging", method_kwargs={"Bucket": bucket_name},
-            not_found_codes=["NoSuchTagSet"]
-        )
-        # Save bucket policy
-        evidence_client.get_aws(
-            f"s3/buckets/{bucket_name}/bucket_policy.json",
-            client=s3_client,
-            method="get_bucket_policy",
-            method_kwargs={"Bucket": bucket_name},
-            not_found_codes=["NoSuchBucketPolicy"]
-        )  
 
 def save_iam_evidence(evidence_client):
     print('Gathering IAM evidence')
