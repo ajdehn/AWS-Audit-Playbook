@@ -1,7 +1,5 @@
-## Test Overview:
-**Test ID:** aws-cloudtrail-001
-**Test Description:** At least one multi-region CloudTrail trail has logging enabled.
-**Risk Rating:** High
+## Test Description:
+At least one multi-region CloudTrail trail has logging enabled.
 
 ## Example Risk
 CloudTrail is not properly configured across all regions, resulting in gaps in logging coverage. An attacker may perform actions in an unmonitored region without detection, limiting the organization’s ability to investigate security incidents and respond effectively.

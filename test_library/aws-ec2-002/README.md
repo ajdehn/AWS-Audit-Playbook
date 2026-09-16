@@ -1,5 +1,5 @@
-## Test Overview:
-**Test Description:** EC2 security groups have required tags applied and tag values are not empty.
+## Test Description:
+EC2 security groups have required tags applied and tag values are not empty.
 
 ## Example Risk
 Your AWS account has overly permissive firewall rules that are exposed to the internet. This is exploited by a malicious actor who extracts sensitive data from your AWS resources.
