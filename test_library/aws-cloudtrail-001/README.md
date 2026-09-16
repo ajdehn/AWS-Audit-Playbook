@@ -3,7 +3,7 @@
 **Test Description:** At least one multi-region CloudTrail trail has logging enabled.
 **Risk Rating:** High
 
-## Risk Scenario
+## Example Risk
 CloudTrail is not properly configured across all regions, resulting in gaps in logging coverage. An attacker may perform actions in an unmonitored region without detection, limiting the organization’s ability to investigate security incidents and respond effectively.
 
 ## Test Procedures
