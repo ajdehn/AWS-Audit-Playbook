@@ -1,5 +1,11 @@
-# About
-This playbook was written by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) founder of [AuditOps.io](https://www.auditops.io/). The goal of this project is to **standardize** evidence collection for AWS, and help auditors conduct **AWS audits, without screenshots**.
+# Author
+The AWS-Audit-Playbook is written and maintained by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) founder of [AuditOps.io](https://www.auditops.io/).
+
+## Project Goals
+- Define and provide examples of the evidence **required** to audit an AWS environment.
+- Document the testing procedures to perform a thorough audit of AWS.
+- Share an easy to use script (<25 lines of Python code) to automatically collect the required evidence.
+   - See the open-source [AuditOps Python Library](https://pypi.org/project/auditops/) for more information.
 
 ## Why use this project
 - Auditors deserve consistent, high-quality evidence directly from AWS. Using this project, you will be able to share the required evidence via JSON files gathered from [boto3](https://docs.aws.amazon.com/boto3/latest/).
