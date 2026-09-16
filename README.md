@@ -1,5 +1,5 @@
 # Author
-The AWS-Audit-Playbook is written and maintained by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) founder of [AuditOps.io](https://www.auditops.io/).
+The AWS Audit Playbook is written and maintained by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) founder of [AuditOps.io](https://www.auditops.io/).
 
 ## Project Goals
 1. Improve audit quality by documenting audit procedures, and sharing example evidence and audit reports.
