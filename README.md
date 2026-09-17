@@ -2,15 +2,15 @@
 The AWS Audit Playbook is written and maintained by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) founder of [AuditOps.io](https://www.auditops.io/).
 
 ## Project Goals
-1. Improve audit quality by sharing test procedures, example evidence, and audit reports.
-2. Save **everyone** time currently spent on manual evidence collection.
-3. Raise cloud security standards through high-quality audits.
+1. Improve audit quality by sharing test procedures, example evidence, and sample audit reports.
+2. **Eliminate** screenshots from the AWS audit process, and re-allocate that time towards risk-based discussions.
+3. Raise cloud security standards as a result of these high-quality audits.
 
 ## Project Overview
-- **Test Library (See Below)**: List of audit tests for various AWS services. Each test includes an example risk, test procedures, and links to the evidence library to allow you to easily re-perform the audit.
+- **Test Library**: Detailed explanation of audit tests for various AWS services. Each test includes an example risk, test procedures, and links to audit evidence.
 - **[Evidence Library](./evidence_library/)**: Example audit evidence generated and saved from the [AuditOps Python Library](https://pypi.org/project/auditops/).
-- **[AuditOps Python Library](https://pypi.org/project/auditops/)**: Collects the required AWS evidence in ~25 lines of code.
-- **[AWS Training Portal](https://training.itauditguy.com/)**: Allows **anyone** to login to an AWS sandbox.
+- **[AuditOps-SDK](https://pypi.org/project/auditops/)**: Open-source Python library that generates evidence, performs testing, and builds audit reports in ~25 lines of code.
+- **[AWS Training Portal](https://training.itauditguy.com/)**: Gives **everyone** a chance to login to an AWS sandbox environment.
 
 ## Project Outputs:
    - [Audit Report (PDF)](./evidence_library/aws_audit_report.pdf)
