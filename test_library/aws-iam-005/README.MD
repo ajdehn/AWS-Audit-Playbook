@@ -2,7 +2,7 @@
 AWS passwords must comply with the organization's password complexity requirements.
 
 ## Example Risk
-An engineer sets their IAM user's password as "Spring2026!". Their account is compromised and the attacker is threatening to release your company's sensitive data unless you pay a $500,000 ransom.
+An engineer sets their IAM user's password as "Fall2026!". Their account is compromised and the attacker is threatening to release your company's sensitive data unless you pay a $500,000 ransom.
 
 ## Test Procedures
 1. Obtained the AWS account password policy by calling the [get_account_password_policy()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/iam/client/get_account_password_policy.html) boto3 command. These settings are applicable to all IAM users in the account.
