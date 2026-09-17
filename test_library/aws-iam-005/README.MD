@@ -15,12 +15,7 @@ An engineer sets their IAM user's password as "Fall2026!". Their account is comp
 
 **Note:** If you want to change the default password configuration checks, please update the config file with your desired values. See example below:
 ```
-"iam_password_min_length": 20,
-"iam_password_min_complexity_types": 4,
-"iam_password_require_expiration": false,
-"iam_password_max_password_age": null,
-"iam_password_password_history": 24,
-"iam_key_max_age": 90
+aws_config.iam_minimum_password_length = 20
 ```
 
 ## Other Resources
