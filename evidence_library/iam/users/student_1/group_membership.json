@@ -1,0 +1,14 @@
+{
+    "Groups": [],
+    "ResponseMetadata": {
+        "RequestId": "36fe943b-e8ac-40a2-ae7c-eec668e7f8a4",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:03 GMT",
+            "x-amzn-requestid": "36fe943b-e8ac-40a2-ae7c-eec668e7f8a4",
+            "content-type": "text/xml",
+            "content-length": "322"
+        },
+        "RetryAttempts": 0
+    }
+}

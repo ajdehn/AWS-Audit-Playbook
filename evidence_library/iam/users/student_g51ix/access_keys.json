@@ -1,0 +1,22 @@
+{
+    "AccessKeyMetadata": [
+        {
+            "UserName": "student_g51ix",
+            "AccessKeyId": "AKIA3TURCXF5GYLYQU7E",
+            "Status": "Active",
+            "CreateDate": "2026-08-27 20:53:26+00:00"
+        }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "67497139-d6b6-4a75-8b79-0fd8c66155a5",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:06 GMT",
+            "x-amzn-requestid": "67497139-d6b6-4a75-8b79-0fd8c66155a5",
+            "content-type": "text/xml",
+            "content-length": "561"
+        },
+        "RetryAttempts": 0
+    }
+}

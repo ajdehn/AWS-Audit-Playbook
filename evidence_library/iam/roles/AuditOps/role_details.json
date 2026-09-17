@@ -2,13 +2,14 @@
     "Role": {
         "Path": "/",
         "RoleName": "AuditOps",
-        "RoleId": "AROA3TURCXF5IDAWBYCE4",
+        "RoleId": "AROA3TURCXF5DZQX2MQ77",
         "Arn": "arn:aws:iam::798094440826:role/AuditOps",
-        "CreateDate": "2026-03-19 13:37:35+00:00",
+        "CreateDate": "2026-09-04 20:01:54+00:00",
         "AssumeRolePolicyDocument": {
             "Version": "2012-10-17",
             "Statement": [
                 {
+                    "Sid": "AllowTrustedAccountToAssumeRole",
                     "Effect": "Allow",
                     "Principal": {
                         "AWS": "arn:aws:iam::918184721625:root"
@@ -16,24 +17,37 @@
                     "Action": "sts:AssumeRole",
                     "Condition": {
                         "StringEquals": {
-                            "sts:ExternalId": "u5WRCEkJZ3KMW2Rzvr7P"
+                            "sts:ExternalId": "myVerySecureString1234"
                         }
                     }
                 }
             ]
         },
-        "Description": "Grant AuditOps access to perform a gap assessment.",
+        "Description": "",
         "MaxSessionDuration": 3600,
-        "RoleLastUsed": {}
+        "Tags": [
+            {
+                "Key": "Owner",
+                "Value": "DevOps"
+            },
+            {
+                "Key": "Description",
+                "Value": "Allows AuditOps to perform continuous monitoring."
+            }
+        ],
+        "RoleLastUsed": {
+            "LastUsedDate": "2026-09-16 13:00:32+00:00",
+            "Region": "us-east-1"
+        }
     },
     "ResponseMetadata": {
-        "RequestId": "3812c67a-fb92-4835-af3f-e86232bbac89",
+        "RequestId": "e50ad35d-2ec7-420c-816f-90a33ef4a460",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "date": "Mon, 11 May 2026 21:02:59 GMT",
-            "x-amzn-requestid": "3812c67a-fb92-4835-af3f-e86232bbac89",
+            "date": "Thu, 17 Sep 2026 02:10:11 GMT",
+            "x-amzn-requestid": "e50ad35d-2ec7-420c-816f-90a33ef4a460",
             "content-type": "text/xml",
-            "content-length": "1010"
+            "content-length": "1379"
         },
         "RetryAttempts": 0
     }

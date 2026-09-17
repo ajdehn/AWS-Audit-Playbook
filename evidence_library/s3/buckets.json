@@ -1,19 +1,29 @@
 {
     "ResponseMetadata": {
-        "RequestId": "J5D2K6K5QW95Z5YW",
-        "HostId": "naHgy9cS2sLHXmCjtMdqSELxAVSuOVnMVKdSIFPil5BX7LrZWS9o2ZS6cWXBK8fuBeN4ZZJJxSTHqMMxIScVwtlCpO1ZpGWe",
+        "RequestId": "SNTDQDKMXSEK432F",
+        "HostId": "iWSJYLhUTHEGYSX0Zx0/3+Z0XvNI3WWYn14ubn3sCuEOeRvF4AnsDGo/dFFhsDfy5pkyNYHgHgQ=",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "x-amz-id-2": "naHgy9cS2sLHXmCjtMdqSELxAVSuOVnMVKdSIFPil5BX7LrZWS9o2ZS6cWXBK8fuBeN4ZZJJxSTHqMMxIScVwtlCpO1ZpGWe",
-            "x-amz-request-id": "J5D2K6K5QW95Z5YW",
-            "server": "AmazonS3",
-            "date": "Sun, 23 Aug 2026 13:02:13 GMT",
+            "x-amz-id-2": "iWSJYLhUTHEGYSX0Zx0/3+Z0XvNI3WWYn14ubn3sCuEOeRvF4AnsDGo/dFFhsDfy5pkyNYHgHgQ=",
+            "x-amz-request-id": "SNTDQDKMXSEK432F",
+            "date": "Thu, 17 Sep 2026 02:00:31 GMT",
             "content-type": "application/xml",
-            "transfer-encoding": "chunked"
+            "transfer-encoding": "chunked",
+            "server": "AmazonS3"
         },
         "RetryAttempts": 0
     },
     "Buckets": [
+        {
+            "Name": "acme-co-audit-upload-bucket",
+            "CreationDate": "2026-09-01 11:35:19+00:00",
+            "BucketArn": "arn:aws:s3:::acme-co-audit-upload-bucket"
+        },
+        {
+            "Name": "acme-co-audit-upload-bucket-v3",
+            "CreationDate": "2026-09-04 20:01:39+00:00",
+            "BucketArn": "arn:aws:s3:::acme-co-audit-upload-bucket-v3"
+        },
         {
             "Name": "aws-cloudtrail-logs-798094440826-aa81e64c",
             "CreationDate": "2022-08-19 01:45:55+00:00",
@@ -25,6 +35,21 @@
             "BucketArn": "arn:aws:s3:::bad-bucket-54321"
         },
         {
+            "Name": "cf-templates-1b32w71fmynjo-eu-west-1",
+            "CreationDate": "2026-08-28 12:56:03+00:00",
+            "BucketArn": "arn:aws:s3:::cf-templates-1b32w71fmynjo-eu-west-1"
+        },
+        {
+            "Name": "cf-templates-1b32w71fmynjo-eu-west-2",
+            "CreationDate": "2026-08-28 20:43:11+00:00",
+            "BucketArn": "arn:aws:s3:::cf-templates-1b32w71fmynjo-eu-west-2"
+        },
+        {
+            "Name": "cf-templates-1b32w71fmynjo-us-east-1",
+            "CreationDate": "2026-08-25 20:28:58+00:00",
+            "BucketArn": "arn:aws:s3:::cf-templates-1b32w71fmynjo-us-east-1"
+        },
+        {
             "Name": "config-bucket-798094440826",
             "CreationDate": "2026-04-18 12:05:10+00:00",
             "BucketArn": "arn:aws:s3:::config-bucket-798094440826"
@@ -33,6 +58,11 @@
             "Name": "itauditguy",
             "CreationDate": "2022-11-27 20:54:44+00:00",
             "BucketArn": "arn:aws:s3:::itauditguy"
+        },
+        {
+            "Name": "itauditguy-evidence-upload-bucket",
+            "CreationDate": "2026-09-04 11:39:11+00:00",
+            "BucketArn": "arn:aws:s3:::itauditguy-evidence-upload-bucket"
         },
         {
             "Name": "taylor-swift-secret-vault",

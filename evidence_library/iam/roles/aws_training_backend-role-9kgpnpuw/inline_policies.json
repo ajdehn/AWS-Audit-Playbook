@@ -1,0 +1,16 @@
+{
+    "PolicyNames": [
+        "aws_training_policy"
+    ],
+    "ResponseMetadata": {
+        "RequestId": "680f1088-b522-4a9d-b022-31bbe52499e9",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:14 GMT",
+            "x-amzn-requestid": "680f1088-b522-4a9d-b022-31bbe52499e9",
+            "content-type": "text/xml",
+            "content-length": "384"
+        },
+        "RetryAttempts": 0
+    }
+}

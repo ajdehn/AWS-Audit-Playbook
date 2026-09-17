@@ -1,0 +1,28 @@
+{
+    "RoleName": "AuditOps",
+    "PolicyName": "AuditOpsEvidenceUpload",
+    "PolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Action": [
+                    "s3:PutObject"
+                ],
+                "Resource": "arn:aws:s3:::acme-co-audit-upload-bucket-v3/*",
+                "Effect": "Allow",
+                "Sid": "AllowAuditEvidenceUpload"
+            }
+        ]
+    },
+    "ResponseMetadata": {
+        "RequestId": "a1fe4b79-d16f-4134-becd-86ea24f48ffa",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:11 GMT",
+            "x-amzn-requestid": "a1fe4b79-d16f-4134-becd-86ea24f48ffa",
+            "content-type": "text/xml",
+            "content-length": "650"
+        },
+        "RetryAttempts": 0
+    }
+}

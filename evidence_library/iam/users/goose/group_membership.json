@@ -6,23 +6,16 @@
             "GroupId": "AGPA3TURCXF5EXZAMCECQ",
             "Arn": "arn:aws:iam::798094440826:group/Student-Group",
             "CreateDate": "2023-01-29 16:53:21+00:00"
-        },
-        {
-            "Path": "/",
-            "GroupName": "Read-Only-Group",
-            "GroupId": "AGPA3TURCXF5HTMVQJYWW",
-            "Arn": "arn:aws:iam::798094440826:group/Read-Only-Group",
-            "CreateDate": "2023-01-29 17:53:49+00:00"
         }
     ],
     "ResponseMetadata": {
-        "RequestId": "b458d32b-81a9-493f-a6d9-6374dfa90e74",
+        "RequestId": "b8a8926a-be1f-4aa4-a2da-1b5bcc979e58",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "date": "Mon, 11 May 2026 21:02:57 GMT",
-            "x-amzn-requestid": "b458d32b-81a9-493f-a6d9-6374dfa90e74",
+            "date": "Thu, 17 Sep 2026 02:10:00 GMT",
+            "x-amzn-requestid": "b8a8926a-be1f-4aa4-a2da-1b5bcc979e58",
             "content-type": "text/xml",
-            "content-length": "873"
+            "content-length": "602"
         },
         "RetryAttempts": 0
     }

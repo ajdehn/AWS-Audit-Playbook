@@ -1,0 +1,19 @@
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "AWSLambdaBasicExecutionRole-f73d8ad5-4f0a-468d-b052-f9932afb9237",
+            "PolicyArn": "arn:aws:iam::798094440826:policy/service-role/AWSLambdaBasicExecutionRole-f73d8ad5-4f0a-468d-b052-f9932afb9237"
+        }
+    ],
+    "ResponseMetadata": {
+        "RequestId": "3b6887b3-df36-490f-8fc5-8d1565d65f92",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:15 GMT",
+            "x-amzn-requestid": "3b6887b3-df36-490f-8fc5-8d1565d65f92",
+            "content-type": "text/xml",
+            "content-length": "654"
+        },
+        "RetryAttempts": 0
+    }
+}

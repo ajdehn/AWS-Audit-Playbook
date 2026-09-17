@@ -1,0 +1,14 @@
+{
+    "AttachedPolicies": [],
+    "ResponseMetadata": {
+        "RequestId": "08cc3e4d-d820-44b6-8ee7-5acf0cd9b4ec",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:10 GMT",
+            "x-amzn-requestid": "08cc3e4d-d820-44b6-8ee7-5acf0cd9b4ec",
+            "content-type": "text/xml",
+            "content-length": "360"
+        },
+        "RetryAttempts": 0
+    }
+}

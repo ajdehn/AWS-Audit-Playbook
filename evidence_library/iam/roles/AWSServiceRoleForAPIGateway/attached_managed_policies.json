@@ -1,0 +1,19 @@
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "APIGatewayServiceRolePolicy",
+            "PolicyArn": "arn:aws:iam::aws:policy/aws-service-role/APIGatewayServiceRolePolicy"
+        }
+    ],
+    "ResponseMetadata": {
+        "RequestId": "d79de093-1aeb-4208-90d6-1f91c83cedb6",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:13 GMT",
+            "x-amzn-requestid": "d79de093-1aeb-4208-90d6-1f91c83cedb6",
+            "content-type": "text/xml",
+            "content-length": "575"
+        },
+        "RetryAttempts": 0
+    }
+}

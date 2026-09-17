@@ -1,0 +1,18 @@
+{
+    "LoginProfile": {
+        "UserName": "student_2",
+        "CreateDate": "2026-05-23 14:35:54+00:00",
+        "PasswordResetRequired": false
+    },
+    "ResponseMetadata": {
+        "RequestId": "bb5f0572-c756-4a60-8738-0071ad4ea263",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:03 GMT",
+            "x-amzn-requestid": "bb5f0572-c756-4a60-8738-0071ad4ea263",
+            "content-type": "text/xml",
+            "content-length": "450"
+        },
+        "RetryAttempts": 0
+    }
+}

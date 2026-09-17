@@ -1,0 +1,29 @@
+{
+    "ResponseMetadata": {
+        "RequestId": "XSKFTERENFY0GXNM",
+        "HostId": "KI2ouJiauELSThjdyBcV98sPl0i0+VkWvilcVtEx2dvkaFm3alQ/7JUnMix+EymrJRtYvqemhCOU5PjpFT0KQiTEydoZru+o",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amz-id-2": "KI2ouJiauELSThjdyBcV98sPl0i0+VkWvilcVtEx2dvkaFm3alQ/7JUnMix+EymrJRtYvqemhCOU5PjpFT0KQiTEydoZru+o",
+            "x-amz-request-id": "XSKFTERENFY0GXNM",
+            "date": "Thu, 17 Sep 2026 02:00:36 GMT",
+            "transfer-encoding": "chunked",
+            "server": "AmazonS3"
+        },
+        "RetryAttempts": 0
+    },
+    "TagSet": [
+        {
+            "Key": "Owner",
+            "Value": "DevOps"
+        },
+        {
+            "Key": "Description",
+            "Value": "Stores audit reports and supporting evidence."
+        },
+        {
+            "Key": "Classification",
+            "Value": "Confidential"
+        }
+    ]
+}

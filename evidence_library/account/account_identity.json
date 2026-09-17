@@ -1,0 +1,17 @@
+{
+    "UserId": "AIDA3TURCXF5P4PN4Y2AC",
+    "Account": "798094440826",
+    "Arn": "arn:aws:iam::798094440826:user/student_gmhci",
+    "ResponseMetadata": {
+        "RequestId": "5a10cfcd-dc9c-459a-a439-d55083a241ae",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amzn-requestid": "5a10cfcd-dc9c-459a-a439-d55083a241ae",
+            "x-amz-sts-extended-request-id": "MTp1cy1lYXN0LTE6UzoxNzg5NjEwNDEyODQ5OlI6M1BzUm9LNlY=",
+            "content-type": "text/xml",
+            "content-length": "410",
+            "date": "Thu, 17 Sep 2026 02:00:12 GMT"
+        },
+        "RetryAttempts": 0
+    }
+}

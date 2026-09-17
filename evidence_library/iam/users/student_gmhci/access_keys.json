@@ -1,0 +1,22 @@
+{
+    "AccessKeyMetadata": [
+        {
+            "UserName": "student_gmhci",
+            "AccessKeyId": "AKIA3TURCXF5OVZYYQZT",
+            "Status": "Active",
+            "CreateDate": "2026-09-15 18:26:14+00:00"
+        }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "05046d09-3658-42c3-865f-47ac427c0c5f",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:07 GMT",
+            "x-amzn-requestid": "05046d09-3658-42c3-865f-47ac427c0c5f",
+            "content-type": "text/xml",
+            "content-length": "561"
+        },
+        "RetryAttempts": 0
+    }
+}

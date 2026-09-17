@@ -1,0 +1,18 @@
+{
+    "LoginProfile": {
+        "UserName": "student_cetsa",
+        "CreateDate": "2026-08-27 21:16:10+00:00",
+        "PasswordResetRequired": false
+    },
+    "ResponseMetadata": {
+        "RequestId": "a670687f-6a17-4ecb-bcd0-d730b1a69b38",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:06 GMT",
+            "x-amzn-requestid": "a670687f-6a17-4ecb-bcd0-d730b1a69b38",
+            "content-type": "text/xml",
+            "content-length": "454"
+        },
+        "RetryAttempts": 0
+    }
+}

@@ -1,0 +1,72 @@
+{
+    "RoleName": "aws_training_backend-role-9kgpnpuw",
+    "PolicyName": "aws_training_policy",
+    "PolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "CreateStudentUsers",
+                "Effect": "Allow",
+                "Action": [
+                    "iam:CreateUser",
+                    "iam:TagUser"
+                ],
+                "Resource": "arn:aws:iam::*:user/student_*"
+            },
+            {
+                "Sid": "ReadStudentUsers",
+                "Effect": "Allow",
+                "Action": [
+                    "iam:GetUser"
+                ],
+                "Resource": "arn:aws:iam::*:user/student_*"
+            },
+            {
+                "Sid": "CreateStudentPasswords",
+                "Effect": "Allow",
+                "Action": [
+                    "iam:CreateLoginProfile",
+                    "iam:DeleteLoginProfile"
+                ],
+                "Resource": "arn:aws:iam::*:user/student_*"
+            },
+            {
+                "Sid": "AddUsersToSandboxStudentsOnly",
+                "Effect": "Allow",
+                "Action": [
+                    "iam:AddUserToGroup"
+                ],
+                "Resource": [
+                    "arn:aws:iam::*:group/Student-Group",
+                    "arn:aws:iam::*:user/student_*"
+                ]
+            },
+            {
+                "Sid": "SendEmails",
+                "Effect": "Allow",
+                "Action": [
+                    "ses:SendEmail",
+                    "ses:SendRawEmail"
+                ],
+                "Resource": "*"
+            },
+            {
+                "Sid": "LookupAccountId",
+                "Effect": "Allow",
+                "Action": "sts:GetCallerIdentity",
+                "Resource": "*"
+            }
+        ]
+    },
+    "ResponseMetadata": {
+        "RequestId": "250dd7f1-4e10-4cf0-9ca2-8edac179f027",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:14 GMT",
+            "x-amzn-requestid": "250dd7f1-4e10-4cf0-9ca2-8edac179f027",
+            "content-type": "text/xml",
+            "content-length": "2399"
+        },
+        "RetryAttempts": 0
+    }
+}

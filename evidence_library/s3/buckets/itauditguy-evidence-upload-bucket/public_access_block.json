@@ -1,0 +1,21 @@
+{
+    "ResponseMetadata": {
+        "RequestId": "XSKA86Z295B1Y6F6",
+        "HostId": "/qViq5pzmV7TSXSEh9YNH7FMvK2TO0Qpf3u0cckaBqWVqjK7F8Ky3U0R+poJoUaL5xKQESaHkRKoJHFMzlZCOHjdsr/umBml",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amz-id-2": "/qViq5pzmV7TSXSEh9YNH7FMvK2TO0Qpf3u0cckaBqWVqjK7F8Ky3U0R+poJoUaL5xKQESaHkRKoJHFMzlZCOHjdsr/umBml",
+            "x-amz-request-id": "XSKA86Z295B1Y6F6",
+            "date": "Thu, 17 Sep 2026 02:00:36 GMT",
+            "transfer-encoding": "chunked",
+            "server": "AmazonS3"
+        },
+        "RetryAttempts": 0
+    },
+    "PublicAccessBlockConfiguration": {
+        "BlockPublicAcls": true,
+        "IgnorePublicAcls": true,
+        "BlockPublicPolicy": true,
+        "RestrictPublicBuckets": true
+    }
+}

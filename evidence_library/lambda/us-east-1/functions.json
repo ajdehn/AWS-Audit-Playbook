@@ -1,14 +1,120 @@
 {
-    "Functions": [],
+    "Functions": [
+        {
+            "FunctionName": "upload_audit_evidence",
+            "FunctionArn": "arn:aws:lambda:us-east-1:798094440826:function:upload_audit_evidence",
+            "Runtime": "python3.14",
+            "Role": "arn:aws:iam::798094440826:role/service-role/upload_audit_evidence-role-ysukvesu",
+            "Handler": "lambda_function.lambda_handler",
+            "CodeSize": 299,
+            "Description": "",
+            "Timeout": 3,
+            "MemorySize": 128,
+            "LastModified": "2026-06-10T23:03:46.975+0000",
+            "CodeSha256": "R6fL2f5y9xHPTo4NojRtY2hz04DlAxWgwXm4xSMnwRQ=",
+            "Version": "$LATEST",
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "RevisionId": "0db2d4c0-0ae2-4de9-a747-42be193feb5a",
+            "PackageType": "Zip",
+            "Architectures": [
+                "x86_64"
+            ],
+            "EphemeralStorage": {
+                "Size": 512
+            },
+            "SnapStart": {
+                "ApplyOn": "None",
+                "OptimizationStatus": "Off"
+            },
+            "LoggingConfig": {
+                "LogFormat": "Text",
+                "LogGroup": "/aws/lambda/upload_audit_evidence"
+            }
+        },
+        {
+            "FunctionName": "TEST_run_python_library",
+            "FunctionArn": "arn:aws:lambda:us-east-1:798094440826:function:TEST_run_python_library",
+            "Runtime": "python3.14",
+            "Role": "arn:aws:iam::798094440826:role/service-role/TEST_run_python_library-role-2szsm8ms",
+            "Handler": "lambda_function.lambda_handler",
+            "CodeSize": 299,
+            "Description": "",
+            "Timeout": 3,
+            "MemorySize": 128,
+            "LastModified": "2026-08-30T00:38:02.000+0000",
+            "CodeSha256": "R6fL2f5y9xHPTo4NojRtY2hz04DlAxWgwXm4xSMnwRQ=",
+            "Version": "$LATEST",
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "RevisionId": "5be4c1a3-27c0-4722-b972-e11454b31569",
+            "Layers": [
+                {
+                    "Arn": "arn:aws:lambda:us-east-1:798094440826:layer:TEST-AuditOps-Lambda:1",
+                    "CodeSize": 45906977
+                }
+            ],
+            "PackageType": "Zip",
+            "Architectures": [
+                "x86_64"
+            ],
+            "EphemeralStorage": {
+                "Size": 512
+            },
+            "SnapStart": {
+                "ApplyOn": "None",
+                "OptimizationStatus": "Off"
+            },
+            "LoggingConfig": {
+                "LogFormat": "Text",
+                "LogGroup": "/aws/lambda/TEST_run_python_library"
+            }
+        },
+        {
+            "FunctionName": "aws_training_backend",
+            "FunctionArn": "arn:aws:lambda:us-east-1:798094440826:function:aws_training_backend",
+            "Runtime": "python3.14",
+            "Role": "arn:aws:iam::798094440826:role/service-role/aws_training_backend-role-9kgpnpuw",
+            "Handler": "lambda_function.lambda_handler",
+            "CodeSize": 6504,
+            "Description": "Backend for training.itauditguy.com",
+            "Timeout": 15,
+            "MemorySize": 128,
+            "LastModified": "2026-08-26T22:43:28.000+0000",
+            "CodeSha256": "jT/7AiTh9t7bqbcdFKtZ/iOoRplYFMrpx6jKOnqQ1yQ=",
+            "Version": "$LATEST",
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "RevisionId": "6621937a-e8db-4547-b725-99e326c89d41",
+            "PackageType": "Zip",
+            "Architectures": [
+                "x86_64"
+            ],
+            "EphemeralStorage": {
+                "Size": 512
+            },
+            "SnapStart": {
+                "ApplyOn": "None",
+                "OptimizationStatus": "Off"
+            },
+            "LoggingConfig": {
+                "LogFormat": "Text",
+                "LogGroup": "/aws/lambda/aws_training_backend"
+            }
+        }
+    ],
     "ResponseMetadata": {
-        "RequestId": "5f95afad-8c73-4afa-843e-cf887c496fe8",
+        "RequestId": "d16988bd-0a8c-41ca-99fe-1f9c824f95f3",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "date": "Thu, 09 Apr 2026 18:25:04 GMT",
+            "date": "Thu, 17 Sep 2026 02:00:12 GMT",
             "content-type": "application/json",
-            "content-length": "34",
+            "content-length": "4094",
             "connection": "keep-alive",
-            "x-amzn-requestid": "5f95afad-8c73-4afa-843e-cf887c496fe8"
+            "x-amzn-requestid": "d16988bd-0a8c-41ca-99fe-1f9c824f95f3"
         },
         "RetryAttempts": 0
     }

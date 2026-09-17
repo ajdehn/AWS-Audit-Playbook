@@ -2,11 +2,11 @@
     "SummaryMap": {
         "GroupPolicySizeQuota": 5120,
         "InstanceProfilesQuota": 1000,
-        "Policies": 3,
+        "Policies": 9,
         "GroupsPerUserQuota": 10,
         "InstanceProfiles": 0,
         "AttachedPoliciesPerUserQuota": 10,
-        "Users": 7,
+        "Users": 29,
         "PoliciesQuota": 1500,
         "Providers": 1,
         "AccountMFAEnabled": 1,
@@ -23,26 +23,26 @@
         "ServerCertificatesQuota": 20,
         "MFADevices": 2,
         "UserPolicySizeQuota": 2048,
-        "PolicyVersionsInUse": 16,
+        "PolicyVersionsInUse": 22,
         "ServerCertificates": 0,
-        "Roles": 17,
+        "Roles": 21,
         "RolesQuota": 1000,
         "SigningCertificatesPerUserQuota": 2,
         "MFADevicesInUse": 2,
         "RolePolicySizeQuota": 10240,
-        "AttachedPoliciesPerRoleQuota": 10,
+        "AttachedPoliciesPerRoleQuota": 20,
         "AccountAccessKeysPresent": 0,
         "AccountPasswordPresent": 1,
         "GroupsQuota": 300
     },
     "ResponseMetadata": {
-        "RequestId": "edc3ff44-0d33-43a6-be10-3f45e1f54de3",
+        "RequestId": "8c1e1b41-ac04-46b8-85e3-304b0d6408ab",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "date": "Mon, 11 May 2026 21:03:04 GMT",
-            "x-amzn-requestid": "edc3ff44-0d33-43a6-be10-3f45e1f54de3",
+            "date": "Thu, 17 Sep 2026 02:09:59 GMT",
+            "x-amzn-requestid": "8c1e1b41-ac04-46b8-85e3-304b0d6408ab",
             "content-type": "text/xml",
-            "content-length": "3484"
+            "content-length": "3485"
         },
         "RetryAttempts": 0
     }

@@ -1,17 +1,17 @@
 {
     "ResponseMetadata": {
-        "RequestId": "R0EWZ77H88A6BJ6B",
-        "HostId": "5cYXv+X6KZo0ZYvav0WmCZXiSctBYOFy/C2mJ4dAsPmQM1+H0NrvB66TwT/qxl85GazhznUkOJI=",
+        "RequestId": "1TRF7EQH9CEM5H3N",
+        "HostId": "ahYdIbz4uCvc92lsz0WFv4u2fKZ1b1YNnt+qDhnUxehPeFP4jaWLRLlslH6tquao0cXvg/vp3zFz69qc7tmgWZgn6/FzwtAj",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "x-amz-id-2": "5cYXv+X6KZo0ZYvav0WmCZXiSctBYOFy/C2mJ4dAsPmQM1+H0NrvB66TwT/qxl85GazhznUkOJI=",
-            "x-amz-request-id": "R0EWZ77H88A6BJ6B",
-            "date": "Sun, 23 Aug 2026 13:02:14 GMT",
+            "x-amz-id-2": "ahYdIbz4uCvc92lsz0WFv4u2fKZ1b1YNnt+qDhnUxehPeFP4jaWLRLlslH6tquao0cXvg/vp3zFz69qc7tmgWZgn6/FzwtAj",
+            "x-amz-request-id": "1TRF7EQH9CEM5H3N",
+            "date": "Thu, 17 Sep 2026 02:00:32 GMT",
             "content-type": "application/json",
             "transfer-encoding": "chunked",
             "server": "AmazonS3"
         },
         "RetryAttempts": 0
     },
-    "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AWSCloudTrailAclCheck20150319\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Action\":\"s3:GetBucketAcl\",\"Resource\":\"arn:aws:s3:::aws-cloudtrail-logs-798094440826-aa81e64c\",\"Condition\":{\"StringEquals\":{\"AWS:SourceArn\":\"arn:aws:cloudtrail:us-east-1:798094440826:trail/management-events\"}}},{\"Sid\":\"AWSCloudTrailWrite20150319\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::aws-cloudtrail-logs-798094440826-aa81e64c/AWSLogs/798094440826/*\",\"Condition\":{\"StringEquals\":{\"AWS:SourceArn\":\"arn:aws:cloudtrail:us-east-1:798094440826:trail/management-events\",\"s3:x-amz-acl\":\"bucket-owner-full-control\"}}},{\"Sid\":\"BlockUnencryptedTraffic\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"*\",\"Resource\":[\"arn:aws:s3:::aws-cloudtrail-logs-798094440826-aa81e64c\",\"arn:aws:s3:::aws-cloudtrail-logs-798094440826-aa81e64c/*\"],\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]}"
+    "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AWSCloudTrailAclCheck20150319\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Action\":\"s3:GetBucketAcl\",\"Resource\":\"arn:aws:s3:::aws-cloudtrail-logs-798094440826-aa81e64c\",\"Condition\":{\"StringEquals\":{\"AWS:SourceArn\":\"arn:aws:cloudtrail:us-east-1:798094440826:trail/management-events\"}}},{\"Sid\":\"AWSCloudTrailWrite20150319\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::aws-cloudtrail-logs-798094440826-aa81e64c/AWSLogs/798094440826/*\",\"Condition\":{\"StringEquals\":{\"s3:x-amz-acl\":\"bucket-owner-full-control\",\"AWS:SourceArn\":\"arn:aws:cloudtrail:us-east-1:798094440826:trail/management-events\"}}},{\"Sid\":\"BlockUnencryptedTraffic\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"*\",\"Resource\":[\"arn:aws:s3:::aws-cloudtrail-logs-798094440826-aa81e64c\",\"arn:aws:s3:::aws-cloudtrail-logs-798094440826-aa81e64c/*\"],\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]}"
 }

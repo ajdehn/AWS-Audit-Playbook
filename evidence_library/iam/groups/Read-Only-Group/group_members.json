@@ -2,20 +2,20 @@
     "Users": [
         {
             "Path": "/",
-            "UserName": "goose",
-            "UserId": "AIDA3TURCXF5KWFDYXPDC",
-            "Arn": "arn:aws:iam::798094440826:user/goose",
-            "CreateDate": "2025-11-03 00:38:00+00:00"
+            "UserName": "rooster",
+            "UserId": "AIDA3TURCXF5BERWU62JJ",
+            "Arn": "arn:aws:iam::798094440826:user/rooster",
+            "CreateDate": "2026-09-17 01:36:41+00:00"
         }
     ],
     "ResponseMetadata": {
-        "RequestId": "690cfebb-2482-4a6c-967e-33c15ae51a56",
+        "RequestId": "f36f6a4f-8c10-4ff9-974f-ac9f70ab284d",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "date": "Mon, 11 May 2026 21:02:56 GMT",
-            "x-amzn-requestid": "690cfebb-2482-4a6c-967e-33c15ae51a56",
+            "date": "Thu, 17 Sep 2026 02:10:10 GMT",
+            "x-amzn-requestid": "f36f6a4f-8c10-4ff9-974f-ac9f70ab284d",
             "content-type": "text/xml",
-            "content-length": "798"
+            "content-length": "802"
         },
         "RetryAttempts": 0
     }

@@ -1,0 +1,28 @@
+{
+    "AccessKeyMetadata": [
+        {
+            "UserName": "student_yvwos",
+            "AccessKeyId": "AKIA3TURCXF5FJDFRMLZ",
+            "Status": "Active",
+            "CreateDate": "2026-08-20 12:46:20+00:00"
+        },
+        {
+            "UserName": "student_yvwos",
+            "AccessKeyId": "AKIA3TURCXF5N3VJFM5D",
+            "Status": "Active",
+            "CreateDate": "2026-08-20 14:09:18+00:00"
+        }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "dcf88520-fe36-4a0c-9b04-dd1b2a8a153f",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:10 GMT",
+            "x-amzn-requestid": "dcf88520-fe36-4a0c-9b04-dd1b2a8a153f",
+            "content-type": "text/xml",
+            "content-length": "777"
+        },
+        "RetryAttempts": 0
+    }
+}
