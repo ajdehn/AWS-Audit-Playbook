@@ -1,0 +1,18 @@
+{
+    "EbsEncryptionByDefault": false,
+    "ResponseMetadata": {
+        "RequestId": "31f39f31-fc90-4db2-a9da-6adfcdf23268",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amzn-requestid": "31f39f31-fc90-4db2-a9da-6adfcdf23268",
+            "cache-control": "no-cache, no-store",
+            "strict-transport-security": "max-age=31536000; includeSubDomains",
+            "vary": "accept-encoding",
+            "content-type": "text/xml;charset=UTF-8",
+            "transfer-encoding": "chunked",
+            "date": "Thu, 17 Sep 2026 02:05:37 GMT",
+            "server": "AmazonEC2"
+        },
+        "RetryAttempts": 0
+    }
+}

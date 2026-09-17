@@ -1,0 +1,18 @@
+{
+    "LoginProfile": {
+        "UserName": "student_gmhci",
+        "CreateDate": "2026-09-15 01:53:55+00:00",
+        "PasswordResetRequired": false
+    },
+    "ResponseMetadata": {
+        "RequestId": "97538405-655d-4d5e-b286-4c0317c020a7",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:07 GMT",
+            "x-amzn-requestid": "97538405-655d-4d5e-b286-4c0317c020a7",
+            "content-type": "text/xml",
+            "content-length": "454"
+        },
+        "RetryAttempts": 0
+    }
+}

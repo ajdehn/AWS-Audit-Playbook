@@ -7,7 +7,8 @@
             "MultiAttachEnabled": false,
             "Throughput": 125,
             "Operator": {
-                "Managed": false
+                "Managed": false,
+                "HiddenByDefault": false
             },
             "VolumeId": "vol-0fad5b6c1c9198060",
             "Size": 8,
@@ -30,15 +31,15 @@
         }
     ],
     "ResponseMetadata": {
-        "RequestId": "895e800a-2de7-44fc-b4ed-dccae563e751",
+        "RequestId": "dade7f81-f66b-4b4c-946b-80c838a7c75a",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "x-amzn-requestid": "895e800a-2de7-44fc-b4ed-dccae563e751",
+            "x-amzn-requestid": "dade7f81-f66b-4b4c-946b-80c838a7c75a",
             "cache-control": "no-cache, no-store",
             "strict-transport-security": "max-age=31536000; includeSubDomains",
             "content-type": "text/xml;charset=UTF-8",
-            "content-length": "1121",
-            "date": "Thu, 09 Apr 2026 18:25:01 GMT",
+            "content-length": "1257",
+            "date": "Thu, 17 Sep 2026 02:00:36 GMT",
             "server": "AmazonEC2"
         },
         "RetryAttempts": 0

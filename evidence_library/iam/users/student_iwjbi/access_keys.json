@@ -1,0 +1,22 @@
+{
+    "AccessKeyMetadata": [
+        {
+            "UserName": "student_iwjbi",
+            "AccessKeyId": "AKIA3TURCXF5JHXP36GI",
+            "Status": "Active",
+            "CreateDate": "2026-08-25 01:27:38+00:00"
+        }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "09a832dc-65e5-4e7a-8dfc-173d39abff56",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:08 GMT",
+            "x-amzn-requestid": "09a832dc-65e5-4e7a-8dfc-173d39abff56",
+            "content-type": "text/xml",
+            "content-length": "561"
+        },
+        "RetryAttempts": 0
+    }
+}

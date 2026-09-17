@@ -1,0 +1,38 @@
+{
+    "Role": {
+        "Path": "/aws-service-role/ops.apigateway.amazonaws.com/",
+        "RoleName": "AWSServiceRoleForAPIGateway",
+        "RoleId": "AROA3TURCXF5ESDIEV7SW",
+        "Arn": "arn:aws:iam::798094440826:role/aws-service-role/ops.apigateway.amazonaws.com/AWSServiceRoleForAPIGateway",
+        "CreateDate": "2026-08-03 21:12:00+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "ops.apigateway.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        },
+        "Description": "The Service Linked Role is used by Amazon API Gateway.",
+        "MaxSessionDuration": 3600,
+        "RoleLastUsed": {
+            "LastUsedDate": "2026-08-03 22:23:51+00:00",
+            "Region": "us-east-1"
+        }
+    },
+    "ResponseMetadata": {
+        "RequestId": "e7c2defe-a4ed-4ff7-b24f-e44be5cc684b",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:12 GMT",
+            "x-amzn-requestid": "e7c2defe-a4ed-4ff7-b24f-e44be5cc684b",
+            "content-type": "text/xml",
+            "content-length": "1145"
+        },
+        "RetryAttempts": 0
+    }
+}

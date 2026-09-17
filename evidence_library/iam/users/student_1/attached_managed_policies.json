@@ -1,0 +1,27 @@
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "manage_personal_credentials",
+            "PolicyArn": "arn:aws:iam::798094440826:policy/manage_personal_credentials"
+        },
+        {
+            "PolicyName": "SecurityAudit",
+            "PolicyArn": "arn:aws:iam::aws:policy/SecurityAudit"
+        },
+        {
+            "PolicyName": "IAMUserChangePassword",
+            "PolicyArn": "arn:aws:iam::aws:policy/IAMUserChangePassword"
+        }
+    ],
+    "ResponseMetadata": {
+        "RequestId": "027e14b8-b347-4de7-8144-bb2770a6a160",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:02 GMT",
+            "x-amzn-requestid": "027e14b8-b347-4de7-8144-bb2770a6a160",
+            "content-type": "text/xml",
+            "content-length": "877"
+        },
+        "RetryAttempts": 0
+    }
+}

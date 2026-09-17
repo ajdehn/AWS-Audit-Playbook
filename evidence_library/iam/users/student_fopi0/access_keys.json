@@ -1,0 +1,22 @@
+{
+    "AccessKeyMetadata": [
+        {
+            "UserName": "student_fopi0",
+            "AccessKeyId": "AKIA3TURCXF5O2ZJWJ4I",
+            "Status": "Active",
+            "CreateDate": "2026-08-05 19:45:31+00:00"
+        }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "ab996695-cac4-4a06-b7c2-e300a2518c57",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:06 GMT",
+            "x-amzn-requestid": "ab996695-cac4-4a06-b7c2-e300a2518c57",
+            "content-type": "text/xml",
+            "content-length": "561"
+        },
+        "RetryAttempts": 0
+    }
+}

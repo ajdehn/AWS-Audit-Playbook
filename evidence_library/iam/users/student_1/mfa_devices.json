@@ -1,0 +1,15 @@
+{
+    "MFADevices": [],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "b8c4e4a9-c7ea-4175-8636-092ac0ff867e",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:02 GMT",
+            "x-amzn-requestid": "b8c4e4a9-c7ea-4175-8636-092ac0ff867e",
+            "content-type": "text/xml",
+            "content-length": "314"
+        },
+        "RetryAttempts": 0
+    }
+}

@@ -3,13 +3,14 @@
         {
             "Path": "/",
             "RoleName": "AuditOps",
-            "RoleId": "AROA3TURCXF5IDAWBYCE4",
+            "RoleId": "AROA3TURCXF5DZQX2MQ77",
             "Arn": "arn:aws:iam::798094440826:role/AuditOps",
-            "CreateDate": "2026-03-19 13:37:35+00:00",
+            "CreateDate": "2026-09-04 20:01:54+00:00",
             "AssumeRolePolicyDocument": {
                 "Version": "2012-10-17",
                 "Statement": [
                     {
+                        "Sid": "AllowTrustedAccountToAssumeRole",
                         "Effect": "Allow",
                         "Principal": {
                             "AWS": "arn:aws:iam::918184721625:root"
@@ -17,13 +18,13 @@
                         "Action": "sts:AssumeRole",
                         "Condition": {
                             "StringEquals": {
-                                "sts:ExternalId": "u5WRCEkJZ3KMW2Rzvr7P"
+                                "sts:ExternalId": "myVerySecureString1234"
                             }
                         }
                     }
                 ]
             },
-            "Description": "Grant AuditOps access to perform a gap assessment.",
+            "Description": "",
             "MaxSessionDuration": 3600
         },
         {
@@ -164,6 +165,27 @@
                 ]
             },
             "Description": "Allowing Inspector to call AWS services on behalf of customers",
+            "MaxSessionDuration": 3600
+        },
+        {
+            "Path": "/aws-service-role/ops.apigateway.amazonaws.com/",
+            "RoleName": "AWSServiceRoleForAPIGateway",
+            "RoleId": "AROA3TURCXF5ESDIEV7SW",
+            "Arn": "arn:aws:iam::798094440826:role/aws-service-role/ops.apigateway.amazonaws.com/AWSServiceRoleForAPIGateway",
+            "CreateDate": "2026-08-03 21:12:00+00:00",
+            "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "ops.apigateway.amazonaws.com"
+                        },
+                        "Action": "sts:AssumeRole"
+                    }
+                ]
+            },
+            "Description": "The Service Linked Role is used by Amazon API Gateway.",
             "MaxSessionDuration": 3600
         },
         {
@@ -358,6 +380,26 @@
             "MaxSessionDuration": 3600
         },
         {
+            "Path": "/service-role/",
+            "RoleName": "aws_training_backend-role-9kgpnpuw",
+            "RoleId": "AROA3TURCXF5EA3KZ7EUM",
+            "Arn": "arn:aws:iam::798094440826:role/service-role/aws_training_backend-role-9kgpnpuw",
+            "CreateDate": "2026-08-03 20:59:45+00:00",
+            "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                        },
+                        "Action": "sts:AssumeRole"
+                    }
+                ]
+            },
+            "MaxSessionDuration": 3600
+        },
+        {
             "Path": "/",
             "RoleName": "Goose_temp_admin_access",
             "RoleId": "AROA3TURCXF5LJSI2ERVM",
@@ -377,16 +419,56 @@
             },
             "Description": "This role allows Goose to \"checkout\" Administrator access.",
             "MaxSessionDuration": 3600
+        },
+        {
+            "Path": "/service-role/",
+            "RoleName": "TEST_run_python_library-role-2szsm8ms",
+            "RoleId": "AROA3TURCXF5ARHQRBJOP",
+            "Arn": "arn:aws:iam::798094440826:role/service-role/TEST_run_python_library-role-2szsm8ms",
+            "CreateDate": "2026-08-30 00:36:50+00:00",
+            "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                        },
+                        "Action": "sts:AssumeRole"
+                    }
+                ]
+            },
+            "MaxSessionDuration": 3600
+        },
+        {
+            "Path": "/service-role/",
+            "RoleName": "upload_audit_evidence-role-ysukvesu",
+            "RoleId": "AROA3TURCXF5LEG7RMXE7",
+            "Arn": "arn:aws:iam::798094440826:role/service-role/upload_audit_evidence-role-ysukvesu",
+            "CreateDate": "2026-06-10 23:03:38+00:00",
+            "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                        },
+                        "Action": "sts:AssumeRole"
+                    }
+                ]
+            },
+            "MaxSessionDuration": 3600
         }
     ],
     "ResponseMetadata": {
-        "RequestId": "5ff3d8d9-45d1-4c95-a4bc-7583a909f78c",
+        "RequestId": "4da65c86-130c-4339-9dbb-f0750a0d6ad9",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "date": "Mon, 11 May 2026 21:02:59 GMT",
-            "x-amzn-requestid": "5ff3d8d9-45d1-4c95-a4bc-7583a909f78c",
+            "date": "Thu, 17 Sep 2026 02:10:11 GMT",
+            "x-amzn-requestid": "4da65c86-130c-4339-9dbb-f0750a0d6ad9",
             "content-type": "text/xml",
-            "content-length": "14225"
+            "content-length": "16982"
         },
         "RetryAttempts": 0
     }

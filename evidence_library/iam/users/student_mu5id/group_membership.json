@@ -1,0 +1,22 @@
+{
+    "Groups": [
+        {
+            "Path": "/",
+            "GroupName": "Student-Group",
+            "GroupId": "AGPA3TURCXF5EXZAMCECQ",
+            "Arn": "arn:aws:iam::798094440826:group/Student-Group",
+            "CreateDate": "2023-01-29 16:53:21+00:00"
+        }
+    ],
+    "ResponseMetadata": {
+        "RequestId": "b7574833-b525-4951-8d9b-26424abab5b6",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:08 GMT",
+            "x-amzn-requestid": "b7574833-b525-4951-8d9b-26424abab5b6",
+            "content-type": "text/xml",
+            "content-length": "602"
+        },
+        "RetryAttempts": 0
+    }
+}

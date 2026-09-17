@@ -1,0 +1,18 @@
+{
+    "LoginProfile": {
+        "UserName": "student_p6qiq",
+        "CreateDate": "2026-08-04 12:37:01+00:00",
+        "PasswordResetRequired": false
+    },
+    "ResponseMetadata": {
+        "RequestId": "75f6d9c7-21a4-4d91-a41a-df4eb5d42ae8",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:08 GMT",
+            "x-amzn-requestid": "75f6d9c7-21a4-4d91-a41a-df4eb5d42ae8",
+            "content-type": "text/xml",
+            "content-length": "454"
+        },
+        "RetryAttempts": 0
+    }
+}

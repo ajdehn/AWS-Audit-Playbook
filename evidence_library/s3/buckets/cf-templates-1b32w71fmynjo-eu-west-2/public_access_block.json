@@ -1,0 +1,21 @@
+{
+    "ResponseMetadata": {
+        "RequestId": "NH6EM2QJHXZPR1CC",
+        "HostId": "RNoTVgjrUgWQEA9iG13aYNZrwYEW4MlIVmnxumC0qRT+nQgajXpI+dlLKIqVpng4GAt362OsAeI=",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amz-id-2": "RNoTVgjrUgWQEA9iG13aYNZrwYEW4MlIVmnxumC0qRT+nQgajXpI+dlLKIqVpng4GAt362OsAeI=",
+            "x-amz-request-id": "NH6EM2QJHXZPR1CC",
+            "date": "Thu, 17 Sep 2026 02:00:34 GMT",
+            "transfer-encoding": "chunked",
+            "server": "AmazonS3"
+        },
+        "RetryAttempts": 0
+    },
+    "PublicAccessBlockConfiguration": {
+        "BlockPublicAcls": true,
+        "IgnorePublicAcls": true,
+        "BlockPublicPolicy": true,
+        "RestrictPublicBuckets": true
+    }
+}

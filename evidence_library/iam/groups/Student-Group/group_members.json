@@ -2,6 +2,83 @@
     "Users": [
         {
             "Path": "/",
+            "UserName": "student_cetsa",
+            "UserId": "AIDA3TURCXF5B4T2ITLSV",
+            "Arn": "arn:aws:iam::798094440826:user/student_cetsa",
+            "CreateDate": "2026-08-27 21:16:09+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "student_p6qiq",
+            "UserId": "AIDA3TURCXF5BHJB4FHFJ",
+            "Arn": "arn:aws:iam::798094440826:user/student_p6qiq",
+            "CreateDate": "2026-08-04 12:37:01+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "student_6u7xp",
+            "UserId": "AIDA3TURCXF5C5ETEFCHB",
+            "Arn": "arn:aws:iam::798094440826:user/student_6u7xp",
+            "CreateDate": "2026-08-25 00:20:58+00:00",
+            "PasswordLastUsed": "2026-08-25 00:33:29+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "student_yvwos",
+            "UserId": "AIDA3TURCXF5CIPJOTTGP",
+            "Arn": "arn:aws:iam::798094440826:user/student_yvwos",
+            "CreateDate": "2026-08-19 21:16:16+00:00",
+            "PasswordLastUsed": "2026-08-20 12:45:31+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "student_iwjbi",
+            "UserId": "AIDA3TURCXF5D2NGGDU6Y",
+            "Arn": "arn:aws:iam::798094440826:user/student_iwjbi",
+            "CreateDate": "2026-08-25 01:21:48+00:00",
+            "PasswordLastUsed": "2026-08-25 14:36:35+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "student_48tpz",
+            "UserId": "AIDA3TURCXF5GV7J5NW6Z",
+            "Arn": "arn:aws:iam::798094440826:user/student_48tpz",
+            "CreateDate": "2026-08-04 13:52:20+00:00",
+            "PasswordLastUsed": "2026-08-04 14:11:16+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "student_4x93d",
+            "UserId": "AIDA3TURCXF5I3CQNDP55",
+            "Arn": "arn:aws:iam::798094440826:user/student_4x93d",
+            "CreateDate": "2026-08-26 22:54:54+00:00",
+            "PasswordLastUsed": "2026-08-27 01:34:54+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "student_fopi0",
+            "UserId": "AIDA3TURCXF5KAVYUGLT4",
+            "Arn": "arn:aws:iam::798094440826:user/student_fopi0",
+            "CreateDate": "2026-08-05 19:43:39+00:00",
+            "PasswordLastUsed": "2026-08-05 19:45:05+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "student_j0hry",
+            "UserId": "AIDA3TURCXF5KSDSH7MRY",
+            "Arn": "arn:aws:iam::798094440826:user/student_j0hry",
+            "CreateDate": "2026-08-26 22:32:57+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "student_g51ix",
+            "UserId": "AIDA3TURCXF5KUEHY3ZQI",
+            "Arn": "arn:aws:iam::798094440826:user/student_g51ix",
+            "CreateDate": "2026-08-27 20:24:42+00:00",
+            "PasswordLastUsed": "2026-08-27 20:48:24+00:00"
+        },
+        {
+            "Path": "/",
             "UserName": "goose",
             "UserId": "AIDA3TURCXF5KWFDYXPDC",
             "Arn": "arn:aws:iam::798094440826:user/goose",
@@ -9,20 +86,81 @@
         },
         {
             "Path": "/",
-            "UserName": "student1",
-            "UserId": "AIDA3TURCXF5NTC4AKKET",
-            "Arn": "arn:aws:iam::798094440826:user/student1",
-            "CreateDate": "2026-04-30 19:06:08+00:00"
+            "UserName": "student_1u605",
+            "UserId": "AIDA3TURCXF5LEAQIEXUO",
+            "Arn": "arn:aws:iam::798094440826:user/student_1u605",
+            "CreateDate": "2026-08-08 12:56:56+00:00",
+            "PasswordLastUsed": "2026-08-08 12:58:17+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "student_xjfjl",
+            "UserId": "AIDA3TURCXF5M5B2NB6MS",
+            "Arn": "arn:aws:iam::798094440826:user/student_xjfjl",
+            "CreateDate": "2026-08-27 20:47:26+00:00",
+            "PasswordLastUsed": "2026-08-27 20:53:28+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "student_x0oqs",
+            "UserId": "AIDA3TURCXF5MRI2QDA72",
+            "Arn": "arn:aws:iam::798094440826:user/student_x0oqs",
+            "CreateDate": "2026-08-26 02:06:15+00:00",
+            "PasswordLastUsed": "2026-08-26 02:07:10+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "student_b12bs",
+            "UserId": "AIDA3TURCXF5MVBZ4S5JL",
+            "Arn": "arn:aws:iam::798094440826:user/student_b12bs",
+            "CreateDate": "2026-08-27 01:33:06+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "student_hx8sc",
+            "UserId": "AIDA3TURCXF5NVE4TSJVZ",
+            "Arn": "arn:aws:iam::798094440826:user/student_hx8sc",
+            "CreateDate": "2026-08-04 13:49:10+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "student_mu5id",
+            "UserId": "AIDA3TURCXF5O2VDLJQI2",
+            "Arn": "arn:aws:iam::798094440826:user/student_mu5id",
+            "CreateDate": "2026-09-01 16:00:30+00:00",
+            "PasswordLastUsed": "2026-09-01 16:05:21+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "student_pdfbx",
+            "UserId": "AIDA3TURCXF5OLJQ2IN56",
+            "Arn": "arn:aws:iam::798094440826:user/student_pdfbx",
+            "CreateDate": "2026-08-04 14:10:42+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "student_2qu2i",
+            "UserId": "AIDA3TURCXF5ORBBC2QGH",
+            "Arn": "arn:aws:iam::798094440826:user/student_2qu2i",
+            "CreateDate": "2026-08-04 12:58:35+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "student_gmhci",
+            "UserId": "AIDA3TURCXF5P4PN4Y2AC",
+            "Arn": "arn:aws:iam::798094440826:user/student_gmhci",
+            "CreateDate": "2026-09-15 01:53:54+00:00",
+            "PasswordLastUsed": "2026-09-17 01:03:18+00:00"
         }
     ],
     "ResponseMetadata": {
-        "RequestId": "367b0290-6055-4892-88a1-8670033d4986",
+        "RequestId": "4cb8ca1f-9335-4a2d-9207-f130c546248c",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "date": "Mon, 11 May 2026 21:02:57 GMT",
-            "x-amzn-requestid": "367b0290-6055-4892-88a1-8670033d4986",
+            "date": "Thu, 17 Sep 2026 02:10:11 GMT",
+            "x-amzn-requestid": "4cb8ca1f-9335-4a2d-9207-f130c546248c",
             "content-type": "text/xml",
-            "content-length": "1046"
+            "content-length": "6564"
         },
         "RetryAttempts": 0
     }

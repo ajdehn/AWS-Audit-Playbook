@@ -1,0 +1,18 @@
+{
+    "LoginProfile": {
+        "UserName": "student_fopi0",
+        "CreateDate": "2026-08-05 19:43:39+00:00",
+        "PasswordResetRequired": false
+    },
+    "ResponseMetadata": {
+        "RequestId": "86785f2f-e51e-4134-bdbe-e395beb48f3a",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:06 GMT",
+            "x-amzn-requestid": "86785f2f-e51e-4134-bdbe-e395beb48f3a",
+            "content-type": "text/xml",
+            "content-length": "454"
+        },
+        "RetryAttempts": 0
+    }
+}

@@ -1,0 +1,18 @@
+{
+    "LoginProfile": {
+        "UserName": "student_x0oqs",
+        "CreateDate": "2026-08-26 02:06:15+00:00",
+        "PasswordResetRequired": false
+    },
+    "ResponseMetadata": {
+        "RequestId": "e6a59516-d6b9-431a-a7a6-859b79b8c2c0",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:09 GMT",
+            "x-amzn-requestid": "e6a59516-d6b9-431a-a7a6-859b79b8c2c0",
+            "content-type": "text/xml",
+            "content-length": "454"
+        },
+        "RetryAttempts": 0
+    }
+}

@@ -1,0 +1,37 @@
+{
+    "Role": {
+        "Path": "/service-role/",
+        "RoleName": "aws_training_backend-role-9kgpnpuw",
+        "RoleId": "AROA3TURCXF5EA3KZ7EUM",
+        "Arn": "arn:aws:iam::798094440826:role/service-role/aws_training_backend-role-9kgpnpuw",
+        "CreateDate": "2026-08-03 20:59:45+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "lambda.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        },
+        "MaxSessionDuration": 3600,
+        "RoleLastUsed": {
+            "LastUsedDate": "2026-09-17 01:06:35+00:00",
+            "Region": "us-east-1"
+        }
+    },
+    "ResponseMetadata": {
+        "RequestId": "ba9e4a06-7d53-4cb6-b384-73d01e417a9b",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:14 GMT",
+            "x-amzn-requestid": "ba9e4a06-7d53-4cb6-b384-73d01e417a9b",
+            "content-type": "text/xml",
+            "content-length": "997"
+        },
+        "RetryAttempts": 0
+    }
+}

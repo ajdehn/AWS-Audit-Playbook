@@ -1,21 +1,21 @@
 {
     "IsLogging": true,
-    "LatestDeliveryTime": "2026-08-23 07:51:31.810000-05:00",
+    "LatestDeliveryTime": "2026-09-16 21:00:17.585000-05:00",
     "StartLoggingTime": "2022-08-18 20:45:54.957000-05:00",
-    "LatestDeliveryAttemptTime": "2026-08-23T12:51:31Z",
+    "LatestDeliveryAttemptTime": "2026-09-17T02:00:17Z",
     "LatestNotificationAttemptTime": "",
     "LatestNotificationAttemptSucceeded": "",
-    "LatestDeliveryAttemptSucceeded": "2026-08-23T12:51:31Z",
+    "LatestDeliveryAttemptSucceeded": "2026-09-17T02:00:17Z",
     "TimeLoggingStarted": "2022-08-19T01:45:54Z",
     "TimeLoggingStopped": "",
     "ResponseMetadata": {
-        "RequestId": "988f32ce-0d2c-4f08-8cdd-516dc90836cd",
+        "RequestId": "6345e4fc-c318-4770-b87d-453603cfbb86",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "x-amzn-requestid": "988f32ce-0d2c-4f08-8cdd-516dc90836cd",
+            "x-amzn-requestid": "6345e4fc-c318-4770-b87d-453603cfbb86",
             "content-type": "application/x-amz-json-1.1",
-            "content-length": "341",
-            "date": "Sun, 23 Aug 2026 13:02:16 GMT"
+            "content-length": "342",
+            "date": "Thu, 17 Sep 2026 02:00:37 GMT"
         },
         "RetryAttempts": 0
     }

@@ -20,16 +20,16 @@
         "Description": "Allowing Inspector to call AWS services on behalf of customers",
         "MaxSessionDuration": 3600,
         "RoleLastUsed": {
-            "LastUsedDate": "2026-05-11 13:30:59+00:00",
+            "LastUsedDate": "2026-09-17 01:40:42+00:00",
             "Region": "us-east-1"
         }
     },
     "ResponseMetadata": {
-        "RequestId": "3b246a02-65ae-41e3-b84e-dfe48bb32c0a",
+        "RequestId": "aa6ec8e4-5c52-473c-a8ff-faa14fa4c0f6",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "date": "Mon, 11 May 2026 21:03:00 GMT",
-            "x-amzn-requestid": "3b246a02-65ae-41e3-b84e-dfe48bb32c0a",
+            "date": "Thu, 17 Sep 2026 02:10:12 GMT",
+            "x-amzn-requestid": "aa6ec8e4-5c52-473c-a8ff-faa14fa4c0f6",
             "content-type": "text/xml",
             "content-length": "1153"
         },

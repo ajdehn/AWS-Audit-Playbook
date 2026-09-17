@@ -1,0 +1,22 @@
+{
+    "AccessKeyMetadata": [
+        {
+            "UserName": "student_48tpz",
+            "AccessKeyId": "AKIA3TURCXF5N73Q5YB5",
+            "Status": "Active",
+            "CreateDate": "2026-08-04 14:54:21+00:00"
+        }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+        "RequestId": "af3252c5-5d3c-480e-b79a-4871a82bea68",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:04 GMT",
+            "x-amzn-requestid": "af3252c5-5d3c-480e-b79a-4871a82bea68",
+            "content-type": "text/xml",
+            "content-length": "561"
+        },
+        "RetryAttempts": 0
+    }
+}

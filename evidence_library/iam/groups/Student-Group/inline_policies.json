@@ -1,15 +1,15 @@
 {
     "PolicyNames": [
-        "testInlinePolicy"
+        "manage_personal_credentials"
     ],
     "ResponseMetadata": {
-        "RequestId": "b5c784d7-1007-4b23-aa34-30f610c1f366",
+        "RequestId": "9653f979-92b9-4574-8663-9f59df3ee185",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "date": "Mon, 11 May 2026 21:02:57 GMT",
-            "x-amzn-requestid": "b5c784d7-1007-4b23-aa34-30f610c1f366",
+            "date": "Thu, 17 Sep 2026 02:10:11 GMT",
+            "x-amzn-requestid": "9653f979-92b9-4574-8663-9f59df3ee185",
             "content-type": "text/xml",
-            "content-length": "385"
+            "content-length": "396"
         },
         "RetryAttempts": 0
     }

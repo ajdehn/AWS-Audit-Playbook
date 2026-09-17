@@ -1,0 +1,18 @@
+{
+    "LoginProfile": {
+        "UserName": "student_xjfjl",
+        "CreateDate": "2026-08-27 20:47:26+00:00",
+        "PasswordResetRequired": false
+    },
+    "ResponseMetadata": {
+        "RequestId": "8b6754db-d0eb-41e3-9c0d-687ab9bce4e5",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:10 GMT",
+            "x-amzn-requestid": "8b6754db-d0eb-41e3-9c0d-687ab9bce4e5",
+            "content-type": "text/xml",
+            "content-length": "454"
+        },
+        "RetryAttempts": 0
+    }
+}

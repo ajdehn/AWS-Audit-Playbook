@@ -1,0 +1,18 @@
+{
+    "LoginProfile": {
+        "UserName": "student_hx8sc",
+        "CreateDate": "2026-08-04 13:49:10+00:00",
+        "PasswordResetRequired": false
+    },
+    "ResponseMetadata": {
+        "RequestId": "f8239a00-dadc-4a0d-8576-879775b3d302",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:07 GMT",
+            "x-amzn-requestid": "f8239a00-dadc-4a0d-8576-879775b3d302",
+            "content-type": "text/xml",
+            "content-length": "454"
+        },
+        "RetryAttempts": 0
+    }
+}

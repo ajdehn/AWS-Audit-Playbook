@@ -1,0 +1,18 @@
+{
+    "LoginProfile": {
+        "UserName": "student_j0hry",
+        "CreateDate": "2026-08-26 22:32:58+00:00",
+        "PasswordResetRequired": false
+    },
+    "ResponseMetadata": {
+        "RequestId": "b79966e6-624d-47f7-9ff2-cddbcab800ba",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:08 GMT",
+            "x-amzn-requestid": "b79966e6-624d-47f7-9ff2-cddbcab800ba",
+            "content-type": "text/xml",
+            "content-length": "454"
+        },
+        "RetryAttempts": 0
+    }
+}

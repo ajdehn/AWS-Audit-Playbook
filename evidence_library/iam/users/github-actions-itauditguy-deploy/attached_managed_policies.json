@@ -1,0 +1,19 @@
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "deploy_itauditguy_website",
+            "PolicyArn": "arn:aws:iam::798094440826:policy/deploy_itauditguy_website"
+        }
+    ],
+    "ResponseMetadata": {
+        "RequestId": "984d0d66-87d5-47b4-83f8-45b568229131",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:00 GMT",
+            "x-amzn-requestid": "984d0d66-87d5-47b4-83f8-45b568229131",
+            "content-type": "text/xml",
+            "content-length": "563"
+        },
+        "RetryAttempts": 0
+    }
+}

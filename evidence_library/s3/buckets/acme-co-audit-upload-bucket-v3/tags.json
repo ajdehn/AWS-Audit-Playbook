@@ -1,0 +1,41 @@
+{
+    "ResponseMetadata": {
+        "RequestId": "1TR1S8B8WKV28FBB",
+        "HostId": "e6SNcV5lwlFBL3j7mv0wwI3HuSGXOPCO2R3MG4mSoapqo5Vq8TCvfeYCAAzQWhRA0L9EzPTyC2gqjifkvv4UzMrnJPQzrGfY",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amz-id-2": "e6SNcV5lwlFBL3j7mv0wwI3HuSGXOPCO2R3MG4mSoapqo5Vq8TCvfeYCAAzQWhRA0L9EzPTyC2gqjifkvv4UzMrnJPQzrGfY",
+            "x-amz-request-id": "1TR1S8B8WKV28FBB",
+            "date": "Thu, 17 Sep 2026 02:00:32 GMT",
+            "transfer-encoding": "chunked",
+            "server": "AmazonS3"
+        },
+        "RetryAttempts": 0
+    },
+    "TagSet": [
+        {
+            "Key": "aws:cloudformation:stack-name",
+            "Value": "auditops-continuous-monitoring-v3"
+        },
+        {
+            "Key": "aws:cloudformation:logical-id",
+            "Value": "AuditEvidenceBucket"
+        },
+        {
+            "Key": "Owner",
+            "Value": "DevOps"
+        },
+        {
+            "Key": "Description",
+            "Value": "Stores audit reports and supporting evidence."
+        },
+        {
+            "Key": "aws:cloudformation:stack-id",
+            "Value": "arn:aws:cloudformation:us-east-1:798094440826:stack/auditops-continuous-monitoring-v3/6c619dd0-a89b-11f1-9aa9-0affd607d14b"
+        },
+        {
+            "Key": "Classification",
+            "Value": "Confidential"
+        }
+    ]
+}

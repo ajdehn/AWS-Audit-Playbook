@@ -122,7 +122,8 @@
                         "BandwidthWeighting": "default"
                     },
                     "Operator": {
-                        "Managed": false
+                        "Managed": false,
+                        "HiddenByDefault": false
                     },
                     "SecondaryInterfaces": [],
                     "InstanceId": "i-00ad64923065104d8",
@@ -156,16 +157,16 @@
         }
     ],
     "ResponseMetadata": {
-        "RequestId": "5fc91c1b-bf58-436a-a9ed-12a774d4c140",
+        "RequestId": "d17ce5c8-409d-4004-b565-769a4244c150",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "x-amzn-requestid": "5fc91c1b-bf58-436a-a9ed-12a774d4c140",
+            "x-amzn-requestid": "d17ce5c8-409d-4004-b565-769a4244c150",
             "cache-control": "no-cache, no-store",
             "strict-transport-security": "max-age=31536000; includeSubDomains",
             "vary": "accept-encoding",
             "content-type": "text/xml;charset=UTF-8",
-            "content-length": "4712",
-            "date": "Thu, 09 Apr 2026 18:25:03 GMT",
+            "content-length": "4752",
+            "date": "Thu, 17 Sep 2026 02:00:36 GMT",
             "server": "AmazonEC2"
         },
         "RetryAttempts": 0

@@ -1,0 +1,34 @@
+{
+    "Role": {
+        "Path": "/service-role/",
+        "RoleName": "upload_audit_evidence-role-ysukvesu",
+        "RoleId": "AROA3TURCXF5LEG7RMXE7",
+        "Arn": "arn:aws:iam::798094440826:role/service-role/upload_audit_evidence-role-ysukvesu",
+        "CreateDate": "2026-06-10 23:03:38+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "lambda.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        },
+        "MaxSessionDuration": 3600,
+        "RoleLastUsed": {}
+    },
+    "ResponseMetadata": {
+        "RequestId": "3aa75f55-b4df-4e9f-b45b-df4a6bfb2d53",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "date": "Thu, 17 Sep 2026 02:10:15 GMT",
+            "x-amzn-requestid": "3aa75f55-b4df-4e9f-b45b-df4a6bfb2d53",
+            "content-type": "text/xml",
+            "content-length": "885"
+        },
+        "RetryAttempts": 0
+    }
+}
