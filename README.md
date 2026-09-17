@@ -2,7 +2,7 @@
 The AWS Audit Playbook is written and maintained by [AJ Dehn](https://www.linkedin.com/in/ajdehn/) founder of [AuditOps.io](https://www.auditops.io/).
 
 ## Project Goals
-1. Improve audit quality by standardizing test procedures, providing example evidence, and sharing sample audit reports.
+1. Improve audit quality by standardizing AWS audit procedures, providing example evidence, and sharing sample audit reports.
 2. **Eliminate** screenshots from the AWS audit process, and re-allocate that time towards risk-based discussions.
 3. Raise cloud security standards as a result of these high-quality audits.
 
