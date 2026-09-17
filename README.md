@@ -9,7 +9,7 @@ The AWS Audit Playbook is written and maintained by [AJ Dehn](https://www.linked
 ## Project Overview
 - **Test Library**: Detailed explanation of audit tests for various AWS services. Each test includes an example risk, test procedures, and links to audit evidence.
 - **[Evidence Library](./evidence_library/)**: Example audit evidence generated and saved from the [AuditOps Python Library](https://pypi.org/project/auditops/).
-- **[AuditOps-SDK](https://pypi.org/project/auditops/)**: Open-source Python library that generates evidence, performs testing, and builds audit reports in ~25 lines of code.
+- **[AuditOps-SDK](https://pypi.org/project/auditops/)**: Open-source Python script that generates evidence, performs testing, and builds audit reports in ~25 lines of code.
 - **[AWS Training Portal](https://training.itauditguy.com/)**: Gives **everyone** a chance to login to an AWS sandbox environment.
 
 ## Project Outputs:
