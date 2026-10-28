@@ -9,7 +9,7 @@
 ### Test Procedure
 
 1. Call the [Get an organization endpoint](https://docs.github.com/en/rest/orgs/orgs#get-an-organization) to obtain information about the GitHub organization.
-2. Save the API response: orgs/org_settings.json [(example)](../../../evidence_library/github/audit_evidence/orgs/org_settings.json).
+2. Save the API response: orgs/org_settings.json ([example](../../../evidence_library/github/audit_evidence/orgs/org_settings.json)).
 3. Inspect the evidence (orgs/org_settings.json) to determine whether the 'two_factor_requirement_enabled' property is set to 'true'.
 
 ### Remediation Guidance
