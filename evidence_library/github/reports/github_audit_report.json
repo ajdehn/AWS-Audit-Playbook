@@ -1,0 +1,261 @@
+{
+    "metadata": {
+        "scope": [
+            "Organization Name: itauditguy-training"
+        ],
+        "report_date": "2026-10-28",
+        "auditops_version": "0.1.11"
+    },
+    "test_results": [
+        {
+            "test_id": "github-org-001",
+            "is_excluded": false,
+            "is_passing": true,
+            "test_description": "GitHub organization settings require users to enable MFA.",
+            "risk_rating": 3,
+            "comments": "",
+            "test_procedures": [
+                "Called the [Get an organization](https://docs.github.com/en/rest/orgs/orgs#get-an-organization) endpoint to obtain information about the GitHub organization.",
+                "Saved the API response: orgs/org_settings.json.",
+                "Inspected the evidence (orgs/org_settings.json) to determine whether the 'two_factor_requirement_enabled' property was set to 'true'."
+            ],
+            "test_attributes": []
+        },
+        {
+            "test_id": "github-org-002",
+            "is_excluded": true,
+            "is_passing": false,
+            "test_description": "GitHub organization settings prevent members from creating public repositories.",
+            "risk_rating": 0,
+            "comments": "N/A - This setting is not enforceable on the current GitHub organization plan.",
+            "test_procedures": [
+                "Called the [Get an organization](https://docs.github.com/en/rest/orgs/orgs#get-an-organization) endpoint to obtain information about the GitHub organization.",
+                "Saved the API response: orgs/org_settings.json.",
+                "Inspected the evidence (orgs/org_settings.json) to determine whether the 'members_can_create_public_repositories' property was set to 'false'."
+            ],
+            "test_attributes": []
+        },
+        {
+            "test_id": "github-org-003",
+            "is_excluded": false,
+            "is_passing": true,
+            "test_description": "GitHub organization settings prevent members from creating public pages.",
+            "risk_rating": 0,
+            "comments": "",
+            "test_procedures": [
+                "Called the [Get an organization](https://docs.github.com/en/rest/orgs/orgs#get-an-organization) endpoint to obtain information about the GitHub organization.",
+                "Saved the API response: orgs/org_settings.json.",
+                "Inspected the evidence (orgs/org_settings.json) to determine whether the 'members_can_create_public_pages' property was set to 'false'."
+            ],
+            "test_attributes": []
+        },
+        {
+            "test_id": "github-repo-001",
+            "is_excluded": false,
+            "is_passing": false,
+            "test_description": "Repositories in the GitHub organization are set to private.",
+            "risk_rating": 0,
+            "comments": "Exceptions Noted. 6 of 6 repositories were not set to private.",
+            "test_procedures": [
+                "Called the [List organization repositories](https://docs.github.com/en/rest/repos/repos#list-organization-repositories) endpoint to obtain a list of all repositories.",
+                "Saved the API response: orgs/repos.json.",
+                "For each repository, inspected the 'private' property to determine whether the setting was set to 'true'."
+            ],
+            "test_attributes": [],
+            "samples": [
+                {
+                    "sample_id": {
+                        "repo_name": "training"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": ""
+                },
+                {
+                    "sample_id": {
+                        "repo_name": "bp-bypass"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": ""
+                },
+                {
+                    "sample_id": {
+                        "repo_name": "ruleset-bypass"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": ""
+                },
+                {
+                    "sample_id": {
+                        "repo_name": "ruleset-no-bypass"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": ""
+                },
+                {
+                    "sample_id": {
+                        "repo_name": "bp-no-bypass"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": ""
+                },
+                {
+                    "sample_id": {
+                        "repo_name": "compliant-repo"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": ""
+                }
+            ]
+        },
+        {
+            "test_id": "github-repo-002",
+            "is_excluded": false,
+            "is_passing": true,
+            "test_description": "Repositories are configured to require an approval before a pull request is merged.",
+            "risk_rating": 3,
+            "comments": "",
+            "test_procedures": [
+                "Called the [List organization repositories](https://docs.github.com/en/rest/repos/repos#list-organization-repositories) endpoint to obtain a list of all repositories.",
+                "Saved the API response: orgs/repos.json.",
+                "For each repository, performed the following steps:",
+                "- Called the [Get branch protection](https://docs.github.com/en/rest/branches/branch-protection#get-branch-protection) endpoint to obtain the classic branch protection configuration for the repository's default branch.",
+                "- Saved the API response: repos/[REPO_NAME]/branch_protection_rules.json.",
+                "- Called the [List repository rulesets](https://docs.github.com/en/rest/repos/rules#list-repository-rulesets) endpoint to obtain the rulesets for each repository.",
+                "- Saved the API response: repos/[REPO_NAME]/rulesets.json.",
+                "For each repository ruleset, performed the following steps:",
+                "- Called the [Get repository ruleset](https://docs.github.com/en/rest/repos/rules#get-repository-ruleset) endpoint to obtain the ruleset's settings.",
+                "- Saved the API response: repos/[REPO_NAME]/rulesets/[RULE_ID].json.",
+                "For each repository, inspected the classic branch protection configuration and applicable rulesets to determine whether the default branch required changes to be approved before the pull request can be merged."
+            ],
+            "test_attributes": [],
+            "samples": [
+                {
+                    "sample_id": {
+                        "repo_name": "training"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": "An active repository ruleset requires at least 1 approved pull request review before changes can be merged."
+                },
+                {
+                    "sample_id": {
+                        "repo_name": "bp-bypass"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": "Classic branch protection requires at least 1 approved pull request review before changes can be merged."
+                },
+                {
+                    "sample_id": {
+                        "repo_name": "ruleset-bypass"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": "An active repository ruleset requires at least 1 approved pull request review before changes can be merged."
+                },
+                {
+                    "sample_id": {
+                        "repo_name": "ruleset-no-bypass"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": "An active repository ruleset requires at least 1 approved pull request review before changes can be merged."
+                },
+                {
+                    "sample_id": {
+                        "repo_name": "bp-no-bypass"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": "Classic branch protection requires at least 1 approved pull request review before changes can be merged."
+                },
+                {
+                    "sample_id": {
+                        "repo_name": "compliant-repo"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": "Classic branch protection requires at least 1 approved pull request review before changes can be merged."
+                }
+            ]
+        },
+        {
+            "test_id": "github-repo-003",
+            "is_excluded": false,
+            "is_passing": false,
+            "test_description": "Repositories are configured so that administrators are subject to branch protection requirements.",
+            "risk_rating": 3,
+            "comments": "Exceptions Noted. 4 of 6 Repositories did not require administrators to comply with branch protection requirements.",
+            "test_procedures": [
+                "Called the [List organization repositories](https://docs.github.com/en/rest/repos/repos#list-organization-repositories) endpoint to obtain a list of all repositories.",
+                "Saved the API response: orgs/repos.json.",
+                "For each repository, performed the following steps:",
+                "- Called the [Get branch protection](https://docs.github.com/en/rest/branches/branch-protection#get-branch-protection) endpoint to obtain the classic branch protection configuration for the repository's default branch.",
+                "- Saved the API response: repos/[REPO_NAME]/branch_protection_rules.json.",
+                "- Called the [List repository rulesets](https://docs.github.com/en/rest/repos/rules#list-repository-rulesets) endpoint to obtain the rulesets for each repository.",
+                "- Saved the API response: repos/[REPO_NAME]/rulesets.json.",
+                "For each repository ruleset, performed the following steps:",
+                "- Called the [Get repository ruleset](https://docs.github.com/en/rest/repos/rules#get-repository-ruleset) endpoint to obtain the ruleset's settings.",
+                "- Saved the API response: repos/[REPO_NAME]/rulesets/[RULE_ID].json.",
+                "For each repository, inspected the branch protection rules and ruleset(s) to determine whether Administrators were subject to branch protection rules / ruleset requirements."
+            ],
+            "test_attributes": [],
+            "samples": [
+                {
+                    "sample_id": {
+                        "repo_name": "training"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "Administrators are not subject to the applicable branch protection requirements for the repository's default branch (main)."
+                },
+                {
+                    "sample_id": {
+                        "repo_name": "bp-bypass"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": "Classic branch protection rules for the repository's default branch (main) are enforced for administrators."
+                },
+                {
+                    "sample_id": {
+                        "repo_name": "ruleset-bypass"
+                    },
+                    "is_excluded": false,
+                    "is_passing": true,
+                    "comments": "An active repository ruleset applies to the repository's default branch (main) and does not grant the repository administrator role a bypass."
+                },
+                {
+                    "sample_id": {
+                        "repo_name": "ruleset-no-bypass"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "Administrators are not subject to the applicable branch protection requirements for the repository's default branch (main)."
+                },
+                {
+                    "sample_id": {
+                        "repo_name": "bp-no-bypass"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "Administrators are not subject to the applicable branch protection requirements for the repository's default branch (main)."
+                },
+                {
+                    "sample_id": {
+                        "repo_name": "compliant-repo"
+                    },
+                    "is_excluded": false,
+                    "is_passing": false,
+                    "comments": "Administrators are not subject to the applicable branch protection requirements for the repository's default branch (main)."
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,17 @@
+{
+    "data": {
+        "repository": {
+            "branchProtectionRules": {
+                "nodes": [
+                    {
+                        "pattern": "main",
+                        "isAdminEnforced": false,
+                        "requiredApprovingReviewCount": 1,
+                        "allowsForcePushes": false,
+                        "allowsDeletions": false
+                    }
+                ]
+            }
+        }
+    }
+}

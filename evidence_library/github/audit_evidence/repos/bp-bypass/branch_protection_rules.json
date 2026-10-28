@@ -1,0 +1,70 @@
+{
+    "url": "https://api.github.com/repos/itauditguy-training/bp-bypass/branches/main/protection",
+    "restrictions": {
+        "url": "https://api.github.com/repos/itauditguy-training/bp-bypass/branches/main/protection/restrictions",
+        "users_url": "https://api.github.com/repos/itauditguy-training/bp-bypass/branches/main/protection/restrictions/users",
+        "teams_url": "https://api.github.com/repos/itauditguy-training/bp-bypass/branches/main/protection/restrictions/teams",
+        "apps_url": "https://api.github.com/repos/itauditguy-training/bp-bypass/branches/main/protection/restrictions/apps",
+        "users": [
+            {
+                "login": "ajdehn",
+                "id": 11763672,
+                "node_id": "MDQ6VXNlcjExNzYzNjcy",
+                "avatar_url": "https://avatars.githubusercontent.com/u/11763672?v=4",
+                "gravatar_id": "",
+                "url": "https://api.github.com/users/ajdehn",
+                "html_url": "https://github.com/ajdehn",
+                "followers_url": "https://api.github.com/users/ajdehn/followers",
+                "following_url": "https://api.github.com/users/ajdehn/following{/other_user}",
+                "gists_url": "https://api.github.com/users/ajdehn/gists{/gist_id}",
+                "starred_url": "https://api.github.com/users/ajdehn/starred{/owner}{/repo}",
+                "subscriptions_url": "https://api.github.com/users/ajdehn/subscriptions",
+                "organizations_url": "https://api.github.com/users/ajdehn/orgs",
+                "repos_url": "https://api.github.com/users/ajdehn/repos",
+                "events_url": "https://api.github.com/users/ajdehn/events{/privacy}",
+                "received_events_url": "https://api.github.com/users/ajdehn/received_events",
+                "type": "User",
+                "user_view_type": "public",
+                "site_admin": false
+            }
+        ],
+        "teams": [],
+        "apps": []
+    },
+    "required_pull_request_reviews": {
+        "url": "https://api.github.com/repos/itauditguy-training/bp-bypass/branches/main/protection/required_pull_request_reviews",
+        "dismiss_stale_reviews": false,
+        "require_code_owner_reviews": false,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1
+    },
+    "required_signatures": {
+        "url": "https://api.github.com/repos/itauditguy-training/bp-bypass/branches/main/protection/required_signatures",
+        "enabled": false
+    },
+    "enforce_admins": {
+        "url": "https://api.github.com/repos/itauditguy-training/bp-bypass/branches/main/protection/enforce_admins",
+        "enabled": true
+    },
+    "required_linear_history": {
+        "enabled": false
+    },
+    "allow_force_pushes": {
+        "enabled": false
+    },
+    "allow_deletions": {
+        "enabled": false
+    },
+    "block_creations": {
+        "enabled": true
+    },
+    "required_conversation_resolution": {
+        "enabled": false
+    },
+    "lock_branch": {
+        "enabled": false
+    },
+    "allow_fork_syncing": {
+        "enabled": false
+    }
+}
