@@ -1,0 +1,60 @@
+[
+    {
+        "login": "ajdehn",
+        "id": 11763672,
+        "node_id": "MDQ6VXNlcjExNzYzNjcy",
+        "avatar_url": "https://avatars.githubusercontent.com/u/11763672?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/ajdehn",
+        "html_url": "https://github.com/ajdehn",
+        "followers_url": "https://api.github.com/users/ajdehn/followers",
+        "following_url": "https://api.github.com/users/ajdehn/following{/other_user}",
+        "gists_url": "https://api.github.com/users/ajdehn/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/ajdehn/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/ajdehn/subscriptions",
+        "organizations_url": "https://api.github.com/users/ajdehn/orgs",
+        "repos_url": "https://api.github.com/users/ajdehn/repos",
+        "events_url": "https://api.github.com/users/ajdehn/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/ajdehn/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false,
+        "permissions": {
+            "admin": true,
+            "maintain": true,
+            "push": true,
+            "triage": true,
+            "pull": true
+        },
+        "role_name": "admin"
+    },
+    {
+        "login": "ajdehn-auditops",
+        "id": 270781775,
+        "node_id": "U_kgDOECPNTw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/270781775?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/ajdehn-auditops",
+        "html_url": "https://github.com/ajdehn-auditops",
+        "followers_url": "https://api.github.com/users/ajdehn-auditops/followers",
+        "following_url": "https://api.github.com/users/ajdehn-auditops/following{/other_user}",
+        "gists_url": "https://api.github.com/users/ajdehn-auditops/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/ajdehn-auditops/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/ajdehn-auditops/subscriptions",
+        "organizations_url": "https://api.github.com/users/ajdehn-auditops/orgs",
+        "repos_url": "https://api.github.com/users/ajdehn-auditops/repos",
+        "events_url": "https://api.github.com/users/ajdehn-auditops/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/ajdehn-auditops/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false,
+        "permissions": {
+            "admin": false,
+            "maintain": false,
+            "push": true,
+            "triage": true,
+            "pull": true
+        },
+        "role_name": "write"
+    }
+]

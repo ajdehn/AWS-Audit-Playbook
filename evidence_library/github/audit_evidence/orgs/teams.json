@@ -1,0 +1,19 @@
+[
+    {
+        "name": "dev_team_test",
+        "id": 20059094,
+        "node_id": "T_kwDOEC-dHc4BMhPW",
+        "slug": "dev_team_test",
+        "description": "",
+        "privacy": "closed",
+        "notification_setting": "notifications_enabled",
+        "url": "https://api.github.com/organizations/271555869/team/20059094",
+        "html_url": "https://github.com/orgs/itauditguy-training/teams/dev_team_test",
+        "members_url": "https://api.github.com/organizations/271555869/team/20059094/members{/member}",
+        "repositories_url": "https://api.github.com/organizations/271555869/team/20059094/repos",
+        "type": "organization",
+        "organization_id": 271555869,
+        "permission": "pull",
+        "parent": null
+    }
+]
