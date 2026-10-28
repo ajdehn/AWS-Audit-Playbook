@@ -14,6 +14,10 @@ The AWS Audit Playbook is written and maintained by [AJ Dehn](https://www.linked
 
 ## Resources:
    - AWS
-      - [Example Audit Evidence](./evidence_library/aws/audit_evidence)
-      - [Example Audit Reports (PDF + JSON)](./evidence_library/aws/reports)
+      - [AWS Evidence Library](./evidence_library/aws/audit_evidence)
       - [AWS Test Library](./test_library/aws/README.md)
+      - [Example Audit Reports (PDF + JSON)](./evidence_library/aws/reports)
+   - GitHub
+      - [GitHub Evidence Library](./evidence_library/github/audit_evidence)
+      - [GitHub Test Library](./test_library/github/README.md)
+      - [Example Audit Reports (PDF + JSON)](./evidence_library/github/reports)
