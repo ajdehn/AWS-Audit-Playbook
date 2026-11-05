@@ -14,12 +14,13 @@
 
 ### Remediation Guidance
 
-Prerequisites: The user performing this remediation must have “Owner” level access to the GitHub organization.
+#### Prerequisites:
+The user performing this remediation must have “Owner” level access to the GitHub organization.
 
-Warning: Enabling this setting will block organization members from accessing repositories until they set up MFA, and it will automatically remove any outside collaborators or bot accounts that are not compliant.
+#### Warning:
+Enabling this setting will block organization members from accessing repositories until they set up MFA, and it will automatically remove any outside collaborators or bot accounts that are not compliant.
 
-Remediation Procedure:
-
+#### Remediation Procedure:
 1. [Open GitHub](https://github.com/settings/organizations) and select your organization.
 2. Navigate to “Settings” > “Authentication security”.
 3. Click the “ Require two-factor authentication for everyone” checkbox and click “Save”.
