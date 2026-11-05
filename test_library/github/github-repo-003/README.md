@@ -23,39 +23,42 @@
 
 ### Remediation Guidance
 
-Remediation Procedure:
+#### Determine which protection mechanism is appropriate:
+- **Option 1:** Apply Organization-wide ruleset
+    - Note: This requires “Owner” level access to the GitHub organization.
+- **Option 2:** Apply a Repository-level ruleset
+    - Note: Requires “Admin” level access to the repository.
+- **Option 3:** Apply a branch protection rule (Option 3)
+    - Note: Requires “Admin” level access to the repository.
 
-1. Determine which protection mechanism is appropriate:
-    - a. Recommended: Organization-wide ruleset (Step 2)
-        - i. Note: This requires “Owner” level access to the GitHub organization.
-    - b. Repository-level ruleset (Step 3) or branch protection rule (Step 4)
-        - i. Note: Requires “Admin” level access to the repository.
-2. Apply an organization-wide ruleset:
-    - a. [Open GitHub](https://github.com/settings/organizations) > select your organization > “Settings”.
-    - b. Under Code, planning, and automation, select Repository and then Rulesets.
-    - c. Create a new branch ruleset or edit an existing one.
-    - d. Set Enforcement status to Active.
-    - e. Scroll to the “Target repositories” section and configure the following:
-        - i. Repository targeting criteria: Select “All repositories”, “Selected repositories…”, or configure filtering / matching.
-    - f. Scroll to the “Target branches” section, click “Add target”, and select “Include default branch” or “Include all branches”.
-    - g. Scroll down to the “Branch rules” section and check the box for “Require a pull request before merging”.
-    - h. In the sub-options that appear, check the box for “Require approvals”.
-    - i. Set the “Required approvals” field to your organization's preferred minimum threshold (typically 1 or 2).
-    - j. Review the bypass list and remove administrator bypass permissions that conflict with the intended control. Check for applicable organization-administrator bypass permissions as well as repository-role administrator bypass permissions.
-    - k. Scroll to the bottom of the page and click “Create” to activate the rule organization-wide.
-3. Apply a ruleset to the GitHub repository:
-    - a. Open the repository and select Settings.
-    - b. Under Code, planning, and automation, select Rulesets.
-    - c. Create a new branch ruleset or edit an existing one.
-    - d. Set Enforcement status to Active.
-    - e. Configure the target branches to include the default branch.
-    - f. Configure the required branch protections.
-    - g. Review the bypass list and remove administrator bypass permissions that conflict with the intended control.
-    - h. Save the ruleset.
-4. Apply a branch protection rule to a GitHub repository:
-    - a. Open the repository and select Settings.
-    - b. Under Code, planning, and automation, select Branches.
-    - c. Create or edit the branch protection rule matching the default branch.
-    - d. Enable Include administrators, or the equivalent administrator-enforcement setting displayed by GitHub.
-    - e. Configure the required branch protections.
-    - f. Save the changes.
+#### Option 1: Apply an organization-wide ruleset:
+1. [Open GitHub](https://github.com/settings/organizations) > select your organization > “Settings”.
+2. Under Code, planning, and automation, select Repository and then Rulesets.
+3. Create a new branch ruleset or edit an existing one.
+4. Set Enforcement status to Active.
+5. Scroll to the “Target repositories” section and configure the following:
+   - Repository targeting criteria: Select “All repositories”, “Selected repositories…”, or configure filtering / matching.
+6. Scroll to the “Target branches” section, click “Add target”, and select “Include default branch” or “Include all branches”.
+7. Scroll down to the “Branch rules” section and check the box for “Require a pull request before merging”.
+8. In the sub-options that appear, check the box for “Require approvals”.
+9. Set the “Required approvals” field to your organization's preferred minimum threshold (typically 1 or 2).
+10. Review the bypass list and remove administrator bypass permissions that conflict with the intended control. Check for applicable organization-administrator bypass permissions as well as repository-role administrator bypass permissions.
+11. Scroll to the bottom of the page and click “Create” to activate the rule organization-wide.
+
+#### Option 2: Apply an organization-wide ruleset:
+1. Open GitHub and select your organization.
+2. Under Code, planning, and automation, select Repository and then Rulesets.
+3. Create a new branch ruleset or edit an existing one.
+4. Set Enforcement status to Active.
+5. Configure the target branches to include the default branch.
+6. Configure the required branch protections.
+7. Review the bypass list and remove administrator bypass permissions that conflict with the intended control.
+8. Click “Save changes” to apply the ruleset.
+
+#### Option 3: Apply a branch protection rule to a GitHub repository:
+1. Open the repository and select Settings.
+2. Under Code, planning, and automation, select Branches.
+3. Create or edit a branch protection rule matching the default branch.
+4. Enable “Include administrators”, or the equivalent administrator-enforcement setting displayed by GitHub.
+5. Configure the required branch protections.
+6. Click “Save changes” to apply the rule.
