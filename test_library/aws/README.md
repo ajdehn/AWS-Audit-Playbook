@@ -1,7 +1,7 @@
 ## AWS Test Library
 | Test ID | Test Description | Risk Rating |
 | ------------- | ------------- | ------------- |
-| [aws-cloudtrail-001](test_library/aws/aws-cloudtrail-001) | At least one multi-region CloudTrail trail has logging enabled. | High |
+| [aws-cloudtrail-001](/test_library/aws/aws-cloudtrail-001) | At least one multi-region CloudTrail trail has logging enabled. | High |
 | [aws-ebs-002](/test_library/aws-ebs-002) | EBS volumes are encrypted at rest. | Medium |
 | [aws-ebs-003](/test_library/aws-ebs-003) | EBS volumes must have required tags applied and tag values must not be empty. | Informational |
 | [aws-ec2-001](/test_library/aws-ec2-001) | EC2 instances must have required tags applied and tag values must not be empty. | Informational |
