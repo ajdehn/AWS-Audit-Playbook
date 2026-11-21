@@ -15,9 +15,9 @@
     - Save the trail's logging status: [cloudtrail/trails/[trail_name]/trail_status.json](../../../evidence_library/aws/audit_evidence/cloudtrail/trails/example-trail/trail_status.json).
     - Inspect the trail's logging status to determine whether the `IsLogging` property is set to `true`.
 4. This monitoring test is considered passing when **at least one** multi-region trail has logging enabled. If no such trail exists, note an exception.
-
  
 ### Remediation Guidance
+
 1. Open the [AWS CloudTrail Console](https://console.aws.amazon.com/cloudtrail/).
 2. Navigate to **Trails** and select an existing trail or create a new trail.
 3. Enable **Multi-region trail** to ensure events are recorded across all AWS regions.

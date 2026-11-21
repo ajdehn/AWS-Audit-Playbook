@@ -7,13 +7,11 @@
 - Risk Scenario: An EBS volume is created without encryption and contains sensitive data. The volume is later accessed through a snapshot, backup process, or underlying infrastructure issue, resulting in loss of unencrypted data.
 
 ### Test Procedures
+
 1. Perform the following for each in-scope region:
     - Obtain a list of EBS volumes by calling the [describe_volumes()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/client/describe_volumes.html) Boto3 method.
     - Save the list of EBS volumes: [ec2/[region]/volumes.json](../../../evidence_library/aws/audit_evidence/ec2/us-east-1/volumes.json).
     - For each EBS volume, inspect the `Encrypted` property to determine whether it is set to `true`.
-
-### Other Resources
-- [Example Workpaper](../../../evidence_library/aws/audit_evidence/aws_audit_report.pdf)
 
 ### Remediation Guidance
 
