@@ -1,4 +1,4 @@
-## aws-iam-001 (Root Access Key)
+## aws-iam-001 (root access key)
 
 ### Test Overview
 - **Test Description:** The AWS root account does not have any active access keys.
@@ -6,9 +6,9 @@
 - **Risk Scenario:** An attacker discovers an exposed AWS root account access key and uses it to gain unauthorized access to the organization's AWS environment, potentially resulting in data exposure, resource destruction, or service disruption.
 
 ### Test Procedure
-1. Call the [get_account_summary()](https://docs.aws.amazon.com/boto3/latest/reference/services/iam/client/get_account_summary.html) boto3 command.  
-2. Save the API response: [iam/account_summary.json](../../../evidence_library/aws/audit_evidence/iam/account_summary.json).  
-3. Inspect the evidence (iam/account_summary.json) to determine whether the `AccountAccessKeysPresent` property is set to `0`.
+1. Obtain the AWS Account Summary by calling the [get_account_summary()](https://docs.aws.amazon.com/boto3/latest/reference/services/iam/client/get_account_summary.html) Boto3 method.
+2. Save the AWS Account Summary: [iam/account_summary.json](../../../evidence_library/aws/audit_evidence/iam/account_summary.json).
+3. Inspect the AWS Account Summary to determine whether the `AccountAccessKeysPresent` property is set to `0`.
 
 ### Remediation Guidance
 
