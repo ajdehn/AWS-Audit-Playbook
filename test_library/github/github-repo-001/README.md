@@ -4,18 +4,20 @@
 
 - Test Description: Repositories in the GitHub organization are set to private.
 - Risk Level: Informational
+**Risk Scenario:** A GitHub repository is unintentionally configured as public, exposing source code to unauthorized individuals. An attacker discovers the exposed source code and uses it to identify vulnerabilities to gain unauthorized access to organizational resources.
 
 ### Test Procedure
 
-1. Call the [List organization repositories endpoint](https://docs.github.com/en/rest/repos/repos#list-organization-repositories) to obtain a list of all repositories.
-2. Save the API response: orgs/repos.json ([example](../../../evidence_library/github/audit_evidence/orgs/repos.json)).
+1. Obtain a list of repositories by calling the [List organization repositories](https://docs.github.com/en/rest/repos/repos#list-organization-repositories) GitHub endpoint.
+2. Save the list of repositories: orgs/repos.json ([example](../../../evidence_library/github/audit_evidence/orgs/repos.json)).
 3. For each repository, inspect the 'private' property to determine whether the setting is set to 'true'.
 
 ### Remediation Guidance
 
-Prerequisites: The user performing this remediation must have “Owner” level access to the GitHub organization.
+#### Prerequisites:
+The user performing this remediation must have “Owner” level access to the GitHub organization.
 
-Remediation Procedure:
+#### Remediation Procedure:
 
 1. [Open GitHub](https://github.com/settings/organizations) > select your organization > navigate to the repository that needs to be updated to private.
 2. Click the “Settings” tab in the top navigation menu.

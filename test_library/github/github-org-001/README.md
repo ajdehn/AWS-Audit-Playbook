@@ -7,10 +7,9 @@
 - Risk Scenario: A developer's GitHub password is compromised, allowing a malicious actor to view source code, exploit a vulnerability, and steal confidential data.
 
 ### Test Procedure
-
-1. Call the [Get an organization endpoint](https://docs.github.com/en/rest/orgs/orgs#get-an-organization) to obtain information about the GitHub organization.
-2. Save the API response: orgs/org_settings.json ([example](../../../evidence_library/github/audit_evidence/orgs/org_settings.json)).
-3. Inspect the evidence (orgs/org_settings.json) to determine whether the 'two_factor_requirement_enabled' property is set to 'true'.
+1. Obtain the GitHub organization metadata by calling the [Get an organization](https://docs.github.com/en/rest/orgs/orgs#get-an-organization) GitHub endpoint.
+2. Save the GitHub organization metadata: [orgs/org_settings.json](../../../evidence_library/github/audit_evidence/orgs/org_settings.json).
+3. Inspect the GitHub organization metadata to determine whether the 'two_factor_requirement_enabled' property is set to 'true'.
 
 ### Remediation Guidance
 
