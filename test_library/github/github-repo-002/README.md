@@ -22,7 +22,7 @@
 5. For each repository ruleset, perform the following steps:
     - a. Obtain the ruleset's configuration by calling the [Get a repository ruleset](https://docs.github.com/en/rest/repos/rules#get-repository-ruleset) GitHub endpoint.
     - b. Save the ruleset's configuration: repos/[REPO_NAME]/rulesets/[RULE_ID].json ([example](../../../evidence_library/github/audit_evidence/repos/compliant-repo/rulesets/19733163.json)).
-6. For each repository, inspect the classic branch protection configuration and applicable rulesets to determine whether the default branch requires changes to be approved before a pull request can be merged.
+6. For each repository, inspect the branch protection rules and rulesets to determine whether the default branch requires changes to be approved before a pull request can be merged."
 
 ### Remediation Guidance
 
