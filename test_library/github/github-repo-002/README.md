@@ -11,7 +11,7 @@
 1. Obtain a list of repositories by calling the [List organization repositories](https://docs.github.com/en/rest/repos/repos#list-organization-repositories) GitHub endpoint.
 2. Save the list of repositories: orgs/repos.json ([example](../../../evidence_library/github/audit_evidence/orgs/repos.json)).
 3. For each repository, perform the following steps:
-    - a. Checked if the repository was archived. Archived repositories were excluded from branch protection testing because they are not actively maintained.",
+    - a. Checked if the repository was archived. Archived repositories are excluded from branch protection requirements because they are not actively maintained.",
     - b. Obtain the branch protection configuration for the repository's default branch by calling the [Get branch protection](https://docs.github.com/en/rest/branches/branch-protection#get-branch-protection) GitHub endpoint.
         - i. Note: This endpoint may return a 404 response if no classic branch protection configuration exists for the default branch. This does not necessarily indicate that the branch is unprotected, as repository or organization rulesets may also apply.
     - c. Save the branch protection rules: repos/[REPO_NAME]/branch_protection_rules.json ([example](../../../evidence_library/github/audit_evidence/repos/compliant-repo/branch_protection_rules.json)).
