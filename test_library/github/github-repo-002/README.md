@@ -11,16 +11,18 @@
 1. Obtain a list of repositories by calling the [List organization repositories](https://docs.github.com/en/rest/repos/repos#list-organization-repositories) GitHub endpoint.
 2. Save the list of repositories: orgs/repos.json ([example](../../../evidence_library/github/audit_evidence/orgs/repos.json)).
 3. For each repository, perform the following steps:
-    - a. Obtain the branch protection configuration for the repository's default branch by calling the [Get branch protection](https://docs.github.com/en/rest/branches/branch-protection#get-branch-protection) GitHub endpoint.
+    - a. Checked if the repository was archived. Archived repositories were excluded from branch protection testing because they are not actively maintained.",
+
+    - b. Obtain the branch protection configuration for the repository's default branch by calling the [Get branch protection](https://docs.github.com/en/rest/branches/branch-protection#get-branch-protection) GitHub endpoint.
         - i. Note: This endpoint may return a 404 response if no classic branch protection configuration exists for the default branch. This does not necessarily indicate that the branch is unprotected, as repository or organization rulesets may also apply.
-    - b. Save the branch protection rules: repos/[REPO_NAME]/branch_protection_rules.json ([example](../../../evidence_library/github/audit_evidence/repos/compliant-repo/branch_protection_rules.json)).
-    - c. Obtain the rulesets associated with the repository by calling the [List repository rulesets](https://docs.github.com/en/rest/repos/rules#list-repository-rulesets) GitHub endpoint.
+    - c. Save the branch protection rules: repos/[REPO_NAME]/branch_protection_rules.json ([example](../../../evidence_library/github/audit_evidence/repos/compliant-repo/branch_protection_rules.json)).
+    - d. Obtain the rulesets associated with the repository by calling the [List repository rulesets](https://docs.github.com/en/rest/repos/rules#list-repository-rulesets) GitHub endpoint.
         - i. Note: The includes_parents parameter defaults to true, so the response will include rulesets defined at the organization or enterprise level that apply to the repository.
-    - d. Save rulesets associated with the repository: repos/[REPO_NAME]/rulesets.json ([example](../../../evidence_library/github/audit_evidence/repos/compliant-repo/rulesets.json)).
-4. For each repository ruleset, perform the following steps:
+    - e. Save rulesets associated with the repository: repos/[REPO_NAME]/rulesets.json ([example](../../../evidence_library/github/audit_evidence/repos/compliant-repo/rulesets.json)).
+5. For each repository ruleset, perform the following steps:
     - a. Obtain the ruleset's configuration by calling the [Get a repository ruleset](https://docs.github.com/en/rest/repos/rules#get-repository-ruleset) GitHub endpoint.
     - b. Save the ruleset's configuration: repos/[REPO_NAME]/rulesets/[RULE_ID].json ([example](../../../evidence_library/github/audit_evidence/repos/compliant-repo/rulesets/19733163.json)).
-5. For each repository, inspect the classic branch protection configuration and applicable rulesets to determine whether the default branch requires changes to be approved before a pull request can be merged.
+6. For each repository, inspect the classic branch protection configuration and applicable rulesets to determine whether the default branch requires changes to be approved before a pull request can be merged.
 
 ### Remediation Guidance
 
